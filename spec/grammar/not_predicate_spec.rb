@@ -1,0 +1,20 @@
+# Copyright 2007 Wincent Colaiuta
+# $Id$
+
+require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
+
+require 'walrus/grammar/not_predicate'
+
+module Walrus
+  class Grammar
+    
+    context 'using a "not predicate"' do
+      
+      specify 'should complain on trying to parse a nil string' do
+        lambda { NotPredicate.new('irrelevant').parse(nil) }.should_raise ArgumentError
+      end
+      
+    end
+    
+  end # class Grammar
+end # module Walrus
