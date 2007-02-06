@@ -35,17 +35,13 @@ module Walrus
       raise StandardError if @starting_symbol.nil?
       
       # TODO: may have to catch :ZeroWidthParseSuccess and others here as well
-#      begin
-        # 1. get the parse results
-        # 2. call grammar.wrap(results) and return them?
-        # in practice only symbol parslets will do the wrap lookup, I think...
-        # ironically, this hash-passing makes my ContinuationWrapper trick unnecessary (in the case of symbol parslets; may still need them in other cases... eg. when you send a ^ message to a Symbol instance when defining a production)
-        options[:grammar] = self
-        options[:rule_name] = @starting_symbol
-        @rules[@starting_symbol].parse(string, options)
-#      rescue ContinuationWrapperException => c  # a SymbolParslet wants to know what Grammar instance it belongs to
-#        c.continuation.call(self)
-#      end
+      # 1. get the parse results
+      # 2. call grammar.wrap(results) and return them?
+      # in practice only symbol parslets will do the wrap lookup, I think...
+      # ironically, this hash-passing makes my ContinuationWrapper trick unnecessary (in the case of symbol parslets; may still need them in other cases... eg. when you send a ^ message to a Symbol instance when defining a production)
+      options[:grammar] = self
+      options[:rule_name] = @starting_symbol
+      @rules[@starting_symbol].parse(string, options)
     end
     
     # Defines a rule and stores it 
