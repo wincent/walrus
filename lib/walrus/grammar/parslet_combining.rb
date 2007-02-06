@@ -16,8 +16,8 @@ module Walrus
     module ParsletCombining
       
       # Convenience method.
-      def parse(string)
-        self.to_parseable.parse(string)
+      def parse(string, options = {})
+        self.to_parseable.parse(string, options)
       end
       
       # Defines a sequence of Parslets (or ParsletCombinations).
@@ -135,6 +135,7 @@ module Walrus
       # Shorthand for ParsletCombining.produce.
       # Problem is that | and ^ appear to have the same precedence...
       # Although & has higher precedence than ^ (good)
+      # I am not sure if there's any benefit in having a method like this...
       def ^(subclass_name, *production)
         self.produce(self, subclass_name, *production)
       end

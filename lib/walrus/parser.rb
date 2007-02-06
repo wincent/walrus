@@ -182,24 +182,52 @@ module Walrus
         rule            :placeholder_parameters,        '('.skip & (:placeholder_parameter >> (',' & :placeholder_parameter).zero_or_more).optional & ')'.skip
         rule            :placeholder_parameter,         :placeholder | :ruby_expression
         
-        rule            :comment,                       '##'.skip & :comment_text.optional
-        rule            :comment_text,                  /.+$/
+        rule            :comment,                       '##'.skip & /.*$/.optional
+        production      :comment,                       :Node,  # superclass
+                                                        :lexeme # variable name to store input
         
-        # which syntax looks better? this? (all on one line)
-        rule            :comment,                       :comment_marker & :comment_text.optional ^ (:Comment, :skip, :comment_text)
+        # but given that the production is so simple, would be nice to be able to specify it on the same line:
+        rule            :comment,                       ('##'.skip & /.*$/.optional) ^ :Node
         
-        # or this? (separate line using "production" method)
-        rule            :comment,                       :comment_marker & :comment_text.optional
-        production      :comment, :Comment,             :skip, :comment_text
+        # so simple that you could almost omit the :Node and it shoudl assume it, but then we lose our text-only, non-AST support
         
-        # or this? (first option split across two lines)
-        rule            :comment,                       :comment_marker & :comment_text.optional ^ 
-                        (:Comment,                      :skip,            :comment_text)
+        # want a subclass like this, would be nice to automate its creation...
+        # eg... use rule name as a basis for generating the class name
+        # comment -> camelcase + node = CommentNode
+        class CommentNode < Node
+          def initialize(lexeme = "")
+            self.set_value_for_key(lexeme, :lexeme)
+          end
+        end
         
-        # or this? (separate "production" method, but inferring Node class); i think this is the neatest/nicest
-        # but it requires a different approach, instead of wrapping before storing the rule, we wrap at runtime in the parse method
-        rule            :comment,                       :comment_marker & :comment_text.optional
-        production      :comment,                       :skip, :comment_text
+        # clearly need a superclass, Node, that implements "set_value_for_key"
+        # should also implement value_for_key
+        # and method_missing too so that you can do CommentNode.lexeme
+        
+        # how to define abstract superclass?
+        # example: we want a StringLiteral superclass
+        # can literally define SingleQuotedLiteral etc using "production" calls
+        # but how to define the superclass?
+        # do we need a "node" method?
+        
+        # step one: define abstract superclass
+        node        :StringLiteral, :Node # creates StringLiteral class, superclass is Node
+        
+        # can then define a production: this would also create the DoubleQuotedStringLiteral class
+        production  :double_quoted_string_literal, :StringLiteral, #superclass
+                                                    :lexeme #optional (if left out just assume that any input goes in "lexeme")
+        
+        # what syntax to use when you just want to use an existing class? just omit the parameters?
+        production  :double_quoted_string_literal   # no params means "use existing class (convert to camelcase)"
+        
+        # alternatively, could I be explicit?
+        Node.subclass('StringLiteral') # creates StringLiteral class, a subclass of Node
+        production :double_quoted_string_literal, StringLiteral.subclass('DoubleQuotedStringLiteral') # create subclass of StringLiteral
+        production :double_quoted_string_literal # alt version; no params means "use existing class"
+        
+        # "subclass" should take additional optional params (lexeme names; accessors will be created for each of these
+        
+        
         
       end
     end

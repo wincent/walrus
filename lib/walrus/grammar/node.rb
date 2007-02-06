@@ -7,65 +7,34 @@ module Walrus
     # Make subclasses of this for us in Abstract Syntax Trees (ASTs).
     class Node
       
-      # :skip means that parameter won't appear in AST.
-      #
-      # Example:
-      #
-      # Given this source:
-      #
-      #   target = expression
-      #
-      # We would want to represent this using an "Assignment" Node in the AST:
-      #
-      #   Node.subclass(:Assignment, :assignment_target, :skip, :assignment_expression)
-      #
-      # Would create this class:
-      #
-      #   class Assignment < Node
-      #     attr_reader :assignment_target, :assignment_expression
-      #     def initialize(assignment_target, assignment_expression)
-      #       @assignment_target = assignment_target
-      #       @assignment_expression = assignment_expression
-      #     end
-      #   end
-      #
-      # subclass should be a Symbol
-      # args are optional symbols describing the contents of the AST
-      # :symbol would be a named attribute
-      # :Class would be a subnode class
-      # :skip means the parameter won't appear in the AST
-      #
-      # Example:
-      #
-      #
-      def subclass(subclass, *args)
+      # Dynamically creates a Node descendant.
+      # subclass_name should be a Symbol or String containing the name of the subclass to be created.
+      # namespace should be the module in which the new subclass should be created; it defaults to Walrus::Grammar.
+      # results are optional symbols expected to be parsed when initializing an instance of the subclass. If no optional symbols are provided then a default initializer is created that expects a single parameter and stores a reference to it in an instance variable called "lexeme".
+      def self.subclass(subclass_name, namespace = Walrus::Grammar, *results)
+        raise ArgumentError if subclass_name.nil?
+        
         # create new anonymous class with Node as superclass, assigning it to a constant effectively names the class
+        new_class = namespace.const_set(subclass_name.to_s, Class.new(self))
         
-        # TODO: consider here instead creating subclasses in the namespace of the Grammar subclass being defined
-        new_class = Walrus::Grammar::const_set(subclass, Class.new(Node))
-        
-        # could be really complicated, even if i use a hash for internal storage and write "value for key" accessors
-        # need also to decide how to represent lists (variable numbers of elements)
-        # eg. how would your represent this array?
-        # [ foo, bar, 1, 2 ]
-        # maybe in that case I just need to return a real array
-        <<-DEF
-        DEF
-        new_class.class_eval do
-          def initialize(args)
-            args.each { |arg| self.arg = }
-          end
+        # set up accessors
+        for result in results
+          new_class.class_eval { attr_reader result }
         end
         
-        
-        # set up accessors (using send because attr_accessor is private; in Ruby 1.9 will need to used funccall)
-        args.each { |symbol| new_class.send(:attr_accessor, symbol) }
-        
-        
-        # ideally would use attr_reader and then define private methods for setting the values
-        # or just define the initialize method define_method
-        # make methods private by calling private
-        
+        # set up initializer
+        if results.length == 0 # default case, store sole parameter in "lexeme"
+          new_class.class_eval { attr_reader :lexeme }
+          initialize_body = "def initialize(lexeme)\n"
+          initialize_body << "@lexeme = lexeme\n"
+        else
+          initialize_body = "def initialize(#{results.collect { |symbol| symbol.to_s}.join(', ')})\n"
+          for result in results
+            initialize_body << "@#{result.to_s} = #{result.to_s}\n"
+          end
+        end
+        initialize_body << "end\n"
+        new_class.class_eval initialize_body        
         new_class
       end
       

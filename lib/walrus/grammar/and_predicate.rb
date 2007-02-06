@@ -7,11 +7,11 @@ module Walrus
     require 'walrus/grammar/predicate'
     class AndPredicate < Predicate
       
-      def parse(string)
+      def parse(string, options = {})
         raise ArgumentError if string.nil?
         catch(:ZeroWidthParseSuccess) do
           begin
-            @parseable.parse(string)
+            @parseable.parse(string, options)
           rescue ParseError
             raise ParseError.new('predicate not satisfied (expected "%s") while parsing "%s"' % [@parseable.to_s, string])
           end

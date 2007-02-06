@@ -7,7 +7,11 @@ module Walrus
   end
 end
 
+require 'walrus/additions/string'
+
 class Symbol
+  
+  autoload(:ContinuationWrapperException, 'walrus/grammar/continuation_wrapper_exception')
   
   require 'walrus/grammar/parslet_combining'
   include Walrus::Grammar::ParsletCombining
@@ -19,6 +23,24 @@ class Symbol
   # Basically these SymbolParslets allow deferred evaluation of a rule or production (deferred until parsing takes place) rather than being evaluated at the time a rule or production is defined.
   def to_parseable
     Walrus::Grammar::SymbolParslet.new(self)
+  end
+  
+  # Dynamically creates a subclass named after the receiver, with parent class superclass, taking params.
+  def ^(superclass, *params)    
+    
+    # first use the continuation trick to find out what grammar (namespace) receiver is being messaged in
+    continuation  = nil
+    value         = callcc { |c| continuation = c }         
+    if value == continuation                                # first time that we're here
+      raise Walrus::Grammar::ContinuationWrapperException.new(continuation)  # give higher up a chance to help us
+    else # value is the Grammar instance passed to us from higher up using call on the continuation
+      grammar = value
+    end
+    
+    # actually create the subclass
+    grammar.const_get(superclass.to_s.to_class_name.to_s).subclass(self.to_s.to_class_name.to_s, *params)
+    self
+    
   end
   
 end # class Symbol

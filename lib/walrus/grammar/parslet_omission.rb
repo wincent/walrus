@@ -15,11 +15,11 @@ module Walrus
         @parseable = parseable
       end
       
-      def parse(string)
+      def parse(string, options = {})
         raise ArgumentError if string.nil?
         substring = ""
         catch(:ZeroWidthParseSuccess) do
-          substring = @parseable.parse(string).to_s
+          substring = @parseable.parse(string, options).to_s
         end
         
         # not enough to just return a ZeroWidthParseSuccess here; that could cause higher levels to stop parsing and in any case there'd be no way to embed the scanned substring in the symbol

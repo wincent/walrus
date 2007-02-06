@@ -19,14 +19,14 @@ module Walrus
         self.max = max
       end
       
-      def parse(string)
+      def parse(string, options = {})
         raise ArgumentError if string.nil?
         state     = ParserState.new(string)
         
         catch(:ZeroWidthParseSuccess) do          # a zero-width match is grounds for immediate abort
           while @max.nil? or state.count < @max   # try forever if max is nil; otherwise keep trying while match count < max
             begin
-              parsed = @parseable.parse(state.remainder)
+              parsed = @parseable.parse(state.remainder, options)
               state.parsed(parsed)
               state.skipped(parsed.omitted.to_s)  # in case any sub-parslets skipped tokens along the way
             rescue SkippedSubstringException => e

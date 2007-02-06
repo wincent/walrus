@@ -10,6 +10,9 @@ require 'walrus/grammar/additions/symbol'
 
 module Walrus
   class Grammar
+    
+    autoload(:Node, 'walrus/grammar/node')
+    
     context 'defining a grammar subclass' do
       
       specify 'should be able to create new Grammar subclasses on the fly' do
@@ -67,32 +70,61 @@ module Walrus
     
     context 'defining productions in a grammar' do
       
-      specify 'should be able to define a simple Node subclass' do
+      specify '"node" method should complain if new class name is nil' do
+        lambda do
+          Grammar.subclass('NodeComplainingGrammar') { node nil }
+        end.should_raise ArgumentError
+      end
+      
+      specify 'should be able to define a simple Node subclass using the "node" function' do
         
-        # single element in the Node
         Grammar.subclass('NodeGrammar1') do
-          production :MyNodeSubclass, :foo
+          node      :my_node_subclass
+          node      :my_subclass_of_a_subclass, :my_node_subclass
+          node      :my_node_class_that_takes_params, :node, :foo, :bar
         end
         
-        # two elements in the Node
-        Grammar.subclass('NodeGrammar2') do
-          production :MyNodeSubclass2, :foo, :bar
-        end
-        
-        # three elements in the Node, one of them skipped
-        Grammar.subclass('NodeGrammar3') do
-          production :MyNodeSubclass3, :foo, :skip, :bar
-        end
+        NodeGrammar1::MyNodeSubclass.to_s.should == 'Walrus::NodeGrammar1::MyNodeSubclass'
+        NodeGrammar1::MyNodeSubclass.superclass.should == Node
+        NodeGrammar1::MySubclassOfASubclass.to_s.should == 'Walrus::NodeGrammar1::MySubclassOfASubclass'
+        NodeGrammar1::MySubclassOfASubclass.superclass.should == NodeGrammar1::MyNodeSubclass
+        NodeGrammar1::MyNodeClassThatTakesParams.to_s.should == 'Walrus::NodeGrammar1::MyNodeClassThatTakesParams'
+        NodeGrammar1::MyNodeClassThatTakesParams.superclass.should == Node
+        node = NodeGrammar1::MyNodeClassThatTakesParams.new('hello', 'world')
+        node.foo.should == 'hello'
+        node.bar.should == 'world'
         
       end
       
-      specify 'should be able to use "build" to wrap up parslets and combintions of parslets' do
-      end
-      
-      specify 'should be able to use "^" as a shorthand for "build"' do
+      specify 'should be able to use "^" pseudo-operator to define production subclasses on the fly' do
+        
+        Grammar.subclass('HeMeansJavaRuntimeAPIs') do
+          rule        :foobar, 'foo' & 'bar'
+          production  :foobar ^ :node, :foo, :bar
+        end
+        
+        # can i dynamically introspect the number of arguments expected by a method?
+        # or do i have to add a class method to my generated Node subclasses that returns the number of arguments expected by new
+        # Method#arity is the answer
+        
+        
+        
       end
       
       specify 'should complain if an attempt is made to create the same production class twice' do
+        lambda do
+          Grammar.subclass('HowToGetControlOfJavaAwayFromSun') do
+            rule        :foo, 'foo'
+            production  :foo
+            production  :foo
+          end
+        end.should_raise ArgumentError
+      end
+      
+      specify 'should complain if an attempt is made to create a production for a rule that does not exist yet' do
+        lambda do
+          Grammar.subclass('GettingControlOfJavaAwayFromSun') { production :foo }
+        end.should_raise ArgumentError
       end
       
     end
@@ -173,6 +205,8 @@ module Walrus
       end
       
       specify 'should be able to parse using recursive rules (nested parentheses)' do
+        
+        # basic example
         grammar = Grammar.subclass('NestedGrammar') do
           starting_symbol :bracket_expression
           rule            :left_bracket,        '('
@@ -184,6 +218,35 @@ module Walrus
         grammar.parse('(content)').should == ['(', 'content', ')']
         grammar.parse('(content (and more content))').should == ['(', ['content ', ['(', 'and more content', ')']], ')']
         lambda { grammar.parse('(') }.should_raise ParseError
+        
+        # same example but automatically skipping the delimiting braces for clearer output
+        grammar = Grammar.subclass('NestedSkippingGrammar') do
+          starting_symbol :bracket_expression
+          rule            :bracket_expression,  '('.skip & (/[^()]+/ | :bracket_expression).zero_or_more  & ')'.skip
+        end
+        grammar.parse('()').should == []
+        grammar.parse('(content)').should == 'content'
+        grammar.parse('(content (and more content))').should == ['content ', 'and more content']
+        grammar.parse('(content (and more content)(and more))').should == ['content ', 'and more content', 'and more']
+        grammar.parse('(content (and more content)(and more)(more still))').should == ['content ', 'and more content', 'and more', 'more still']
+        grammar.parse('(content (and more content)(and more(more still)))').should == ['content ', 'and more content', ['and more', 'more still']]
+        lambda { grammar.parse('(') }.should_raise ParseError
+        
+        # note that this confusing (possible even misleading) nesting goes away if you use a proper AST
+        grammar = Grammar.subclass('NestedBracketsWithAST') do
+          starting_symbol :bracket_expression
+          rule            :bracket_expression,  '('.skip & (/[^()]+/ | :bracket_expression).zero_or_more  & ')'.skip
+          production      :bracket_expression ^ :node, :children
+        end
+        
+        grammar.parse('()').children.should == []
+        grammar.parse('(content)')#.should == 'content'
+        grammar.parse('(content (and more content))')#.should == ['content ', 'and more content']
+        grammar.parse('(content (and more content)(and more))')#.should == ['content ', 'and more content', 'and more']
+        grammar.parse('(content (and more content)(and more)(more still))')#.should == ['content ', 'and more content', 'and more', 'more still']
+        grammar.parse('(content (and more content)(and more(more still)))')#.should == ['content ', 'and more content', ['and more', 'more still']]
+        lambda { grammar.parse('(') }.should_raise ParseError
+        
       end
       
       specify 'should be able to parse using recursive rules (nested comments)' do

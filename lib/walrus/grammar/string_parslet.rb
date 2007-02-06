@@ -18,7 +18,7 @@ module Walrus
         self.expected_string = string
       end
       
-      def parse(string)
+      def parse(string, options = {})
         raise ArgumentError if string.nil?
         chars = StringEnumerator.new(string)
         parsed = ''

@@ -9,7 +9,7 @@ module Walrus
   module CamelCase
     
     # Converts strings of the form "FooBar" to "foo_bar".
-    # Note that some information loss may be incurred; for example, "EOL" would be reduced to "token".
+    # Note that some information loss may be incurred; for example, "EOLToken" would be reduced to "eol_token".
     # Raises an ArgumentError if the string parameter is nil.
     def require_name_from_classname(string)
       

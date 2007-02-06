@@ -7,11 +7,11 @@ module Walrus
     require 'walrus/grammar/predicate'
     class NotPredicate < Predicate
       
-      def parse(string)
+      def parse(string, options = {})
         raise ArgumentError if string.nil?
         catch(:ZeroWidthParseSuccess) do
           begin
-            @parseable.parse(string)
+            @parseable.parse(string, options)
           rescue ParseError # failed to pass (which is just what we wanted)
             throw :NotPredicateSuccess
           end

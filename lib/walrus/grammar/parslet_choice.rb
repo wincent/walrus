@@ -37,12 +37,12 @@ module Walrus
       end
       
       # First tries to parse the left option, falling back and trying the right option and then the any subsequent options in the others instance variable on failure. If no options successfully complete parsing then an ParseError is raised. Any zero-width parse successes throw by alternative parsers will flow on to a higher level.
-      def parse(string)
+      def parse(string, options = {})
         raise ArgumentError if string.nil?
         alternatives = [@left, @right] + @others
         alternatives.each do |parseable|
         begin
-          return parseable.parse(string)
+          return parseable.parse(string, options)
         rescue ParseError
           next
         end

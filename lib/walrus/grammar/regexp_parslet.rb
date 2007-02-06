@@ -17,7 +17,7 @@ module Walrus
         self.expected_regexp = regexp
       end
       
-      def parse(string)
+      def parse(string, options = {})
         raise ArgumentError if string.nil?
         if (string =~ @expected_regexp) != 0
           raise ParseError.new('non-matching characters "%s" while parsing regular expression "%s"' % [string, @expected_regexp.inspect])

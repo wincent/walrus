@@ -44,7 +44,7 @@ module Walrus
         append(next_parslet)
       end
       
-      def parse(string)
+      def parse(string, options = {})
         raise ArgumentError if string.nil?
         state               = ParserState.new(string)
         last_caught         = nil # keep track of the last kind of throw to be caught
@@ -55,7 +55,7 @@ module Walrus
               catch(:AndPredicateSuccess) do
                 catch(:ZeroWidthParseSuccess) do
                   begin
-                    parsed = parseable.parse(state.remainder)
+                    parsed = parseable.parse(state.remainder, options)
                     state.parsed(parsed)
                     state.skipped(parsed.omitted.to_s)  # in case any sub-parslets skipped tokens along the way
                   rescue SkippedSubstringException => e
