@@ -250,58 +250,11 @@ module Walrus
         grammar.parse('(content)').children.should == 'content'
         
         # nested test: one expression nested at first level
-        puts "STARTING FAILING TEST >>>>>>"
         results = grammar.parse('(content (and more content))')
-        # diagnostic info:
-        #
-        # node_class is Walrus::Grammar::BracketExpression
-        # will eval: new(result)
-        # result is: #<Walrus::Grammar::MatchDataWrapper:0x10ea4b0 @match_data=#<MatchData:0x10ea44c>, @omitted=["(", "", ")"]>
-        # wrapped result is #<Walrus::Grammar::BracketExpression:0x10e0230 @children=#<Walrus::Grammar::MatchDataWrapper:0x10ea4b0 @match_data=#<MatchData:0x10ea44c>, @omitted=["(", "", ")"]>>
-        #
-        # i think the problem is that in wrapping the lower-level (nested) BracketExpression our higher-level parslet combination dies
-        # witness the stack trace:
-        #
-        # NoMethodError in 'parsing using a grammar should be able to parse using recursive rules (nested parentheses)'
-        # undefined method `join' for nil:NilClass
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar/parser_state.rb:48:in `parsed'
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar/parslet_repetition.rb:30:in `parse'
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar/parslet_repetition.rb:26:in `catch'
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar/parslet_repetition.rb:26:in `parse'
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar/parslet_sequence.rb:58:in `parse'
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar/parslet_sequence.rb:56:in `catch'
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar/parslet_sequence.rb:56:in `parse'
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar/parslet_sequence.rb:55:in `catch'
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar/parslet_sequence.rb:55:in `parse'
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar/parslet_sequence.rb:54:in `catch'
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar/parslet_sequence.rb:54:in `parse'
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar/parslet_sequence.rb:53:in `catch'
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar/parslet_sequence.rb:53:in `parse'
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar/parslet_sequence.rb:52:in `each'
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar/parslet_sequence.rb:52:in `parse'
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar.rb:40:in `parse'
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/spec/grammar_spec.rb:254:
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/spec/grammar_spec.rb:137:
-        #
-        # the problem is that our ParserState class gets handed the AST-wrapper, but it's a Node subclass that doesn't know how to 
-        # respond to the "to_s" message
-        # 
-        # needed action:
-        #    Node subclasses must respond to_s
-        #    they must also respond to "omitted" (whatever is returned by omitted must also respond "to_s")
-        # may be able to handle this at the level of Node
-        # iterate over instance variables and send to_s and omitted.to_s to each, accumulating results
-        # 
-        # alternative approach:
-        # let the "wrap" method handle this
-        # it's up to "wrap" to send "to_s" and "omitted.to_s" to the result(s)
-        # store them back in the object using ivar accessor methods
-        #
-        puts "THIS LINE NEVER EXECUTED"
         results.children[0].should == 'content '
         results.children[1].children.should == 'and more content'
         
-        
+        # nested test
         grammar.parse('(content (and more content)(and more))')#.should == ['content ', 'and more content', 'and more']
         grammar.parse('(content (and more content)(and more)(more still))')#.should == ['content ', 'and more content', 'and more', 'more still']
         grammar.parse('(content (and more content)(and more(more still)))')#.should == ['content ', 'and more content', ['and more', 'more still']]

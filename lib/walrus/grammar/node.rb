@@ -7,6 +7,13 @@ module Walrus
     # Make subclasses of this for us in Abstract Syntax Trees (ASTs).
     class Node
       
+      attr_accessor :omitted
+      attr_writer   :string_value
+      
+      def to_s
+        @string_value
+      end
+      
       # Dynamically creates a Node descendant.
       # subclass_name should be a Symbol or String containing the name of the subclass to be created.
       # namespace should be the module in which the new subclass should be created; it defaults to Walrus::Grammar.

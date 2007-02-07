@@ -92,22 +92,28 @@ module Walrus
     def wrap(result, rule_name)
       if @productions.has_key?(rule_name.to_sym)    # figure out arity of "initialize" method and wrap results in AST node
         node_class  = self.class.const_get(@productions[rule_name.to_sym].to_s.to_class_name)
-        puts "node_class is " + node_class.to_s
         param_count = node_class.instance_method(:initialize).arity
         raise if param_count < 1
         
         # dynamically build up a message send
-        if param_count == 1 : params = 'result'
-        else                  params = 'result[0]'
+        if param_count == 1
+          params        = 'result'
+          string_value  = result.to_s
+          omitted       = result.omitted
+        else
+          params        = 'result[0]'
+          string_value  = result[0].to_s
+          omitted       = result[0].omitted
         end
         for i in 1..(param_count - 1)
-          params << ", result[#{i.to_s}]"
+          params        << ", result[#{i.to_s}]"
+          string_value  << result[i].to_s
+          omitted       << result[i].omitted
         end
-        puts "will eval: " + 'new(%s)' % params
-        puts "result is: " + result.inspect
-        r = node_class.class_eval('new(%s)' % params)
-        puts "wrapped result is " + r.inspect
-        r
+        node              = node_class.class_eval('new(%s)' % params)
+        node.string_value = string_value
+        node.omitted      = omitted
+        node
       else
         result
       end
