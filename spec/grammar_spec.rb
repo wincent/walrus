@@ -249,15 +249,32 @@ module Walrus
         grammar.parse('()').children.should == []
         grammar.parse('(content)').children.should == 'content'
         
-        # nested test: one expression nested at first level
+        # nested test: two expressions at the first level, one of them nested
         results = grammar.parse('(content (and more content))')
         results.children[0].should == 'content '
         results.children[1].children.should == 'and more content'
         
-        # nested test
-        grammar.parse('(content (and more content)(and more))')#.should == ['content ', 'and more content', 'and more']
-        grammar.parse('(content (and more content)(and more)(more still))')#.should == ['content ', 'and more content', 'and more', 'more still']
-        grammar.parse('(content (and more content)(and more(more still)))')#.should == ['content ', 'and more content', ['and more', 'more still']]
+        # nested test: three expressions at first level, two of them nested
+        results = grammar.parse('(content (and more content)(and more))')#.should == ['content ', 'and more content', 'and more']        
+        results.children[0].should == 'content '        
+        results.children[1].children.should == 'and more content'
+        results.children[2].children.should == 'and more'
+        
+        # nested test: four expressions at the first level, three of them nested
+        results = grammar.parse('(content (and more content)(and more)(more still))')
+        results.children[0].should == 'content '        
+        results.children[1].children.should == 'and more content'
+        results.children[2].children.should == 'and more'
+        results.children[3].children.should == 'more still'
+        
+        # nested test: three expressions at the first level, one nested and another not only nested but containing another level of nesting
+        results = grammar.parse('(content (and more content)(and more(more still)))')
+        results.children[0].should == 'content '        
+        results.children[1].children.should == 'and more content'
+        results.children[2].children[0].should == 'and more'
+        results.children[2].children[1].children.should == 'more still'
+        
+        # bad input case
         lambda { grammar.parse('(') }.should_raise ParseError
         
       end
