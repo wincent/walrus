@@ -55,7 +55,6 @@ module Walrus
     # new_class_name must not be nil.
     def node(new_class_name, parent_class = nil, *attributes)
       raise ArgumentError if new_class_name.nil?
-      parent_class = :Node if parent_class.nil?
       new_class_name = new_class_name.to_s.to_class_name # camel-case
       if parent_class.nil?
         Node.subclass(new_class_name, self.class, *attributes)

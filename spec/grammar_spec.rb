@@ -293,6 +293,41 @@ module Walrus
         lambda { grammar.parse('/*') }.should_raise ParseError
       end
       
+      specify 'should be able to write a grammar that produces an AST for a simple language that supports addition and assignment' do
+        
+        grammar = Grammar.subclass('SimpleASTLanguage') do
+          
+          starting_symbol :expression
+          
+          # terminal tokens
+          rule            :identifier,      /[a-zA-Z0-9]*/
+          rule            :integer_literal, /[0-9]+/
+          
+          # expressions
+          rule            :expression,      :identifier | :integer_literal | :assignment_expression | :addition_expression
+          node            :expression
+          rule            :assignment_expression, :identifier & '='.skip & :expression
+          production      :assignment_expression.build(:expression, :target, :value)
+          rule            :addition_expression,   :expression & '+'.skip & :expression
+          production      :addition_expression.build(:expression, :summee, :summor)
+          
+        end
+        
+        # witness: it's looking for Node subclasses in the wrong namespace
+        
+        # uninitialized constant Walrus::Grammar::Expression
+        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar/additions/symbol.rb:41:in `const_get'
+        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar/additions/symbol.rb:41:in `build'
+        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/spec/grammar_spec.rb:310:
+        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar.rb:29:in `instance_eval'
+        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar.rb:29:in `initialize'
+        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar.rb:20:in `new'
+        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar.rb:20:in `subclass'
+        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/spec/grammar_spec.rb:298:
+        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/spec/grammar_spec.rb:137:
+        
+      end
+      
     end
   end # class Grammar  
 end # module Walrus
