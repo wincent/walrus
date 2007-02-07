@@ -35,13 +35,10 @@ module Walrus
       raise StandardError if @starting_symbol.nil?
       
       # TODO: may have to catch :ZeroWidthParseSuccess and others here as well
-      # 1. get the parse results
-      # 2. call grammar.wrap(results) and return them?
-      # in practice only symbol parslets will do the wrap lookup, I think...
-      # ironically, this hash-passing makes my ContinuationWrapper trick unnecessary (in the case of symbol parslets; may still need them in other cases... eg. when you send a ^ message to a Symbol instance when defining a production)
-      options[:grammar] = self
+      options[:grammar]   = self
       options[:rule_name] = @starting_symbol
-      @rules[@starting_symbol].parse(string, options)
+      result              = @rules[@starting_symbol].parse(string, options)
+      self.wrap(result, @starting_symbol)
     end
     
     # Defines a rule and stores it 
@@ -80,9 +77,9 @@ module Walrus
     #
     #   production :numeric_literal, :raw_token
     #
-    # Example; using the "^" shorthand psuedo-operator to dynamically define an "AssigmentExpression" class with superclass "Expression" and assign the created class as the AST production class for the rule "assignment_expression":
+    # Example; using the "build" method to dynamically define an "AssigmentExpression" class with superclass "Expression" and assign the created class as the AST production class for the rule "assignment_expression":
     #
-    #   production :assignment_expression ^ :expression, :target, :value
+    #   production :assignment_expression.build(:expression, :target, :value)
     #
     def production(rule_name, class_symbol = nil)
       raise ArgumentError if rule_name.nil?
@@ -93,8 +90,24 @@ module Walrus
     end
     
     def wrap(result, rule_name)
-      if @productions.has_key?(rule_name.to_s)
-        # figure out arity wrap in AST node
+      if @productions.has_key?(rule_name.to_sym)    # figure out arity of "initialize" method and wrap results in AST node
+        node_class  = self.class.const_get(@productions[rule_name.to_sym].to_s.to_class_name)
+        puts "node_class is " + node_class.to_s
+        param_count = node_class.instance_method(:initialize).arity
+        raise if param_count < 1
+        
+        # dynamically build up a message send
+        if param_count == 1 : params = 'result'
+        else                  params = 'result[0]'
+        end
+        for i in 1..(param_count - 1)
+          params << ", result[#{i.to_s}]"
+        end
+        puts "will eval: " + 'new(%s)' % params
+        puts "result is: " + result.inspect
+        r = node_class.class_eval('new(%s)' % params)
+        puts "wrapped result is " + r.inspect
+        r
       else
         result
       end

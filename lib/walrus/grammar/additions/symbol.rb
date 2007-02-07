@@ -26,7 +26,7 @@ class Symbol
   end
   
   # Dynamically creates a subclass named after the receiver, with parent class superclass, taking params.
-  def ^(superclass, *params)    
+  def build(superclass, *params)    
     
     # first use the continuation trick to find out what grammar (namespace) receiver is being messaged in
     continuation  = nil
@@ -38,7 +38,7 @@ class Symbol
     end
     
     # actually create the subclass
-    grammar.const_get(superclass.to_s.to_class_name.to_s).subclass(self.to_s.to_class_name.to_s, *params)
+    grammar.const_get(superclass.to_s.to_class_name.to_s).subclass(self.to_s.to_class_name.to_s, grammar, *params)
     self
     
   end

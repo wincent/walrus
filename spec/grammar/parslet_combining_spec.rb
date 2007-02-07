@@ -282,12 +282,5 @@ module Walrus
       
     end
     
-    context 'using shorthand "^" pseudo-operator to define AST productions' do
-      
-      specify 'should be able to specify a simple production' do
-      end
-      
-    end
-    
   end # class Grammar
 end # module Walrus

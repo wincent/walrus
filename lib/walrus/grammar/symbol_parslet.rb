@@ -16,12 +16,16 @@ module Walrus
         @symbol = symbol
       end
       
-      # SymbolParslets are basically context-free until the first time they are used. That is, in order to keep the interface clean and make it easy and neat to reference symbols when defining rules for a grammar, SymbolParslets don't actually know what Grammar they are associated with at the time of their definition. The first time they are used (the first time the parse method is invoked) they throw a ContinuationWrapperException which can be caught by the grammar; the grammar uses the wrapped continuation object to resume execution at the point where the exception was thrown, passing back a reference to the grammar so that the SymbolParslet can proceed with the lookup. The parslet also remembers the passed-in grammar instance so that in subsequent uses the convoluted look-up isn't necessary.
+      # SymbolParslets don't actually know what Grammar they are associated with at the time of their definition. They expect the Grammar to be passed in with the options hash under the ":grammar" key.
       # Raises if string is nil, or if the options hash does not include a :grammar key.
       def parse(string, options = {})
         raise ArgumentError if string.nil?
         raise ArgumentError unless options.has_key?(:grammar)
-        options[:grammar].rules[@symbol].parse(string, options)
+        grammar = options[:grammar]
+        augmented_options = options.clone
+        augmented_options[:rule_name] = @symbol
+        result = grammar.rules[@symbol].parse(string, augmented_options)
+        grammar.wrap(result, @symbol)
       end
       
     end # class SymbolParslet

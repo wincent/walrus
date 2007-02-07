@@ -127,19 +127,6 @@ module Walrus
         self.omission(self)
       end
       
-      # Wraps parseable (a parslet or parslet combination) in a Producer wrapper tailored according to description.
-      def produce(parseable, subclass_name, *production)
-        Walrus::Grammar::Producer.new()
-      end
-      
-      # Shorthand for ParsletCombining.produce.
-      # Problem is that | and ^ appear to have the same precedence...
-      # Although & has higher precedence than ^ (good)
-      # I am not sure if there's any benefit in having a method like this...
-      def ^(subclass_name, *production)
-        self.produce(self, subclass_name, *production)
-      end
-      
     end # module ParsletCombining
     
   end # class Grammar
