@@ -34,12 +34,15 @@ module Walrus
     def parse(string, options = {})
       raise ArgumentError if string.nil?
       raise StandardError if @starting_symbol.nil?
-      
-      # TODO: may have to catch :ZeroWidthParseSuccess and others here as well
       options[:grammar]   = self
       options[:rule_name] = @starting_symbol
-      result              = @rules[@starting_symbol].parse(string, options)
-      self.wrap(result, @starting_symbol)
+      options[:skipping]  = @skipping
+      #catch :AndPredicateSuccess do     # not sure whether to let these go through to the caller
+      #catch :ZeroWidthParseSuccess do   # not sure whether to let these go through to the caller
+        result              = @rules[@starting_symbol].parse(string, options)
+        self.wrap(result, @starting_symbol)
+      #end
+      #end
     end
     
     # Defines a rule and stores it 
@@ -109,8 +112,18 @@ module Walrus
     end
     
     # Sets the starting symbol.
+    # symbol must refer to a rule.
     def starting_symbol(symbol)
       @starting_symbol = symbol
+    end
+    
+    # Sets the default parslet that is used for skipping inter-token whitespace.
+    # This allows for simpler grammars which do not need to explicitly put optional whitespace parslets between elements.
+    # symbol must refer to a rule which itself is a Parslet or ParsletCombination and which is responsible for skipping. Note that the ability to pass an arbitrary parslet means that the notion of what consitutes the "whitespace" that should be skipped is completely flexible.
+    # The inter-token parslet is passed inside the "options" hash when invoking the "parse" methods. Any parser which fails will retry after giving this inter-token parslet a chance to consume and discard intervening whitespace.
+    # The initial, conservative implementation only performs this fallback skipping for ParsletSequence and ParsletRepetition combinations.
+    def skipping(symbol)
+      @skipping = symbol
     end
     
     # TODO: pretty print method?

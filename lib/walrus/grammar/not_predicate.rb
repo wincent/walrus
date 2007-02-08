@@ -9,7 +9,7 @@ module Walrus
       
       def parse(string, options = {})
         raise ArgumentError if string.nil?
-        catch(:ZeroWidthParseSuccess) do
+        catch :ZeroWidthParseSuccess do
           begin
             @parseable.parse(string, options)
           rescue ParseError # failed to pass (which is just what we wanted)

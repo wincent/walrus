@@ -13,10 +13,10 @@ module Walrus
         last_caught         = nil # keep track of the last kind of throw to be caught
         alternatives        = [@first, @second] + @others
         alternatives.each do |parseable|
-          catch(:ProcessNextAlternative) do
-            catch(:NotPredicateSuccess) do
-              catch(:AndPredicateSuccess) do
-                catch(:ZeroWidthParseSuccess) do
+          catch :ProcessNextAlternative do
+            catch :NotPredicateSuccess do
+              catch :AndPredicateSuccess do
+                catch :ZeroWidthParseSuccess do
                   begin
                     parsed = parseable.parse(state.remainder, options)
                     if parsed.respond_to? :each

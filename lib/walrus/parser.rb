@@ -145,23 +145,34 @@ module Walrus
         # would be nice if we could tell productions to "flatten" their content into a single string
         # although the string literal content example shows that this might not be necessary if you can produce a single regexp match
         
-        # would be nice if you could specify Node superclasses as well (for example, have a node subclass inherit from another node subclass)
-        # example, single and double quoted strings
-        
         starting_symbol :template
         
-        rule            :ws,                            /\s+/         # whitespace
-        rule            :nl,                            /\r\n|\r|\n/  # newlines
+        # one argument: this is the default "skip" parslet
+        # it is passed inside the "options" hash when invoking the "parse" methods
+        # basically, any parser which fails will retry after giving this intertoken parslet a bash
+        skipping        :whitespace_or_newlines
         
-        rule            :template,                      :template_element.zero_or_more        # up to end-of-file
-        rule            :template_element,              :directive | :placeholder | :comment | :raw_text | :escape_sequence
+        # two arguments: this specifies the inter-token "skip" parslet for a given rule
+        #skip            :directive, :whitespace
+        
+        rule            :whitespace,                    /\s+/
+        rule            :newlines,                      /\r\n|\r|\n/
+        rule            :whitespace_or_newlines,        :whitespace | :newlines
+        rule            :end_of_input,                  /\z/
+        
+        rule            :template,                      :template_element.zero_or_more & :end_of_input.and?
+        rule            :template_element,              :comment | :directive | :placeholder | :raw_text | :escape_sequence
         
         rule            :raw_text,                      /[^#$\\]+/
         
         rule            :string_literal,                :single_quoted_string_literal | :doble_quoted_string_literal
+        node            :string_literal
+        
         rule            :single_quoted_string_literal,  "'".skip & :single_quoted_string_content.optional & "'".skip
+        production      :single_quoted_string_literal.build(:string_literal)
         rule            :single_quoted_string_content,  /(\\(?!').|\\'|[^'\\]+)+/
         rule            :double_quoted_string_literal,  '"'.skip & :double_quoted_string_content.optional & '"'.skip
+        production      :double_quoted_string_literal.build(:string_literal)
         rule            :double_quoted_string_content,  /(\\(?!").|\\"|[^"\\]+)+/
         
         rule            :identifier,                    /[a-zA-Z_][a-zA-Z0-9_]*/
@@ -182,51 +193,8 @@ module Walrus
         rule            :placeholder_parameters,        '('.skip & (:placeholder_parameter >> (',' & :placeholder_parameter).zero_or_more).optional & ')'.skip
         rule            :placeholder_parameter,         :placeholder | :ruby_expression
         
-        rule            :comment,                       '##'.skip & /.*$/.optional
-        production      :comment,                       :Node,  # superclass
-                                                        :lexeme # variable name to store input
-        
-        # but given that the production is so simple, would be nice to be able to specify it on the same line:
-        rule            :comment,                       ('##'.skip & /.*$/.optional) ^ :Node
-        
-        # so simple that you could almost omit the :Node and it shoudl assume it, but then we lose our text-only, non-AST support
-        
-        # want a subclass like this, would be nice to automate its creation...
-        # eg... use rule name as a basis for generating the class name
-        # comment -> camelcase + node = CommentNode
-        class CommentNode < Node
-          def initialize(lexeme = "")
-            self.set_value_for_key(lexeme, :lexeme)
-          end
-        end
-        
-        # clearly need a superclass, Node, that implements "set_value_for_key"
-        # should also implement value_for_key
-        # and method_missing too so that you can do CommentNode.lexeme
-        
-        # how to define abstract superclass?
-        # example: we want a StringLiteral superclass
-        # can literally define SingleQuotedLiteral etc using "production" calls
-        # but how to define the superclass?
-        # do we need a "node" method?
-        
-        # step one: define abstract superclass
-        node        :StringLiteral, :Node # creates StringLiteral class, superclass is Node
-        
-        # can then define a production: this would also create the DoubleQuotedStringLiteral class
-        production  :double_quoted_string_literal, :StringLiteral, #superclass
-                                                    :lexeme #optional (if left out just assume that any input goes in "lexeme")
-        
-        # what syntax to use when you just want to use an existing class? just omit the parameters?
-        production  :double_quoted_string_literal   # no params means "use existing class (convert to camelcase)"
-        
-        # alternatively, could I be explicit?
-        Node.subclass('StringLiteral') # creates StringLiteral class, a subclass of Node
-        production :double_quoted_string_literal, StringLiteral.subclass('DoubleQuotedStringLiteral') # create subclass of StringLiteral
-        production :double_quoted_string_literal # alt version; no params means "use existing class"
-        
-        # "subclass" should take additional optional params (lexeme names; accessors will be created for each of these
-        
+        rule            :comment,                       '##'.skip & /.*$/
+        production      :comment.build(:node)
         
         
       end

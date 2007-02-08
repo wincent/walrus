@@ -18,7 +18,7 @@ module Walrus
       def parse(string, options = {})
         raise ArgumentError if string.nil?
         substring = ""
-        catch(:ZeroWidthParseSuccess) do
+        catch :ZeroWidthParseSuccess do
           substring = @parseable.parse(string, options).to_s
         end
         

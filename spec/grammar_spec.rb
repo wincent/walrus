@@ -383,6 +383,29 @@ module Walrus
         
       end
       
+      specify 'should be able to define a default parslet for intertoken skipping' do
+        grammar = Grammar.subclass('SkippingGrammar') do
+          starting_symbol :translation_unit
+          skipping        :whitespace_and_newlines
+          rule            :whitespace_and_newlines, /[\s\n\r]+/ 
+          rule            :translation_unit,        :word_list & :end_of_string.and? | :end_of_string
+          rule            :end_of_string,           /\z/
+          rule            :word_list,               :word.zero_or_more
+          rule            :word,                    /[a-z0-9_]+/
+        end
+        
+        # not sure if I can justify the difference in behaviour here compared with the previous grammar
+        # if I catch these throws at the grammar level I can return nil
+        # but note that the previous grammar returns an empty array, which to_s is just ""
+        lambda { grammar.parse('') }.should_throw :AndPredicateSuccess
+        
+        grammar.parse('foo').should == 'foo'
+        grammar.parse('foo bar').should == ['foo', 'bar']       # intervening whitespace
+        grammar.parse('foo bar     ').should == ['foo', 'bar']  # trailing whitespace
+        grammar.parse('     foo bar').should == ['foo', 'bar']  # leading whitespace
+        
+      end
+      
     end
   end # class Grammar  
 end # module Walrus
