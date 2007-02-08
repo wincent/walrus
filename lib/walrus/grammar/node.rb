@@ -33,8 +33,8 @@ module Walrus
         if results.length == 0 # default case, store sole parameter in "lexeme"
           new_class.class_eval { attr_reader :lexeme }
           initialize_body = "def initialize(lexeme)\n"
-          initialize_body << "@string_value = \"\"\n"
-          initialize_body << "@omitted = \"\"\n"
+          initialize_body << "@string_value = lexeme.to_s\n"
+          initialize_body << "@omitted = lexeme.omitted.to_s\n"
           initialize_body << "@lexeme = lexeme\n"
         else
           initialize_body = "def initialize(#{results.collect { |symbol| symbol.to_s}.join(', ')})\n"

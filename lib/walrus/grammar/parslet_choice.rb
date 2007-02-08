@@ -41,11 +41,11 @@ module Walrus
         raise ArgumentError if string.nil?
         alternatives = [@left, @right] + @others
         alternatives.each do |parseable|
-        begin
-          return parseable.parse(string, options)
-        rescue ParseError
-          next
-        end
+          begin
+            return parseable.parse(string, options)
+          rescue ParseError
+            next
+          end
         end
         raise ParseError.new('no valid alternatives while parsing "%s"' % string)
       end

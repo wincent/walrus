@@ -300,18 +300,71 @@ module Walrus
           starting_symbol :expression
           
           # terminal tokens
-          rule            :identifier,      /[a-zA-Z0-9]*/
+          rule            :identifier,      /[a-zA-Z_][a-zA-Z0-9_]*/
+          production      :identifier.build(:node)
           rule            :integer_literal, /[0-9]+/
+          production      :integer_literal.build(:node)
           
           # expressions
-          rule            :expression,      :identifier | :integer_literal | :assignment_expression | :addition_expression
+          rule            :expression,      :assignment_expression | :addition_expression | :identifier | :integer_literal
           node            :expression
           rule            :assignment_expression, :identifier & '='.skip & :expression
           production      :assignment_expression.build(:expression, :target, :value)
-          rule            :addition_expression,   :expression & '+'.skip & :expression
+          rule            :addition_expression,   (:identifier | :integer_literal) & '+'.skip & :expression
           production      :addition_expression.build(:expression, :summee, :summor)
           
         end
+        
+        results = grammar.parse('hello')
+        results.should_be_kind_of SimpleASTLanguage::Identifier
+        results.lexeme.should == 'hello'
+        
+        results = grammar.parse('1234')
+        results.should_be_kind_of SimpleASTLanguage::IntegerLiteral
+        results.lexeme.should == '1234'
+        
+        results = grammar.parse('foo=bar')
+        results.should_be_kind_of SimpleASTLanguage::Expression
+        results.should_be_kind_of SimpleASTLanguage::AssignmentExpression
+        results.target.should_be_kind_of SimpleASTLanguage::Identifier
+        results.target.lexeme.should == 'foo'
+        results.value.should_be_kind_of SimpleASTLanguage::Identifier
+        results.value.lexeme.should == 'bar'
+        
+        results = grammar.parse('baz+123')
+        results.should_be_kind_of SimpleASTLanguage::Expression
+        results.should_be_kind_of SimpleASTLanguage::AdditionExpression
+        results.summee.should_be_kind_of SimpleASTLanguage::Identifier
+        results.summee.lexeme.should == 'baz'
+        results.summor.should_be_kind_of SimpleASTLanguage::IntegerLiteral
+        results.summor.lexeme.should == '123'
+        
+        results = grammar.parse('foo=abc+123')
+        results.should_be_kind_of SimpleASTLanguage::Expression
+        results.should_be_kind_of SimpleASTLanguage::AssignmentExpression
+        results.target.should_be_kind_of SimpleASTLanguage::Identifier
+        results.target.lexeme.should == 'foo'
+        results.value.should_be_kind_of SimpleASTLanguage::AdditionExpression
+        results.value.summee.should_be_kind_of SimpleASTLanguage::Identifier
+        results.value.summee.lexeme.should == 'abc'
+        results.value.summor.should_be_kind_of SimpleASTLanguage::IntegerLiteral
+        results.value.summor.lexeme.should == '123'
+        
+        results = grammar.parse('a+b+2')
+        results.should_be_kind_of SimpleASTLanguage::Expression
+        results.should_be_kind_of SimpleASTLanguage::AdditionExpression
+        results.summee.should_be_kind_of SimpleASTLanguage::Identifier
+        results.summee.lexeme.should == 'a'
+        results.summor.should_be_kind_of SimpleASTLanguage::AdditionExpression
+        results.summor.summee.should_be_kind_of SimpleASTLanguage::Identifier
+        results.summor.summee.lexeme.should == 'b'
+        results.summor.summor.should_be_kind_of SimpleASTLanguage::IntegerLiteral
+        results.summor.summor.lexeme.should == '2'
+        
+        # my grammar needs to include an "end of input" marker and check for it
+        # and perhaps my "parse" method in the grammar needs to check for it
+        # really need both; useful for reminding grammar author that such a thing is needed
+        # should raise a ParseError "not all input was consumed"
         
       end
       
