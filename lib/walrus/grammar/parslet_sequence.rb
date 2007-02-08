@@ -62,14 +62,11 @@ module Walrus
                     state.skipped(e.to_s)
                   rescue ParseError => e # failed, will try to skip; save original error in case skipping fails
                     if options.has_key?(:skipping) and not options[:skipping].nil?
-                      puts "caught a parse error, but have a skipping parslet " + options[:skipping].inspect
                       begin
                         parsed = options[:skipping].parse(state.remainder, options) # potentially guard against self references (possible infinite recursion) here
                       rescue ParseError
-                        puts "failed to skip, so will re-raise original error"
                         raise e # skipping didn't help either, raise original error
                       end
-                      puts "skipping succeeded: skipped '%s' (normal text) and skipped '%s' ('omitted' text)" % [parsed.to_s, parsed.omitted.to_s]
                       state.skipped(parsed)
                       state.skipped(parsed.omitted.to_s)
                       redo # skipping succeeded, try to redo

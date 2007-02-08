@@ -2,6 +2,10 @@
 # $Id$
 
 require 'walrus/additions/string'
+require 'walrus/grammar/additions/regexp'
+require 'walrus/grammar/additions/string'
+require 'walrus/grammar/additions/symbol'
+require 'walrus/grammar/node'
 
 module Walrus
   class Grammar
@@ -122,6 +126,7 @@ module Walrus
     # symbol must refer to a rule which itself is a Parslet or ParsletCombination and which is responsible for skipping. Note that the ability to pass an arbitrary parslet means that the notion of what consitutes the "whitespace" that should be skipped is completely flexible.
     # The inter-token parslet is passed inside the "options" hash when invoking the "parse" methods. Any parser which fails will retry after giving this inter-token parslet a chance to consume and discard intervening whitespace.
     # The initial, conservative implementation only performs this fallback skipping for ParsletSequence and ParsletRepetition combinations.
+    # Possible future extension: if two arguments passed instead of one, considered this as an override for the parslet/rule identified by the first parameter.
     def skipping(symbol)
       @skipping = symbol
     end
