@@ -16,10 +16,11 @@ module Walrus
       raise ArgumentError if subclass_name.nil?
       raise ArgumentError if Walrus::const_defined?(subclass_name)
       Walrus::const_set(subclass_name, Class.new(Grammar))
+      subclass = Walrus::module_eval(subclass_name)
       begin
-        Walrus::module_eval(subclass_name).new(&block)
+        subclass.new(&block)
       rescue ContinuationWrapperException => c # a Symbol in a production rule wants to know what namespace its being used in
-        c.continuation.call(self)
+        c.continuation.call(subclass)
       end
     end
     

@@ -313,19 +313,6 @@ module Walrus
           
         end
         
-        # witness: it's looking for Node subclasses in the wrong namespace
-        
-        # uninitialized constant Walrus::Grammar::Expression
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar/additions/symbol.rb:41:in `const_get'
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar/additions/symbol.rb:41:in `build'
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/spec/grammar_spec.rb:310:
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar.rb:29:in `instance_eval'
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar.rb:29:in `initialize'
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar.rb:20:in `new'
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/lib/walrus/grammar.rb:20:in `subclass'
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/spec/grammar_spec.rb:298:
-        # /Users/wincent/trabajo/unversioned/walrus/svn-files/trunk/spec/grammar_spec.rb:137:
-        
       end
       
     end
