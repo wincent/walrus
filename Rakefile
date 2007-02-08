@@ -37,7 +37,7 @@ end
 
 desc 'Verify that test coverage is above minimum threshold'
 RCov::VerifyTask.new(:verify => :spec) do |t|
-  t.threshold   = 98.3 # never adjust expected coverage down, only up
+  t.threshold   = 99.2 # never adjust expected coverage down, only up
   t.index_html  = 'coverage/index.html'
 end
 

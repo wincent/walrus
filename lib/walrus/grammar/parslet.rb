@@ -12,7 +12,7 @@ module Walrus
         self
       end
       
-      def parse
+      def parse(string, options = {})
         raise NotImplementedError # subclass responsibility
       end
       

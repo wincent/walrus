@@ -7,8 +7,8 @@ module Walrus
     # Make subclasses of this for us in Abstract Syntax Trees (ASTs).
     class Node
       
-      # In order to be useful parse results Node and its subclasses must work well with ParserState objects, and that means responding to the "to_s" and "omitted" messages. Whatever is returned by "omitted" must itself respond to "to_s". For simplicity in the current design the "wrap" method of the Grammar class (which handles the wrapping up of parslet output into AST nodes) uses these accessors to set the required state. TODO: A cleaner, more encapsulated design would extend the "initialize" methods in dynamically generated Node subclasses so that they performed the same maintenance of state (by sending "to_s" and "omitted.to_s" for each parameter passed into the "initialize" method.)
-      attr_reader :omitted
+      # In order to be useful parse results Node and its subclasses must work well with ParserState objects, and that means responding to the "to_s" and "omitted" messages. Whatever is returned by "omitted" must itself respond to "to_s".
+      attr_accessor :omitted # an accessor because ParserState may wish to write to it
       
       def to_s
         @string_value

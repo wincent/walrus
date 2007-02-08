@@ -14,6 +14,10 @@ module Walrus
         lambda { Predicate.new(nil) }.should_raise ArgumentError
       end
       
+      specify 'should complain if sent "parse" message (Predicate abstract superclass, "parse" is the responsibility of the subclasses)' do
+        lambda { Predicate.new('foo').parse('bar') }.should_raise NotImplementedError
+      end
+      
     end
     
   end # class Grammar

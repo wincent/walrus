@@ -361,10 +361,25 @@ module Walrus
         results.summor.summor.should_be_kind_of SimpleASTLanguage::IntegerLiteral
         results.summor.summor.lexeme.should == '2'
         
-        # my grammar needs to include an "end of input" marker and check for it
-        # and perhaps my "parse" method in the grammar needs to check for it
-        # really need both; useful for reminding grammar author that such a thing is needed
-        # should raise a ParseError "not all input was consumed"
+      end
+      
+      specify 'should be able to write a grammar that complains if all the input is not consumed' do
+        grammar = Grammar.subclass('ComplainingGrammar') do
+          starting_symbol :translation_unit
+          rule            :translation_unit,  :word_list & :end_of_string.and? | :end_of_string
+          rule            :end_of_string,     /\z/
+          rule            :whitespace,        /\s+/
+          rule            :word,              /[a-z]+/
+          rule            :word_list,         :word >> (:whitespace.skip & :word).zero_or_more
+          
+        end
+        
+        grammar.parse('').should == ''
+        grammar.parse('foo').should == 'foo'
+        grammar.parse('foo bar').should == ['foo', 'bar']
+        lambda { grammar.parse('...') }.should_raise ParseError
+        lambda { grammar.parse('foo...') }.should_raise ParseError
+        lambda { grammar.parse('foo bar...') }.should_raise ParseError
         
       end
       

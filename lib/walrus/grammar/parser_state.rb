@@ -20,14 +20,10 @@ module Walrus
       # Returns the number of characters scanned so far (including skipped characters).
       attr_reader :length
       
-      # Returns true if characters were skipped, otherwise returns false.
-      attr_reader :did_skip
-      
       # Raises an ArgumentError if string is nil.
       def initialize(string)
         raise ArgumentError if string.nil?
         self.base_string  = string
-        @did_skip         = false
         @results          = []              # for accumulating results
         @skipped          = []              # for accumulating skipped text
         @length           = 0               # for counting number of characters parsed so far
@@ -52,7 +48,6 @@ module Walrus
       # In all other respects this method behaves exactly like the parsed method.
       def skipped(substring)
         raise ArgumentError if substring.nil?
-        @did_skip = true
         @skipped << substring
         @length += substring.to_s.length
         @remainder = @base_string.chars[@length..-1].join # use chars method here to correctly support multi-byte characters
@@ -86,10 +81,6 @@ module Walrus
         else
           @skipped
         end
-      end
-      
-      def did_skip?
-        self.did_skip
       end
       
       # TODO: possibly implement "undo/rollback" and "reset" methods
