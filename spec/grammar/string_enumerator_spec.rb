@@ -36,6 +36,22 @@ module Walrus
         enumerator.next.should_be_nil
       end
       
+      # this was a bug
+      specify 'enumerators should continue past newlines' do
+        enumerator = StringEnumerator.new("hello\nworld")
+        enumerator.next.should == 'h'
+        enumerator.next.should == 'e'
+        enumerator.next.should == 'l'
+        enumerator.next.should == 'l'
+        enumerator.next.should == 'o'
+        enumerator.next.should == "\n" # was returning nil here
+        enumerator.next.should == 'w'
+        enumerator.next.should == 'o'
+        enumerator.next.should == 'r'
+        enumerator.next.should == 'l'
+        enumerator.next.should == 'd'
+      end
+      
     end
     
   end # class Grammar

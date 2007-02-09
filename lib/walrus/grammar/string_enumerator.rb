@@ -17,7 +17,7 @@ module Walrus
       def next
         old_kcode = $KCODE
         $KCODE    = "U"     # UTF-8
-        char      = @scanner.scan(/./)
+        char      = @scanner.scan(/./m) # must use multiline mode or "." won't match newlines
         $KCODE    = old_kcode
         char
       end

@@ -19,14 +19,15 @@ module Walrus
         skipping        :whitespace_or_newlines
         
         rule            :whitespace,                    /\s+/
-        rule            :newlines,                      /\r\n|\r|\n/
-        rule            :whitespace_or_newlines,        :whitespace | :newlines
+        rule            :newline,                       /\r\n|\r|\n/
+        rule            :whitespace_or_newlines,        /(\r\n|\r|\n|\s)+/
         rule            :end_of_input,                  /\z/
         
         rule            :template,                      :template_element.zero_or_more & :end_of_input.and?
-        rule            :template_element,              :comment | :directive | :placeholder | :raw_text | :escape_sequence
+        rule            :template_element,              :raw_text | :comment | :directive | :placeholder |:escape_sequence
         
-        rule            :raw_text,                      /[^#$\\\]+/
+        rule            :raw_text,                      /[^\$\\#]+/
+        production      :raw_text.build(:node)
         
         rule            :string_literal,                :single_quoted_string_literal | :doble_quoted_string_literal
         node            :string_literal
@@ -42,12 +43,11 @@ module Walrus
         
         rule            :ruby_expression,               'not yet implemented'# string literals, numbers, arrays, method calls, etc (basic Ruby subset)
         
-        rule            :escape_sequence,               :escape_marker & :escape_character
-        rule            :escape_marker,                 '\\'
-        rule            :escape_character,              /#\\\$/
+        rule            :escape_sequence,               '\\'.skip & /[\$\\#]/
+        production      :escape_sequence.build(:node)
         
         rule            :directive,                     '#'.skip & :directive_name & :directive_parameters.optional
-        rule            :directive_name,                /[a-zA-Z]+/
+        rule            :directive_name,                /block/i | /def/i | /end/i | /extends/i | /import/i | /set/i | /super/i
         rule            :directive_parameters,          '('.skip & (:directive_parameter >> (',''#'.skip & :directive_parameter).zero_or_more ).optional & ')'.skip
         rule            :directive_parameter,           :placeholder | :ruby_expression
         
