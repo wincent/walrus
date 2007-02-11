@@ -10,6 +10,11 @@ require 'walrus/grammar/node'
 module Walrus
   class Grammar
     
+    class NoParameterMarker
+      require 'singleton'
+      include Singleton
+    end
+    
     autoload(:ContinuationWrapperException, 'walrus/grammar/continuation_wrapper_exception')
     
     attr_reader :rules
@@ -29,8 +34,9 @@ module Walrus
     end
     
     def initialize(&block)
-      @rules        = Hash.new { |hash, key| raise StandardError.new('no value for key "%s"' % key.to_s) }
-      @productions  = Hash.new { |hash, key| raise StandardError.new('no value for key "%s"' % key.to_s) }
+      @rules              = Hash.new { |hash, key| raise StandardError.new('no value for key "%s"' % key.to_s) }
+      @productions        = Hash.new { |hash, key| raise StandardError.new('no value for key "%s"' % key.to_s) }
+      @skipping_overrides = Hash.new { |hash, key| raise StandardError.new('no value for key "%s"' % key.to_s) }
       self.instance_eval(&block) if block_given?
     end
     
@@ -126,14 +132,27 @@ module Walrus
       @starting_symbol = symbol
     end
     
-    # Sets the default parslet that is used for skipping inter-token whitespace.
-    # This allows for simpler grammars which do not need to explicitly put optional whitespace parslets between elements.
-    # symbol must refer to a rule which itself is a Parslet or ParsletCombination and which is responsible for skipping. Note that the ability to pass an arbitrary parslet means that the notion of what consitutes the "whitespace" that should be skipped is completely flexible.
+    # Sets the default parslet that is used for skipping inter-token whitespace, and can be used to override the default on a rule-by-rule basis.
+    # This allows for simpler grammars which do not need to explicitly put optional whitespace parslets (or any other kind of parslet) between elements.
+    #
+    # There are two modes of operation for this method. In the first mode (when only one parameter is passed) the rule_or_parslet parameter is used to define the default parslet for inter-token skipping. rule_or_parslet must refer to a rule which itself is a Parslet or ParsletCombination and which is responsible for skipping. Note that the ability to pass an arbitrary parslet means that the notion of what consitutes the "whitespace" that should be skipped is completely flexible. Raises if a default skipping parslet has already been set.
+    #
+    # In the second mode of operation (when two parameters are passed) the rule_or_parslet parameter is interpreted to be the rule to which an override should be applied, where the parslet parameter specifies the parslet to be used in this case. If nil is explicitly passed then this overrides the default parslet; no parslet will be used for the purposes of inter-token skipping. Raises if an override has already been set for the named rule.
+    #
     # The inter-token parslet is passed inside the "options" hash when invoking the "parse" methods. Any parser which fails will retry after giving this inter-token parslet a chance to consume and discard intervening whitespace.
     # The initial, conservative implementation only performs this fallback skipping for ParsletSequence and ParsletRepetition combinations.
-    # Possible future extension: if two arguments passed instead of one, considered this as an override for the parslet/rule identified by the first parameter.
-    def skipping(symbol)
-      @skipping = symbol
+    #
+    # Raises if rule_or_parslet is nil.
+    def skipping(rule_or_parslet, parslet = NoParameterMarker.instance)
+      raise ArgumentError if rule_or_parslet.nil?
+      if parslet == NoParameterMarker.instance  # first mode of operation: set default parslet
+        raise if @skipping                      # should not set a default skipping parslet twice
+        @skipping = rule_or_parslet
+      else                                      # second mode of operation: override default case
+        raise ArgumentError if @skipping_overrides.has_key?(rule_or_parslet)
+        raise ArgumentError unless @rules.has_key?(rule_or_parslet)
+        @skipping_overrides[rule_or_parslet] = parslet
+      end
     end
     
     # TODO: pretty print method?

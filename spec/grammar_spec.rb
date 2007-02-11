@@ -431,6 +431,59 @@ module Walrus
         
       end
       
+      specify 'should complain if trying to set default skipping parslet more than once' do
+        lambda do
+          Grammar.subclass('SetSkipperTwice') do
+            skipping :first   # fine
+            skipping :again   # should raise here
+          end
+        end.should_raise
+      end
+      
+      specify 'should complain if passed nil' do
+        lambda do
+          Grammar.subclass('PassNilToSkipping') { skipping nil }
+        end.should_raise ArgumentError
+      end
+      
+      specify 'should be able to override default skipping parslet on a per-rule basis' do
+        
+        # the example grammar parses word lists and number lists
+        grammar = Grammar.subclass('OverrideDefaultSkippingParslet') do
+          starting_symbol :translation_unit
+          skipping        :whitespace_and_newlines
+          rule            :whitespace_and_newlines, /[\s\n\r]+/
+          rule            :whitespace,              /\s+/ 
+          rule            :translation_unit,        :component & :end_of_string.and? | :end_of_string
+          rule            :end_of_string,           /\z/
+          rule            :component,               :word_list | :number_list
+          rule            :word_list,               :word.zero_or_more
+          rule            :word,                    /[a-z]+/
+          rule            :number_list,             :number.zero_or_more
+          rule            :number,                  /[0-9]+/
+          
+          # when passed two arguments, the "skipping" method sets up an override for the first named rule
+          skipping        :number_list,             :whitespace
+        end
+        
+      end
+      
+      specify 'should complain if trying to override the default for the same rule twice' do
+        lambda do
+          Grammar.subclass('OverrideSameRuleTwice') do
+            rule      :the_rule, 'foo'
+            skipping  :the_rule, :the_override  # fine
+            skipping  :the_rule, :the_override  # should raise
+          end
+        end.should_raise ArgumentError
+      end
+      
+      specify "should complain if trying to set an override for a rule that hasn't been defined yet" do
+        lambda do
+          Grammar.subclass('OverrideUndefinedRule') { skipping :non_existent_rule, :the_override }
+        end.should_raise ArgumentError
+      end
+      
     end
   end # class Grammar  
 end # module Walrus

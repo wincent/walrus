@@ -46,11 +46,24 @@ module Walrus
         rule            :escape_sequence,               '\\'.skip & /[\$\\#]/
         production      :escape_sequence.build(:node)
         
+        # directives like comments should extend to the end of the line
+        # but comments should be allowed to appear to the right of a directive
+        # the current rules below would allow us to skip newlines between tokens which is bad: we only want to skip whitespace
+        
         rule            :directive,                     /#(?!\r|\n|\s)/.skip & :directive_name & :directive_parameters.optional
         production      :directive.build(:node, :name, :parameters)
         rule            :directive_name,                /block/i | /def/i | /end/i | /extends/i | /import/i | /set/i | /super/i
-        rule            :directive_parameters,          (:directive_parameter >> (','.skip & :directive_parameter).zero_or_more ).optional
+        rule            :directive_parameters,          (:directive_parameter >> (','.skip & :directive_parameter).zero_or_more ).optional & :comment.optional
         rule            :directive_parameter,           :identifier | :string_literal | :placeholder | :ruby_expression
+        
+        # may have specific rules for some directive types
+        # eg. #include 'string_literal'
+        # or  #extends ClassName
+        # or  #set assignment = expression
+        # or  #super parameter, list
+        # or  #super (parameter, list, with, brackets) // probably don't want brackets as the other directives don't use them
+        # or  #block name
+        # or  #end (no parameters)
         
         rule            :placeholder,                   '$'.skip & :placeholder_name & :placeholder_parameters.optional
         rule            :placeholder_name,              :identifier
