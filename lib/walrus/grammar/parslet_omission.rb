@@ -22,7 +22,7 @@ module Walrus
           substring = @parseable.parse(string, options).to_s
         end
         
-        # not enough to just return a ZeroWidthParseSuccess here; that could cause higher levels to stop parsing and in any case there'd be no way to embed the scanned substring in the symbol
+        # not enough to just return a ZeroWidthParseSuccess here; that could cause higher levels to stop parsing and in any case there'd be no clean way to embed the scanned substring in the symbol
         raise SkippedSubstringException.new(substring)
       end
       

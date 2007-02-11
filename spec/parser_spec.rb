@@ -7,7 +7,7 @@ require 'walrus/parser'
 
 module Walrus
   
-  context 'parsing with the parser' do
+  context 'parsing raw text, escape markers and comments' do
     
     context_setup do
       @parser = Parser.new()
@@ -135,6 +135,78 @@ module Walrus
       result[0].lexeme.should == "hello\n"
       result[1].should_be_kind_of WalrusGrammar::EscapeSequence
       result[1].lexeme.should == '#'
+      
+    end
+  end
+    
+  context 'parsing directives' do
+    
+    context_setup do
+      @parser = Parser.new()
+    end
+    
+    specify 'should complain on encountering an unknown or invalid directive name' do
+      lambda { @parser.parse('#glindenburgen') }.should_raise Grammar::ParseError
+      lambda { @parser.parse('#') }.should_raise Grammar::ParseError
+    end
+    
+    specify 'should complain if there is whitespace between the directive marker (#) and the directive name' do
+      lambda { @parser.parse('# extends OtherTemplate') }.should_raise Grammar::ParseError
+    end
+    
+    specify 'should be able to parse a directive that takes a single parameter' do
+      result = @parser.parse('#extends OtherTemplate')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.name.should == 'extends'
+    end
+    
+    specify 'should be able to parse a directive with no parameters' do
+      #result = @parser.parse('#super') # expected two things but gets only one
+      
+    end
+    
+    specify 'should be able to parse single quoted string literals' do
+      
+      # string literals have no special meaning when part of raw text
+      result = @parser.parse("'hello'")
+      result.should_be_kind_of WalrusGrammar::RawText
+      result.lexeme.should == "'hello'"
+      
+      # basic case
+      
+      # empty string
+      
+      # with escaped single quotes inside
+      
+      # with other escapes inside
+      
+      # with double quotes inside
+      
+      # with Walrus comments inside (ignored)
+      
+      # with Walrus placeholders inside (no interpolation)
+      
+      # with Walrus directives inside (no interpolation)
+      
+    end
+    
+    specify 'should be able to parse double quoted string literals' do
+      
+      # basic case
+      
+      # empty string
+      
+      # with escaped double quotes inside
+      
+      # with other escapes inside
+      
+      # with single quotes inside
+      
+      # with Walrus comments inside (ignored)
+      
+      # with Walrus placeholders inside (no interpolation)
+      
+      # with Walrus directives inside (no interpolation)
       
     end
     

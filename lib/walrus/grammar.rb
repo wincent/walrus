@@ -109,7 +109,12 @@ module Walrus
         for i in 1..(param_count - 1)
           params        << ", result[#{i.to_s}]"
         end
-        node_class.class_eval('new(%s)' % params)
+        
+        # ParserState may have packed info into the "omitted" instance variable of "results", make sure our node has a copy of it
+        node = node_class.class_eval('new(%s)' % params)
+        node.omitted = result.omitted
+        node
+        
       else
         result
       end

@@ -29,7 +29,7 @@ module Walrus
         rule            :raw_text,                      /[^\$\\#]+/
         production      :raw_text.build(:node)
         
-        rule            :string_literal,                :single_quoted_string_literal | :doble_quoted_string_literal
+        rule            :string_literal,                :single_quoted_string_literal | :double_quoted_string_literal
         node            :string_literal
         
         rule            :single_quoted_string_literal,  "'".skip & :single_quoted_string_content.optional & "'".skip
@@ -46,10 +46,11 @@ module Walrus
         rule            :escape_sequence,               '\\'.skip & /[\$\\#]/
         production      :escape_sequence.build(:node)
         
-        rule            :directive,                     '#'.skip & :directive_name & :directive_parameters.optional
+        rule            :directive,                     /#(?!\r|\n|\s)/.skip & :directive_name & :directive_parameters.optional
+        production      :directive.build(:node, :name, :parameters)
         rule            :directive_name,                /block/i | /def/i | /end/i | /extends/i | /import/i | /set/i | /super/i
-        rule            :directive_parameters,          '('.skip & (:directive_parameter >> (',''#'.skip & :directive_parameter).zero_or_more ).optional & ')'.skip
-        rule            :directive_parameter,           :placeholder | :ruby_expression
+        rule            :directive_parameters,          (:directive_parameter >> (','.skip & :directive_parameter).zero_or_more ).optional
+        rule            :directive_parameter,           :identifier | :string_literal | :placeholder | :ruby_expression
         
         rule            :placeholder,                   '$'.skip & :placeholder_name & :placeholder_parameters.optional
         rule            :placeholder_name,              :identifier

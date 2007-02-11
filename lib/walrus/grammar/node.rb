@@ -8,7 +8,7 @@ module Walrus
     class Node
       
       # In order to be useful parse results Node and its subclasses must work well with ParserState objects, and that means responding to the "to_s" and "omitted" messages. Whatever is returned by "omitted" must itself respond to "to_s".
-      attr_accessor :omitted # an accessor because ParserState may wish to write to it
+      attr_accessor :omitted # an accessor because ParserState and the Grammar "wrap" method may wish to write to it
       
       def to_s
         @string_value

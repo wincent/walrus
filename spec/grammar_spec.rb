@@ -381,6 +381,8 @@ module Walrus
       end
       
       specify 'should be able to define a default parslet for intertoken skipping' do
+        
+        # simple example
         grammar = Grammar.subclass('SkippingGrammar') do
           starting_symbol :translation_unit
           skipping        :whitespace_and_newlines
@@ -400,6 +402,32 @@ module Walrus
         grammar.parse('foo bar').should == ['foo', 'bar']       # intervening whitespace
         grammar.parse('foo bar     ').should == ['foo', 'bar']  # trailing whitespace
         grammar.parse('     foo bar').should == ['foo', 'bar']  # leading whitespace
+        
+        # additional example, this time involving the ">>" pseudo-operator
+        grammar = Grammar.subclass('SkippingAndMergingGrammar') do
+          starting_symbol :translation_unit
+          skipping        :whitespace_and_newlines
+          rule            :whitespace_and_newlines, /[\s\n\r]+/ 
+          rule            :translation_unit,        :word_list & :end_of_string.and? | :end_of_string
+          rule            :end_of_string,           /\z/
+          rule            :word_list,               :word >> (','.skip & :word).zero_or_more
+          rule            :word,                    /[a-z0-9_]+/
+        end
+        
+        # one word
+        grammar.parse('foo').should == 'foo'
+        
+        # two words
+        grammar.parse('foo,bar').should == ['foo', 'bar']         # no whitespace
+        grammar.parse('foo, bar').should == ['foo', 'bar']        # whitespace after
+        grammar.parse('foo ,bar').should == ['foo', 'bar']        # whitespace before
+        grammar.parse('foo , bar').should == ['foo', 'bar']       # whitespace before and after
+        grammar.parse('foo , bar     ').should == ['foo', 'bar']  # trailing and embedded whitespace
+        grammar.parse('     foo , bar').should == ['foo', 'bar']  # leading and embedded whitespace
+        
+        # three or four words
+        grammar.parse('foo , bar, baz').should == ['foo', 'bar', 'baz']
+        grammar.parse(' foo , bar, baz ,bin').should == ['foo', 'bar', 'baz', 'bin']
         
       end
       
