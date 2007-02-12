@@ -452,19 +452,32 @@ module Walrus
         grammar = Grammar.subclass('OverrideDefaultSkippingParslet') do
           starting_symbol :translation_unit
           skipping        :whitespace_and_newlines
-          rule            :whitespace_and_newlines, /[\s\n\r]+/
-          rule            :whitespace,              /\s+/ 
-          rule            :translation_unit,        :component & :end_of_string.and? | :end_of_string
+          rule            :whitespace_and_newlines, /\s+/       # any whitespace including newlines
+          rule            :whitespace,              /[ \t\v]+/  # literally only spaces, tabs, not newlines etc
+          rule            :translation_unit,        :component.one_or_more & :end_of_string.and? | :end_of_string
           rule            :end_of_string,           /\z/
           rule            :component,               :word_list | :number_list
-          rule            :word_list,               :word.zero_or_more
+          rule            :word_list,               :word.one_or_more
           rule            :word,                    /[a-z]+/
-          rule            :number_list,             :number.zero_or_more
           rule            :number,                  /[0-9]+/
           
-          # when passed two arguments, the "skipping" method sets up an override for the first named rule
-          skipping        :number_list,             :whitespace
+          # the interesting bit: we override the skipping rule for number lists
+          rule            :number_list,             :number.one_or_more
+          skipping        :number_list,             :whitespace # only whitespace, no newlines
         end
+        
+        # words in word lists can be separated by whitespace or newlines
+        grammar.parse('hello world').should == ['hello', 'world']
+        grammar.parse("hello\nworld").should == ['hello', 'world']
+        grammar.parse("hello world\nworld hello").should == ['hello', 'world', 'world', 'hello']
+        
+        # numbers in number lists may be separated only by whitespace, not newlines
+        grammar.parse('123 456').should == ['123', '456']
+        grammar.parse("123\n456").should == ['123', '456'] # this succeeds because parser treats them as two separate number lists
+        grammar.parse("123 456\n456 123").should == [['123', '456'], ['456', '123']]
+        
+        # intermixing word lists and number lists
+        grammar.parse("hello world\nfoo\n123 456 baz bar\n123\n456").should == [['hello', 'world', 'foo'], ['123', '456'], ['baz', 'bar'], '123', '456']
         
       end
       

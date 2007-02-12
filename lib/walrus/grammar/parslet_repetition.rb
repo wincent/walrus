@@ -32,9 +32,15 @@ module Walrus
             rescue SkippedSubstringException => e
               state.skipped(e.to_s)
             rescue ParseError => e # failed, will try to skip; save original error in case skipping fails
-              if options.has_key?(:skipping) and not options[:skipping].nil?
+              skipping_parslet = nil
+              if options.has_key?(:rule_name) and options[:grammar].skipping_overrides.has_key?(options[:rule_name])
+                skipping_parslet = options[:grammar].skipping_overrides[options[:rule_name]]
+              elsif options.has_key?(:skipping)
+                skipping_parslet = options[:skipping]
+              end
+              if skipping_parslet
                 begin
-                  parsed = options[:skipping].parse(state.remainder, options) # potentially guard against self references (possible infinite recursion) here
+                  parsed = skipping_parslet.parse(state.remainder, options) # potentially guard against self references (possible infinite recursion) here
                 rescue ParseError
                   break # skipping didn't help either, raise original error
                 end

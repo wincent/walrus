@@ -18,6 +18,7 @@ module Walrus
     autoload(:ContinuationWrapperException, 'walrus/grammar/continuation_wrapper_exception')
     
     attr_reader :rules
+    attr_reader :skipping_overrides
     
     # Creates a Grammar subclass named according to subclass_name and instantiates an instance of the new class, returning it after evaluating the optional block in the context of the newly created instance. The advantage of working inside a new subclass is that any constants defined in the new grammar will be in a separate namespace.
     # The subclass_name parameter should be a String.

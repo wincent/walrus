@@ -56,7 +56,7 @@ module Walrus
         rule            :directive_parameters,          (:directive_parameter >> (','.skip & :directive_parameter).zero_or_more ).optional & :comment.optional
         rule            :directive_parameter,           :identifier | :string_literal | :placeholder | :ruby_expression
         
-        # may have specific rules for some directive types
+        # may have specific rules for some directive types: I think this is the way to go (ie. a C parser wouldn't expect one rule to may onto all language keywords, would it?)
         # eg. #include 'string_literal'
         # or  #extends ClassName
         # or  #set assignment = expression

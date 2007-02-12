@@ -37,6 +37,16 @@ module Walrus
             state.parsed(result)
             state.skipped(result.omitted.to_s)
           rescue ParseError => e
+            
+            # TODO: do the same here as I did in parslet_repetition (check for overrides)
+            skipping_parslet = nil
+            if options.has_key?(:rule_name) and options[:grammar].skipping_overrides.has_key?(options[:rule_name])
+              skipping_parslet = options[:grammar].skipping_overrides[options[:rule_name]]
+            elsif options.has_key?(:skipping)
+              skipping_parslet = options[:skipping]
+            end
+            #if skipping_parslet...
+              
             if options.has_key?(:skipping) and not options[:skipping].nil? and options[:skipping] != @symbol
               begin
                 result = options[:skipping].parse(state.remainder, augmented_options)
