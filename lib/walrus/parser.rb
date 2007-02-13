@@ -26,6 +26,7 @@ module Walrus
         rule            :template,                          :template_element.zero_or_more & :end_of_input.and?
         rule            :template_element,                  :raw_text | :comment | :directive | :placeholder |:escape_sequence
         
+        # anything at all other than the three characters which have special meaning in Walrus: $, \ and #
         rule            :raw_text,                          /[^\$\\#]+/
         production      :raw_text.build(:node)
         
@@ -39,17 +40,13 @@ module Walrus
         production      :double_quoted_string_literal.build(:string_literal)
         rule            :double_quoted_string_content,      /(\\(?!").|\\"|[^"\\]+)+/
         
-        rule            :identifier,                        /[a-zA-Z_][a-zA-Z0-9_]*/
+        rule            :identifier,                        /[a-z_][a-zA-Z0-9_]*/
         rule            :constant,                          /[A-Z][a-zA-Z0-9_]*/
         
         rule            :ruby_expression,                   'not yet implemented'# string literals, numbers, arrays, method calls, etc (basic Ruby subset)
         
         rule            :escape_sequence,                   '\\'.skip & /[\$\\#]/
         production      :escape_sequence.build(:node)
-        
-        # directives like comments should extend to the end of the line
-        # but comments should be allowed to appear to the right of a directive
-        # the current rules below would allow us to skip newlines between tokens which is bad: we only want to skip whitespace
         
         #rule            :directive,                     /#(?!\r|\n|\s)/.skip & :directive_name & :directive_parameters.optional
         #production      :directive.build(:node, :name, :parameters)
@@ -59,26 +56,34 @@ module Walrus
         #rule            :directive_parameter,           :identifier | :string_literal | :placeholder | :ruby_expression
         
         # may have specific rules for some directive types: I think this is the way to go (ie. a C parser wouldn't expect one rule to may onto all language keywords, would it?)
-        # eg. #include 'string_literal'
-        # or  #extends ClassName
         # or  #set assignment = expression
         # or  #super parameter, list
         # or  #super (parameter, list, with, brackets) // probably don't want brackets as the other directives don't use them
         # or  #block name
         # or  #end (no parameters)
         
-        rule            :directive,                     :end_directive | :extends_directive
+        rule            :directive,                     :end_directive | :extends_directive | :import_directive | :include_directive
         node            :directive
         skipping        :directive, :whitespace
         
         # all directives must be followed by a comment, a newline, or the end of the input
         rule            :directive_predicate,           :whitespace.optional.skip & (:comment | :newline | :end_of_input).and?
         
+        rule            :block_directive,               '#block' & :identifier & :parameter_list.optional >> :directive_predicate
+        
+        rule            :def_directive,                 '#def' & :identifier & :parameter_list.optional >> :directive_predicate
+        
         rule            :end_directive,                 '#end' >> :directive_predicate
         production      :end_directive.build(:directive)
         
         rule            :extends_directive,             '#extends'.skip & :constant >> :directive_predicate
         production      :extends_directive.build(:directive, :class_name)
+        
+        rule            :import_directive,              '#import'.skip & :constant >> :directive_predicate
+        production      :import_directive.build(:directive, :class_name)
+        
+        rule            :include_directive,             '#include'.skip & :string_literal >> :directive_predicate
+        production      :include_directive.build(:directive, :file_name)
         
         rule            :placeholder,                   '$'.skip & :placeholder_name & :placeholder_parameters.optional
         rule            :placeholder_name,              :identifier

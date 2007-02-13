@@ -161,6 +161,12 @@ module Walrus
       result.class_name.should == 'OtherTemplate'
     end
     
+    specify 'should be able to parse a directive with no parameters' do
+      # basic test
+      result = @parser.parse('#end')
+      result.should_be_kind_of WalrusGrammar::EndDirective
+    end
+    
     specify 'should be able to follow a directive by a comment on the same line' do
       
       # no intervening whitespace ("extends" directive, takes one parameter)
@@ -170,8 +176,15 @@ module Walrus
       result[1].should_be_kind_of WalrusGrammar::Comment
       result[1].lexeme.should == ' comment'
       
-      # intervening whitespace
+      # intervening whitespace (between parameter and trailing comment)
       result = @parser.parse('#extends OtherTemplate           ## comment')
+      result[0].should_be_kind_of WalrusGrammar::ExtendsDirective
+      result[0].class_name.should == 'OtherTemplate'
+      result[1].should_be_kind_of WalrusGrammar::Comment
+      result[1].lexeme.should == ' comment'
+      
+      # intervening whitespace (between directive and parameter)
+      result = @parser.parse('#extends          OtherTemplate           ## comment')
       result[0].should_be_kind_of WalrusGrammar::ExtendsDirective
       result[0].class_name.should == 'OtherTemplate'
       result[1].should_be_kind_of WalrusGrammar::Comment
@@ -193,21 +206,81 @@ module Walrus
       
     end
     
-    specify 'should be able to parse a directive with no parameters' do
-      # basic test
-      result = @parser.parse('#end')
-      result.should_be_kind_of WalrusGrammar::EndDirective
-    end
-    
     specify 'should be able to parse an "end" directive' do
       
       # followed by a newline
+      result = @parser.parse("#end\nhello")
+      result[0].should_be_kind_of WalrusGrammar::EndDirective
+      result[0].lexeme.should == '#end'
+      result[1].should_be_kind_of WalrusGrammar::RawText
+      result[1].lexeme.should == "\nhello"
       
       # followed by whitespace
+      result = @parser.parse('#end     ')
+      result.should_be_kind_of WalrusGrammar::EndDirective
+      result.lexeme.should == '#end'
       
-      # followed by a comment on the same line
+    end
+    
+    specify 'should be able to parse an "import" directive' do
       
-      # follwed by the end of the input
+      # followed by a newline
+      result = @parser.parse("#import OtherTemplate\nhello")
+      result[0].should_be_kind_of WalrusGrammar::ImportDirective
+      result[0].class_name.should == 'OtherTemplate'
+      result[1].should_be_kind_of WalrusGrammar::RawText
+      result[1].lexeme.should == "\nhello"
+      
+      # followed by whitespace
+      result = @parser.parse('#import OtherTemplate     ')
+      result.should_be_kind_of WalrusGrammar::ImportDirective
+      result.class_name.should == 'OtherTemplate'
+      
+      # followed by the end of the input
+      result = @parser.parse('#import OtherTemplate')
+      result.should_be_kind_of WalrusGrammar::ImportDirective
+      result.class_name.should == 'OtherTemplate'
+      
+      # comment with no intervening whitespace
+      result = @parser.parse('#import OtherTemplate## comment')
+      result[0].should_be_kind_of WalrusGrammar::ImportDirective
+      result[0].class_name.should == 'OtherTemplate'
+      result[1].should_be_kind_of WalrusGrammar::Comment
+      result[1].lexeme.should == ' comment'
+      
+      # intervening whitespace (between parameter and trailing comment)
+      result = @parser.parse('#import OtherTemplate           ## comment')
+      result[0].should_be_kind_of WalrusGrammar::ImportDirective
+      result[0].class_name.should == 'OtherTemplate'
+      result[1].should_be_kind_of WalrusGrammar::Comment
+      result[1].lexeme.should == ' comment'
+      
+      # intervening whitespace (between directive and parameter)
+      result = @parser.parse('#import          OtherTemplate           ## comment')
+      result[0].should_be_kind_of WalrusGrammar::ImportDirective
+      result[0].class_name.should == 'OtherTemplate'
+      result[1].should_be_kind_of WalrusGrammar::Comment
+      result[1].lexeme.should == ' comment'
+      
+    end
+    
+    specify 'should be able to parse an "include" directive' do
+      
+      # basic case: double-quoted file name
+      result = @parser.parse('#include "file/to/include"')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::IncludeDirective
+      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.file_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.file_name.lexeme.should == 'file/to/include'
+      
+      # basic case: single-quoted file name
+      result = @parser.parse("#include 'file/to/include'")
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::IncludeDirective
+      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.file_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
+      result.file_name.lexeme.should == 'file/to/include'
       
     end
     
@@ -218,41 +291,98 @@ module Walrus
       result.should_be_kind_of WalrusGrammar::RawText
       result.lexeme.should == "'hello'"
       
-      # basic case
-      
       # empty string
+      result = @parser.parse("#include ''")
+      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.file_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
+      result.file_name.lexeme.to_s.should == '' # actually just returns []; I might need to add a "flatten" or "to_string" method to my Grammar specification system
       
       # with escaped single quotes inside
+      result = @parser.parse("#include 'hello \\'world\\''")
+      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.file_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
+      result.file_name.lexeme.should == "hello \\'world\\'"
       
       # with other escapes inside
+      result = @parser.parse("#include 'hello\\nworld'")
+      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.file_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
+      result.file_name.lexeme.should == 'hello\nworld'
       
       # with double quotes inside
+      result = @parser.parse("#include 'hello \"world\"'")
+      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.file_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
+      result.file_name.lexeme.should == 'hello "world"'
       
       # with Walrus comments inside (ignored)
+      result = @parser.parse("#include 'hello ##world'")
+      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.file_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
+      result.file_name.lexeme.should == 'hello ##world'
       
       # with Walrus placeholders inside (no interpolation)
+      result = @parser.parse("#include 'hello $world'")
+      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.file_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
+      result.file_name.lexeme.should == 'hello $world'
       
       # with Walrus directives inside (no interpolation)
+      result = @parser.parse("#include 'hello #end'")
+      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.file_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
+      result.file_name.lexeme.should == 'hello #end'
       
     end
     
     specify 'should be able to parse double quoted string literals' do
       
-      # basic case
+      # string literals have no special meaning when part of raw text
+      result = @parser.parse('"hello"')
+      result.should_be_kind_of WalrusGrammar::RawText
+      result.lexeme.should == '"hello"'
       
       # empty string
+      result = @parser.parse('#include ""')
+      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.file_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.file_name.lexeme.to_s.should == '' # actually just returns []; I might need to add a "flatten" or "to_string" method to my Grammar specification system
       
       # with escaped double quotes inside
+      result = @parser.parse('#include "hello \\"world\\""')
+      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.file_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.file_name.lexeme.should == 'hello \\"world\\"'
       
       # with other escapes inside
+      result = @parser.parse('#include "hello\\nworld"')
+      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.file_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.file_name.lexeme.should == 'hello\\nworld'
       
       # with single quotes inside
+      result = @parser.parse('#include "hello \'world\'"')
+      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.file_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.file_name.lexeme.should == "hello 'world'"
       
       # with Walrus comments inside (ignored)
+      result = @parser.parse('#include "hello ##world"')
+      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.file_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.file_name.lexeme.should == 'hello ##world'
       
       # with Walrus placeholders inside (no interpolation)
+      result = @parser.parse('#include "hello $world"')
+      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.file_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.file_name.lexeme.should == 'hello $world'
       
       # with Walrus directives inside (no interpolation)
+      result = @parser.parse('#include "hello #end"')
+      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.file_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.file_name.lexeme.should == 'hello #end'
       
     end
     
