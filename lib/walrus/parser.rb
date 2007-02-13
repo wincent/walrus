@@ -18,9 +18,14 @@ module Walrus
         
         skipping        :whitespace_or_newlines
         
-        rule            :whitespace,                    /[ \t\v]+/    # only spaces and tabs, not newlines
-        rule            :newline,                       /\r\n|\r|\n/
         rule            :whitespace_or_newlines,        /\s+/
+        
+        # only spaces and tabs, not newlines
+        rule            :whitespace,                    /[ \t\v]+/
+        rule            :newline,                       /\r\n|\r|\n/
+        
+        # optional whitespace (tabs and spaces only) followed by a backslash/newline (note: this is not escape-aware)
+        rule            :line_continuation,             /[ \t\v]*\\\n/
         rule            :end_of_input,                  /\z/
         
         rule            :template,                      :template_element.zero_or_more & :end_of_input.and?
@@ -64,11 +69,14 @@ module Walrus
         # | :super_directive | :set_directive
         
         node            :directive
-        skipping        :directive, :whitespace
+        
+        # directives may span multiple lines if and only if the last character on the line is a backslash \
+        skipping        :directive,                     :whitespace | :line_continuation
         
         # all directives must be followed by a comment, a newline, or the end of the input
         rule            :directive_predicate,           :whitespace.optional.skip & (:comment | :newline | :end_of_input).and?
         
+        # TODO: make block directive keep consuming content until it hits an #end directive, store this in a content attribute
         rule            :block_directive,               '#block' & :identifier & :def_parameter_list.optional >> :directive_predicate
         
         rule            :def_directive,                 '#def' & :identifier & :def_parameter_list.optional >> :directive_predicate
@@ -89,7 +97,21 @@ module Walrus
         rule            :include_directive,             '#include'.skip & :string_literal >> :directive_predicate
         production      :include_directive.build(:directive, :file_name)
         
-        rule            :raw_directive,                 '#raw'.skip & '#end'.skip
+        # "Any section of a template definition that is inside a #raw ... #end raw tag pair will be printed verbatim without any parsing of $placeholders or other directives."
+        # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.raw.html
+        rule            :raw_directive,                 '#raw'.skip & /.*(?=#end)/ & '#end'.skip >> :directive_predicate
+        
+        # in a "raw" block none of the Walrus special characters should have meaning
+        # the block continues until the parser hits an "#end" directive
+        # how would you include a literal "#end" in the raw section itself?
+        # you would need to escape it in some way
+        # does that mean that "\" can be used to escape #end?
+        # but then, how would you include a literal "\#end"?
+        # \\#end
+        # does that mean an escaped \ ? in which case the #end marks the end of the section
+        # or does it mean an escaped \#end ? in which case how would you write a literal "\\#end" ?
+        # these questions might be worth exploring because they could help me in the implementation of the #ruby directive (which will also accumulate stuff until it hits "#end")
+        rule            :raw_content,                   //
         
         rule            :set_directive,                 '#set'.skip & :assignment_expression >> :directive_predicate
         production      :set_directive.build(:directive, :assignment)

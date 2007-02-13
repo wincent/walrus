@@ -233,6 +233,18 @@ module Walrus
       
     end
     
+    specify 'should be able to span directives across lines by using a line continuation backslash' do
+      
+      # basic case
+      result = @parser.parse("#extends \\\nOtherTemplate")
+      result.should_be_kind_of WalrusGrammar::ExtendsDirective
+      result.class_name.should == 'OtherTemplate'
+      
+      # should fail if backslash is not the last character on the line
+      lambda { @parser.parse("#extends \\ \nOtherTemplate") }.should_raise Grammar::ParseError
+      
+    end
+    
     specify 'should be able to parse an "end" directive' do
       
       # followed by a newline
@@ -431,12 +443,32 @@ module Walrus
     
     specify 'should be able to parse the "slurp" directive' do
       
+      # basic case
       result = @parser.parse("hello #slurp\nworld")
       result[0].should_be_kind_of WalrusGrammar::RawText
       result[0].lexeme.should == 'hello '
       result[1].should_be_kind_of WalrusGrammar::SlurpDirective
       result[2].should_be_kind_of WalrusGrammar::RawText
       result[2].lexeme.should == 'world'
+      
+      # must be the last thing on the line (no comments)
+      lambda { @parser.parse("hello #slurp ## my comment...\nworld") }.should_raise Grammar::ParseError
+      
+      # but intervening whitespace is ok
+      result = @parser.parse("hello #slurp     \nworld")
+      result[0].should_be_kind_of WalrusGrammar::RawText
+      result[0].lexeme.should == 'hello '
+      result[1].should_be_kind_of WalrusGrammar::SlurpDirective
+      result[2].should_be_kind_of WalrusGrammar::RawText
+      result[2].lexeme.should == 'world'
+      
+      # should only slurp one newline, not multiple newlines
+      result = @parser.parse("hello #slurp\n\n\nworld")       # three newlines
+      result[0].should_be_kind_of WalrusGrammar::RawText
+      result[0].lexeme.should == 'hello '
+      result[1].should_be_kind_of WalrusGrammar::SlurpDirective
+      result[2].should_be_kind_of WalrusGrammar::RawText
+      result[2].lexeme.should == "\n\nworld"                  # one newline slurped, two left
       
     end
     
