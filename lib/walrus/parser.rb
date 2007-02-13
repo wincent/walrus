@@ -72,16 +72,12 @@ module Walrus
         skipping        :directive, :whitespace
         
         # all directives must be followed by a comment, a newline, or the end of the input
-        # hard to factor out the optional whitespace into separate rule:
-        #    rule :directive_predicate, :whitespace.optional.skip & :directive_predicate
-        # because such a rule would return an empty array with the whitespace stuffed into its "omitted" instance variable
-        # this would make the output confusing (['foo', []] instead of just 'foo')
-        rule            :directive_predicate,           (:comment | :newline | :end_of_input).and?
+        rule            :directive_predicate,           :whitespace.optional.skip & (:comment | :newline | :end_of_input).and?
         
-        rule            :end_directive,                 '#end' & :whitespace.optional.skip & :directive_predicate
+        rule            :end_directive,                 '#end' >> :directive_predicate
         production      :end_directive.build(:directive)
         
-        rule            :extends_directive,             '#extends'.skip & :constant & :whitespace.optional.skip & :directive_predicate
+        rule            :extends_directive,             '#extends'.skip & :constant >> :directive_predicate
         production      :extends_directive.build(:directive, :class_name)
         
         rule            :placeholder,                   '$'.skip & :placeholder_name & :placeholder_parameters.optional
