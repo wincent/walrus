@@ -435,10 +435,11 @@ module Walrus
     specify 'should be able to parse the "set" directive' do
       
       # assign a string literal 
-#      result = @parser.parse('#set foo = "bar"')
+      result = @parser.parse('#set foo = "bar"')
       
+      # assign a local variable
+      result = @parser.parse('#set foo = bar')
       
-#      result = @parser.parse('#set foo = bar')
     end
     
     specify 'should be able to parse the "slurp" directive' do
