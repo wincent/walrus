@@ -60,7 +60,7 @@ module Walrus
         # might be nice to have a "compress" or "to_string" or "raw" operator here; we're not really interested in the internal structure of the comment
         # basically, given a result, walk the structure (if any) calling "to_s" and "omitted" and reconstructing the original text? (or calling a "base_text" method)
                 
-        rule            :directive,                     :end_directive | :extends_directive | :import_directive | :include_directive
+        rule            :directive,                     :end_directive | :extends_directive | :import_directive | :include_directive | :slurp_directive
         # | :super_directive | :set_directive
         
         node            :directive
@@ -102,6 +102,7 @@ module Walrus
         # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.slurp.html
         # Unlike other directives (which may be followed by a comment), the "slurp" directive must be the last thing on the line.
         rule            :slurp_directive,               '#slurp' & :whitespace.optional.skip & :newline.skip
+        production      :slurp_directive.build(:node)
         
         rule            :super_directive,               '#super'.skip & :super_parameter_list.optional >> :directive_predicate
         

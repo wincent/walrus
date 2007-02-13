@@ -431,6 +431,13 @@ module Walrus
     
     specify 'should be able to parse the "slurp" directive' do
       
+      result = @parser.parse("hello #slurp\nworld")
+      result[0].should_be_kind_of WalrusGrammar::RawText
+      result[0].lexeme.should == 'hello '
+      result[1].should_be_kind_of WalrusGrammar::SlurpDirective
+      result[2].should_be_kind_of WalrusGrammar::RawText
+      result[2].lexeme.should == 'world'
+      
     end
     
   end
