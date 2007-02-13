@@ -185,7 +185,7 @@ module Walrus
       result = @parser.parse('#extends OtherTemplate')
       result.should_be_kind_of WalrusGrammar::Directive
       result.should_be_kind_of WalrusGrammar::ExtendsDirective
-      result.class_name.should == 'OtherTemplate'
+      result.class_name.lexeme.should == 'OtherTemplate'
     end
     
     specify 'should be able to parse a directive with no parameters' do
@@ -199,21 +199,21 @@ module Walrus
       # no intervening whitespace ("extends" directive, takes one parameter)
       result = @parser.parse('#extends OtherTemplate## comment')
       result[0].should_be_kind_of WalrusGrammar::ExtendsDirective
-      result[0].class_name.should == 'OtherTemplate'
+      result[0].class_name.lexeme.should == 'OtherTemplate'
       result[1].should_be_kind_of WalrusGrammar::Comment
       result[1].lexeme.should == ' comment'
       
       # intervening whitespace (between parameter and trailing comment)
       result = @parser.parse('#extends OtherTemplate           ## comment')
       result[0].should_be_kind_of WalrusGrammar::ExtendsDirective
-      result[0].class_name.should == 'OtherTemplate'
+      result[0].class_name.lexeme.should == 'OtherTemplate'
       result[1].should_be_kind_of WalrusGrammar::Comment
       result[1].lexeme.should == ' comment'
       
       # intervening whitespace (between directive and parameter)
       result = @parser.parse('#extends          OtherTemplate           ## comment')
       result[0].should_be_kind_of WalrusGrammar::ExtendsDirective
-      result[0].class_name.should == 'OtherTemplate'
+      result[0].class_name.lexeme.should == 'OtherTemplate'
       result[1].should_be_kind_of WalrusGrammar::Comment
       result[1].lexeme.should == ' comment'
       
@@ -238,7 +238,7 @@ module Walrus
       # basic case
       result = @parser.parse("#extends \\\nOtherTemplate")
       result.should_be_kind_of WalrusGrammar::ExtendsDirective
-      result.class_name.should == 'OtherTemplate'
+      result.class_name.lexeme.should == 'OtherTemplate'
       
       # should fail if backslash is not the last character on the line
       lambda { @parser.parse("#extends \\ \nOtherTemplate") }.should_raise Grammar::ParseError
@@ -266,38 +266,38 @@ module Walrus
       # followed by a newline
       result = @parser.parse("#import OtherTemplate\nhello")
       result[0].should_be_kind_of WalrusGrammar::ImportDirective
-      result[0].class_name.should == 'OtherTemplate'
+      result[0].class_name.lexeme.should == 'OtherTemplate'
       result[1].should_be_kind_of WalrusGrammar::RawText
       result[1].lexeme.should == "\nhello"
       
       # followed by whitespace
       result = @parser.parse('#import OtherTemplate     ')
       result.should_be_kind_of WalrusGrammar::ImportDirective
-      result.class_name.should == 'OtherTemplate'
+      result.class_name.lexeme.should == 'OtherTemplate'
       
       # followed by the end of the input
       result = @parser.parse('#import OtherTemplate')
       result.should_be_kind_of WalrusGrammar::ImportDirective
-      result.class_name.should == 'OtherTemplate'
+      result.class_name.lexeme.should == 'OtherTemplate'
       
       # comment with no intervening whitespace
       result = @parser.parse('#import OtherTemplate## comment')
       result[0].should_be_kind_of WalrusGrammar::ImportDirective
-      result[0].class_name.should == 'OtherTemplate'
+      result[0].class_name.lexeme.should == 'OtherTemplate'
       result[1].should_be_kind_of WalrusGrammar::Comment
       result[1].lexeme.should == ' comment'
       
       # intervening whitespace (between parameter and trailing comment)
       result = @parser.parse('#import OtherTemplate           ## comment')
       result[0].should_be_kind_of WalrusGrammar::ImportDirective
-      result[0].class_name.should == 'OtherTemplate'
+      result[0].class_name.lexeme.should == 'OtherTemplate'
       result[1].should_be_kind_of WalrusGrammar::Comment
       result[1].lexeme.should == ' comment'
       
       # intervening whitespace (between directive and parameter)
       result = @parser.parse('#import          OtherTemplate           ## comment')
       result[0].should_be_kind_of WalrusGrammar::ImportDirective
-      result[0].class_name.should == 'OtherTemplate'
+      result[0].class_name.lexeme.should == 'OtherTemplate'
       result[1].should_be_kind_of WalrusGrammar::Comment
       result[1].lexeme.should == ' comment'
       

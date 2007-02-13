@@ -46,8 +46,11 @@ module Walrus
         rule            :double_quoted_string_content,  /(\\(?!").|\\"|[^"\\]+)+/
         
         rule            :numeric_literal,               /\d+\.\d+|\d(?!\.)/
+        production      :numeric_literal.build(:node)
         rule            :identifier,                    /[a-z_][a-zA-Z0-9_]*/
+        production      :identifier.build(:node)
         rule            :constant,                      /[A-Z][a-zA-Z0-9_]*/
+        production      :constant.build(:node)
         
         rule            :escape_sequence,               '\\'.skip & /[\$\\#]/
         production      :escape_sequence.build(:node)
