@@ -48,6 +48,33 @@ module Walrus
       result.should_be_kind_of WalrusGrammar::Comment
       result.lexeme.should == ''
       
+      # multi-line comment (empty)
+      result = @parser.parse('#**#')
+      result.should_be_kind_of WalrusGrammar::Comment
+      result.should_be_kind_of WalrusGrammar::MultilineComment
+      result.content.should == [] # might be nice to automatically flatten this stuff into a string
+      
+      # multi-line comment (with content)
+      result = @parser.parse('#* hello world *#')
+      result.should_be_kind_of WalrusGrammar::MultilineComment
+#      result.content.should == ' hello world '     #FAILS
+      
+      # multi-line comment (spanning multiple lines)
+      result = @parser.parse("#* hello\nworld *#")
+      result.should_be_kind_of WalrusGrammar::MultilineComment
+      
+      # multi-line comment (with nested comment)
+      result = @parser.parse('#* hello #*world*# *#')
+      result.should_be_kind_of WalrusGrammar::MultilineComment
+      
+      # multi-line comment (with nested comment, spanning multiple lines)
+      result = @parser.parse("#* hello\n#* world\n... *# *#")
+      result.should_be_kind_of WalrusGrammar::MultilineComment
+      
+      # multi-line comment (with nested single-line comment)
+      result = @parser.parse("#* ##hello\n*#")
+      result.should_be_kind_of WalrusGrammar::MultilineComment
+      
     end
     
     specify 'should be able to parse an escape marker' do
@@ -383,6 +410,26 @@ module Walrus
       result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
       result.file_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
       result.file_name.lexeme.should == 'hello #end'
+      
+    end
+    
+    specify 'should be able to parse the "def" directive' do
+      
+      # simple case: no parameters
+      
+      
+    end
+    
+    specify 'should be able to parse the "set" directive' do
+      
+      # assign a string literal 
+#      result = @parser.parse('#set foo = "bar"')
+      
+      
+#      result = @parser.parse('#set foo = bar')
+    end
+    
+    specify 'should be able to parse the "slurp" directive' do
       
     end
     

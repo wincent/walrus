@@ -29,6 +29,14 @@ module Walrus
         grammar.wrap(result, @symbol)
       end
       
+      # We override the to_s method as it can make parsing error messages more readable. Instead of messages like this:
+      #   predicate not satisfied (expected "#<Walrus::Grammar::SymbolParslet:0x10cd504>") while parsing "hello world"
+      # We can print messages like this:
+      #   predicate not satisfied (expected "rule: end_of_input") while parsing "hello world"
+      def to_s
+        'rule: ' + @symbol.to_s
+      end
+      
     end # class SymbolParslet
     
   end # class Grammar

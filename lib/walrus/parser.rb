@@ -24,7 +24,7 @@ module Walrus
         rule            :end_of_input,                  /\z/
         
         rule            :template,                      :template_element.zero_or_more & :end_of_input.and?
-        rule            :template_element,              :raw_text | :comment | :directive | :placeholder |:escape_sequence
+        rule            :template_element,              :raw_text | :comment | :multiline_comment | :directive | :placeholder |:escape_sequence
         
         # anything at all other than the three characters which have special meaning in Walrus: $, \ and #
         rule            :raw_text,                      /[^\$\\#]+/
@@ -50,7 +50,16 @@ module Walrus
         rule            :comment,                       '##'.skip & /.*$/
         production      :comment.build(:node)
         
+        # nested multiline comments
+        rule            :multiline_comment,             '#*'.skip & :comment_content.optional & '*#'.skip
+        skipping        :multiline_comment, nil
+        production      :multiline_comment.build(:comment, :content)
         
+        # human-language version of the regex: "any run of characters other than # or *, any # not followed by another # or a *, or any * not followed by a #"
+        rule            :comment_content,               ( (:comment & :newline) | :multiline_comment | :whitespace_or_newlines | /([^*#]+|#(?!#|\*)|\*(?!#))+/ ).one_or_more
+        # might be nice to have a "compress" or "to_string" or "raw" operator here; we're not really interested in the internal structure of the comment
+        # basically, given a result, walk the structure (if any) calling "to_s" and "omitted" and reconstructing the original text? (or calling a "base_text" method)
+                
         rule            :directive,                     :end_directive | :extends_directive | :import_directive | :include_directive
         # | :super_directive | :set_directive
         
@@ -64,6 +73,10 @@ module Walrus
         
         rule            :def_directive,                 '#def' & :identifier & :def_parameter_list.optional >> :directive_predicate
         
+        # "The #echo directive is used to echo the output from expressions that can't be written as simple $placeholders."
+        # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.echo.html
+        rule            :echo_directive,                '#echo'.skip & :ruby_expression >> :directive_predicate
+        
         rule            :end_directive,                 '#end' >> :directive_predicate
         production      :end_directive.build(:directive)
         
@@ -76,10 +89,29 @@ module Walrus
         rule            :include_directive,             '#include'.skip & :string_literal >> :directive_predicate
         production      :include_directive.build(:directive, :file_name)
         
+        rule            :raw_directive,                 '#raw'.skip & '#end'.skip
+        
+        rule            :set_directive,                 '#set'.skip & :assignment_expression >> :directive_predicate
+        production      :set_directive.build(:directive, :assignment)
+        
+        # "#silent is the opposite of #echo. It executes an expression but discards the output."
+        # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.silent.html
+        rule            :silent_directive,              '#silent'.skip & :ruby_expression >> :directive_predicate
+        
+        # "The #slurp directive eats up the trailing newline on the line it appears in, joining the following line onto the current line."
+        # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.slurp.html
+        # Unlike other directives (which may be followed by a comment), the "slurp" directive must be the last thing on the line.
+        rule            :slurp_directive,               '#slurp' & :whitespace.optional.skip & :newline.skip
+        
+        rule            :super_directive,               '#super'.skip & :super_parameter_list.optional >> :directive_predicate
+        
         rule            :def_parameter_list,            '('.skip & ( :def_parameter >> ( ','.skip & :def_parameter ).zero_or_more ).optional & ')'.skip
         rule            :def_parameter,                 :identifier | :assignment_expression
         
-        rule            :placeholder,                   '$'.skip & :placeholder_name & :placeholder_parameters.optional
+        # placeholders may be in long form (${foo}) or short form ($foo)
+        rule            :placeholder,                   :long_placeholder | :short_placeholder
+        rule            :long_placeholder,              '$'.skip & '{'.skip & :placeholder_name & :placeholder_parameters.optional & '}'.skip
+        rule            :short_placeholder,             '$'.skip & :placeholder_name & :placeholder_parameters.optional
         rule            :placeholder_name,              :identifier
         rule            :placeholder_parameters,        '('.skip & (:placeholder_parameter >> (','.skip & :placeholder_parameter).zero_or_more).optional & ')'.skip
         rule            :placeholder_parameter,         :placeholder | :ruby_expression
@@ -91,7 +123,7 @@ module Walrus
         rule            :array_literal,                 '['.skip & ( :ruby_expression >> (','.skip & :ruby_expression ).zero_or_more ).optional & ']'.skip
         rule            :hash_literal,                  '{'.skip & ( :hash_assignment >> (','.skip & :hash_assignment ).zero_or_more ).optional & '}'.skip
         rule            :hash_assignment,               :unary_expression & '=>'.skip & (:unary_expression | :addition_expression)
-        rule            :assignment_expression,         :identifier & '='.skip & (:unary_expression | :addition_expression)
+        rule            :assignment_expression,         :identifier & '='.skip & (:addition_expression | :unary_expression)
         rule            :addition_expression,           :unary_expression & '+'.skip & (:addition_expression | :unary_expression)
         rule            :message_expression,            :literal_expression & '.'.skip & :method_expression
         rule            :method_expression,             :identifier & :method_parameter_list.optional 
