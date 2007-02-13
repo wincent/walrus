@@ -9,9 +9,10 @@ module Walrus
       
       def parse(string, options = {})
         raise ArgumentError if string.nil?
+        parsed = "FOO"
         catch :ZeroWidthParseSuccess do
           begin
-            @parseable.parse(string, options)
+            parsed = @parseable.parse(string, options)
           rescue ParseError
             raise ParseError.new('predicate not satisfied (expected "%s") while parsing "%s"' % [@parseable.to_s, string])
           end

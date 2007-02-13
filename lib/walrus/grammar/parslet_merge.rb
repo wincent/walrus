@@ -30,7 +30,7 @@ module Walrus
                     end
                   rescue SkippedSubstringException => e
                     state.skipped(e.to_s)
-                  # TODO: try inter-token parslets on failure here  
+                    # TODO: possiby try inter-token parslets on failure here?
                   end
                   last_caught = nil
                   throw :ProcessNextAlternative

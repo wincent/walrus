@@ -497,6 +497,40 @@ module Walrus
         end.should_raise ArgumentError
       end
       
+      specify 'use of the "skipping" directive should play nicely with predicates' do
+        
+        # example 1: word + predicate
+        grammar = Grammar.subclass('NicePlayer') do
+          starting_symbol :foo
+          skipping        :whitespace
+          rule            :whitespace,                /[ \t\v]+/
+          rule            :foo,                       'hello' & 'world'.and?        
+        end
+        
+        grammar.parse('hello world').should == 'hello'
+        grammar.parse('hello      world').should == 'hello'
+        grammar.parse('helloworld').should == 'hello'
+        lambda { grammar.parse('hello') }.should_raise ParseError
+        lambda { grammar.parse('hello buddy') }.should_raise ParseError
+        lambda { grammar.parse("hello\nbuddy") }.should_raise ParseError
+        
+        # example 2: word + predicate + other word
+        grammar = Grammar.subclass('NicePlayer2') do
+          starting_symbol :foo
+          skipping        :whitespace
+          rule            :whitespace,                /[ \t\v]+/
+          rule            :foo,                       /hel../ & 'world'.and? & /\w+/
+        end
+        
+        grammar.parse('hello world').should == ['hello', 'world']
+        grammar.parse('hello      world').should == ['hello', 'world']
+        grammar.parse('helloworld').should == ['hello', 'world']
+        lambda { grammar.parse('hello') }.should_raise ParseError
+        lambda { grammar.parse('hello buddy') }.should_raise ParseError
+        lambda { grammar.parse("hello\nbuddy") }.should_raise ParseError
+        
+      end
+      
     end
   end # class Grammar  
 end # module Walrus

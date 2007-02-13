@@ -49,6 +49,7 @@ module Walrus
         state               = ParserState.new(string)
         last_caught         = nil # keep track of the last kind of throw to be caught
         alternatives        = [@first, @second] + @others
+        
         alternatives.each do |parseable|
           catch :ProcessNextAlternative do
             catch :NotPredicateSuccess do
@@ -60,14 +61,10 @@ module Walrus
                     state.skipped(parsed.omitted.to_s)  # in case any sub-parslets skipped tokens along the way
                   rescue SkippedSubstringException => e
                     state.skipped(e.to_s)
-                  rescue ParseError => e # failed, will try to skip; save original error in case skipping fails
-                    
-                    # TODO: do the same here as I did in parslet_repetition (check for overrides)
+                  rescue ParseError => e # failed, will try to skip; save original error in case skipping fails                    
                     skipping_parslet = nil
-                    if options.has_key?(:rule_name) and options[:grammar].skipping_overrides.has_key?(options[:rule_name])
-                      skipping_parslet = options[:grammar].skipping_overrides[options[:rule_name]]
-                    elsif options.has_key?(:skipping)
-                      skipping_parslet = options[:skipping]
+                    if options.has_key?(:skipping_override) : skipping_parslet = options[:skipping_override]
+                    elsif options.has_key?(:skipping)       : skipping_parslet = options[:skipping]
                     end
                     if skipping_parslet
                       begin

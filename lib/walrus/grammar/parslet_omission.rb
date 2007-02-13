@@ -17,7 +17,13 @@ module Walrus
       
       def parse(string, options = {})
         raise ArgumentError if string.nil?
-        substring = ""
+        substring = ''
+        
+        # possible should catch these here as well
+        #catch :NotPredicateSuccess do
+        #catch :AndPredicateSuccess do
+        # one of the fundamental problems is that if a parslet throws such a symbol any info about already skipped material is lost (because the symbols contain nothing)
+        # this may be one reason to change these to exceptions...
         catch :ZeroWidthParseSuccess do
           substring = @parseable.parse(string, options).to_s
         end

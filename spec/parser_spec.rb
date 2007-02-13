@@ -157,11 +157,57 @@ module Walrus
     specify 'should be able to parse a directive that takes a single parameter' do
       result = @parser.parse('#extends OtherTemplate')
       result.should_be_kind_of WalrusGrammar::Directive
-      result.name.should == 'extends'
+      result.should_be_kind_of WalrusGrammar::ExtendsDirective
+      result.class_name.should == 'OtherTemplate'
+    end
+    
+    specify 'should be able to follow a directive by a comment on the same line' do
+      
+      # no intervening whitespace ("extends" directive, takes one parameter)
+      result = @parser.parse('#extends OtherTemplate## comment')
+      result[0].should_be_kind_of WalrusGrammar::ExtendsDirective
+      result[0].class_name.should == 'OtherTemplate'
+      result[1].should_be_kind_of WalrusGrammar::Comment
+      result[1].lexeme.should == ' comment'
+      
+      # intervening whitespace
+      result = @parser.parse('#extends OtherTemplate           ## comment')
+      result[0].should_be_kind_of WalrusGrammar::ExtendsDirective
+      result[0].class_name.should == 'OtherTemplate'
+      result[1].should_be_kind_of WalrusGrammar::Comment
+      result[1].lexeme.should == ' comment'
+      
+      # same but with "end" directive (no parameters)
+      result = @parser.parse('#end## comment')
+      result[0].should_be_kind_of WalrusGrammar::EndDirective
+      result[0].lexeme.should == '#end'
+      result[1].should_be_kind_of WalrusGrammar::Comment
+      result[1].lexeme.should == ' comment'
+      
+      # intervening whitespace
+      result = @parser.parse('#end           ## comment')
+      result[0].should_be_kind_of WalrusGrammar::EndDirective
+      result[0].lexeme.should == '#end'
+      result[1].should_be_kind_of WalrusGrammar::Comment
+      result[1].lexeme.should == ' comment'
+      
     end
     
     specify 'should be able to parse a directive with no parameters' do
-      #result = @parser.parse('#super') # expected two things but gets only one
+      # basic test
+      result = @parser.parse('#end')
+      result.should_be_kind_of WalrusGrammar::EndDirective
+    end
+    
+    specify 'should be able to parse an "end" directive' do
+      
+      # followed by a newline
+      
+      # followed by whitespace
+      
+      # followed by a comment on the same line
+      
+      # follwed by the end of the input
       
     end
     
