@@ -22,7 +22,7 @@ module Walrus
         
         # only spaces and tabs, not newlines
         rule            :whitespace,                    /[ \t\v]+/
-        rule            :newline,                       /\r\n|\r|\n/
+        rule            :newline,                       /(\r\n|\r|\n)/
         
         # optional whitespace (tabs and spaces only) followed by a backslash/newline (note: this is not escape-aware)
         rule            :line_continuation,             /[ \t\v]*\\\n/
@@ -101,6 +101,11 @@ module Walrus
         
         # "Any section of a template definition that is inside a #raw ... #end raw tag pair will be printed verbatim without any parsing of $placeholders or other directives."
         # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.raw.html
+        # Unlike Cheetah, Walrus uses a bare "#end" marker and not an "#end raw" to mark the end of the raw block.
+        # I suspect that the regular expression used here is probably very slow; if it proves to be cripplingly slow I may need to write another kind of parslet, similar to a RegexpParslet but which uses a different implementation under the hood (see http://swtch.com/~rsc/regexp/regexp1.html).
+        rule            :raw_directive,                 '#raw'.skip & :directive_end & /.*?(?=#end)/m & '#end'.skip & :directive_end
+        production      :raw_directive.build(:directive, :content)
+        
         # May be able to allow the presence of a literal #end within a raw block by using a "here doc"-style delimiter:
         #
         # #raw <<END_MARKER
@@ -114,8 +119,7 @@ module Walrus
         #      END_MARKER
         #
         # This may require some extensions to the parser generator (the ability to create a StringParslet during parsing and assign that somewhere, using it to detect the end of the block).
-        rule            :raw_directive,                 '#raw'.skip & :directive_end & /.*?(?=#end)/m & '#end'.skip & :directive_end
-        production      :raw_directive.build(:directive, :content)
+#        rule            :raw_here_document,             '#raw'.skip & /<<[A-Z_]+/.store(:here_doc).skip & retrieve(:here_doc) 
         
         # in a "raw" block none of the Walrus special characters should have meaning
         # the block continues until the parser hits an "#end" directive

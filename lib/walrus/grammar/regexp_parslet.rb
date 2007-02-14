@@ -14,15 +14,16 @@ module Walrus
       
       def initialize(regexp)
         raise ArgumentError if regexp.nil?
-        self.expected_regexp = regexp
+        self.expected_regexp = /\A#{regexp}/ # for efficiency, anchor all regexps to the start of the string
       end
       
       def parse(string, options = {})
         raise ArgumentError if string.nil?
-        if (string =~ @expected_regexp) != 0
+        if (string =~ @expected_regexp)
+          MatchDataWrapper.new($~)
+        else
           raise ParseError.new('non-matching characters "%s" while parsing regular expression "%s"' % [string, @expected_regexp.inspect])
         end
-        MatchDataWrapper.new($~)
       end
       
     private

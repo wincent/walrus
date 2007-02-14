@@ -501,6 +501,11 @@ module Walrus
       result.should_be_kind_of WalrusGrammar::RawDirective
       result.content.should == '\\$placeholder'
       
+      # note that you can't include a literal "#end" in the raw block
+      lambda { @parser.parse('#raw# here is my #end! #end') }.should_raise Grammar::ParseError
+      
+      # must use a "here doc" in order to do that
+      
     end
     
     specify 'should be able to parse the "set" directive' do
