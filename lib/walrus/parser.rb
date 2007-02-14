@@ -68,7 +68,7 @@ module Walrus
         # might be nice to have a "compress" or "to_string" or "raw" operator here; we're not really interested in the internal structure of the comment
         # basically, given a result, walk the structure (if any) calling "to_s" and "omitted" and reconstructing the original text? (or calling a "base_text" method)
                 
-        rule            :directive,                     :extends_directive | :import_directive | :include_directive | :set_directive | :slurp_directive
+        rule            :directive,                     :extends_directive | :import_directive | :include_directive | :raw_directive | :set_directive | :slurp_directive
         # | :super_directive | :set_directive
         
         node            :directive
@@ -78,7 +78,8 @@ module Walrus
         
         # "Directive tags can be closed explicitly with #, or implicitly with the end of the line"
         # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/language.directives.closures.html
-        rule            :directive_end,                 (:newline | :end_of_input | /#/).skip
+        # Note that "skipping" the end_of_input here is harmless as it isn't actually consumed
+        rule            :directive_end,                 ( /#/ | :newline | :end_of_input ).skip
         
         # TODO: make block directive keep consuming content until it hits an #end directive, store this in a content attribute
         rule            :block_directive,               '#block' & :identifier & :def_parameter_list.optional & :directive_end
@@ -113,7 +114,8 @@ module Walrus
         #      END_MARKER
         #
         # This may require some extensions to the parser generator (the ability to create a StringParslet during parsing and assign that somewhere, using it to detect the end of the block).
-        rule            :raw_directive,                 '#raw'.skip & /.*(?=#end)/ & '#end'.skip & :directive_end
+        rule            :raw_directive,                 '#raw'.skip & :directive_end & /.*?(?=#end)/m & '#end'.skip & :directive_end
+        production      :raw_directive.build(:directive, :content)
         
         # in a "raw" block none of the Walrus special characters should have meaning
         # the block continues until the parser hits an "#end" directive

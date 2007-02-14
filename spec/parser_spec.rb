@@ -437,6 +437,72 @@ module Walrus
       
     end
     
+    specify 'should be able to parse the "raw" directive' do
+      
+      # shortest example possible
+      result = @parser.parse('#raw##end')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.content.should == ''
+      
+      # one character longer
+      result = @parser.parse('#raw##end#')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.content.should == ''
+      
+      # same but with trailing newline instead
+      result = @parser.parse("#raw##end\n")
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.content.should == ''
+      
+      # only slightly longer (still on one line)
+      result = @parser.parse('#raw#hello world#end')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.content.should == 'hello world'
+      
+      result = @parser.parse('#raw#hello world#end#')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.content.should == 'hello world'
+      
+      result = @parser.parse("#raw#hello world#end\n")
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.content.should == 'hello world'
+      
+      result = @parser.parse("#raw\nhello world\n#end")
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.content.should == "hello world\n"
+      
+      result = @parser.parse("#raw\nhello world\n#end#")
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.content.should == "hello world\n"
+      
+      # with embedded directives (should be ignored)
+      result = @parser.parse('#raw##def example#end')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.content.should == '#def example'
+      
+      # with embedded placeholders (should be ignored)
+      result = @parser.parse('#raw#$foobar#end')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.content.should == '$foobar'
+      
+      # with embedded escapes (should be ignored)
+      result = @parser.parse('#raw#\\$placeholder#end')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.content.should == '\\$placeholder'
+      
+    end
+    
     specify 'should be able to parse the "set" directive' do
       
       # assign a string literal 
