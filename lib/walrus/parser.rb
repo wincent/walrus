@@ -68,7 +68,7 @@ module Walrus
         # might be nice to have a "compress" or "to_string" or "raw" operator here; we're not really interested in the internal structure of the comment
         # basically, given a result, walk the structure (if any) calling "to_s" and "omitted" and reconstructing the original text? (or calling a "base_text" method)
                 
-        rule            :directive,                     :end_directive | :extends_directive | :import_directive | :include_directive | :set_directive | :slurp_directive
+        rule            :directive,                     :extends_directive | :import_directive | :include_directive | :set_directive | :slurp_directive
         # | :super_directive | :set_directive
         
         node            :directive
@@ -76,33 +76,44 @@ module Walrus
         # directives may span multiple lines if and only if the last character on the line is a backslash \
         skipping        :directive,                     :whitespace | :line_continuation
         
-        # all directives must be followed by a comment, a newline, or the end of the input
-        rule            :directive_predicate,           :whitespace.optional.skip & (:comment | :newline | :end_of_input).and?
+        # "Directive tags can be closed explicitly with #, or implicitly with the end of the line"
+        # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/language.directives.closures.html
+        rule            :directive_end,                 (:newline | :end_of_input | /#/).skip
         
         # TODO: make block directive keep consuming content until it hits an #end directive, store this in a content attribute
-        rule            :block_directive,               '#block' & :identifier & :def_parameter_list.optional >> :directive_predicate
+        rule            :block_directive,               '#block' & :identifier & :def_parameter_list.optional & :directive_end
         
-        rule            :def_directive,                 '#def' & :identifier & :def_parameter_list.optional >> :directive_predicate
+        rule            :def_directive,                 '#def' & :identifier & :def_parameter_list.optional & :directive_end
         
         # "The #echo directive is used to echo the output from expressions that can't be written as simple $placeholders."
         # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.echo.html
-        rule            :echo_directive,                '#echo'.skip & :ruby_expression >> :directive_predicate
+        rule            :echo_directive,                '#echo'.skip & :ruby_expression & :directive_end
         
-        rule            :end_directive,                 '#end' >> :directive_predicate
-        production      :end_directive.build(:directive)
-        
-        rule            :extends_directive,             '#extends'.skip & :constant >> :directive_predicate
+        rule            :extends_directive,             '#extends'.skip & :constant & :directive_end
         production      :extends_directive.build(:directive, :class_name)
         
-        rule            :import_directive,              '#import'.skip & :constant >> :directive_predicate
+        rule            :import_directive,              '#import'.skip & :constant & :directive_end
         production      :import_directive.build(:directive, :class_name)
         
-        rule            :include_directive,             '#include'.skip & :string_literal >> :directive_predicate
+        rule            :include_directive,             '#include'.skip & :string_literal & :directive_end
         production      :include_directive.build(:directive, :file_name)
         
         # "Any section of a template definition that is inside a #raw ... #end raw tag pair will be printed verbatim without any parsing of $placeholders or other directives."
         # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.raw.html
-        rule            :raw_directive,                 '#raw'.skip & /.*(?=#end)/ & '#end'.skip >> :directive_predicate
+        # May be able to allow the presence of a literal #end within a raw block by using a "here doc"-style delimiter:
+        #
+        # #raw <<END_MARKER
+        #     content goes here
+        # END_MARKER
+        #
+        # or, if the end marker is to be indented:
+        #
+        # #raw <<-END_MARKER
+        #     content
+        #      END_MARKER
+        #
+        # This may require some extensions to the parser generator (the ability to create a StringParslet during parsing and assign that somewhere, using it to detect the end of the block).
+        rule            :raw_directive,                 '#raw'.skip & /.*(?=#end)/ & '#end'.skip & :directive_end
         
         # in a "raw" block none of the Walrus special characters should have meaning
         # the block continues until the parser hits an "#end" directive
@@ -116,20 +127,20 @@ module Walrus
         # these questions might be worth exploring because they could help me in the implementation of the #ruby directive (which will also accumulate stuff until it hits "#end")
         rule            :raw_content,                   //
         
-        rule            :set_directive,                 '#set'.skip & :assignment_expression >> :directive_predicate
+        rule            :set_directive,                 '#set'.skip & :assignment_expression & :directive_end
         production      :set_directive.build(:directive, :assignment)
         
         # "#silent is the opposite of #echo. It executes an expression but discards the output."
         # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.silent.html
-        rule            :silent_directive,              '#silent'.skip & :ruby_expression >> :directive_predicate
+        rule            :silent_directive,              '#silent'.skip & :ruby_expression & :directive_end
         
         # "The #slurp directive eats up the trailing newline on the line it appears in, joining the following line onto the current line."
         # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.slurp.html
-        # Unlike other directives (which may be followed by a comment), the "slurp" directive must be the last thing on the line.
+        # The "slurp" directive must be the last thing on the line (not followed by a comment or directive end marker)
         rule            :slurp_directive,               '#slurp' & :whitespace.optional.skip & :newline.skip
         production      :slurp_directive.build(:node)
         
-        rule            :super_directive,               '#super'.skip & :super_parameter_list.optional >> :directive_predicate
+        rule            :super_directive,               '#super'.skip & :super_parameter_list.optional & :directive_end
         
         rule            :def_parameter_list,            '('.skip & ( :def_parameter >> ( ','.skip & :def_parameter ).zero_or_more ).optional & ')'.skip
         rule            :def_parameter,                 :identifier | :assignment_expression
