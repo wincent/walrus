@@ -10,6 +10,8 @@ module Walrus
     require 'walrus/grammar/parslet_combination'
     class ParsletRepetition < ParsletCombination
       
+      attr_reader :hash
+      
       # Raises an ArgumentError if parseable or min is nil.
       def initialize(parseable, min, max = nil)
         raise ArgumentError if parseable.nil?
@@ -68,14 +70,29 @@ module Walrus
         
       end
       
+      def eql?(other)
+        other.kind_of? ParsletRepetition and @min == other.min and @max == other.max and @parseable.eql? other.parseable
+      end
+      
+    protected
+      
+      # For determining equality.
+      attr_reader :parseable, :min, :max
+      
     private
+      
+      def update_hash
+        @hash = @min.hash + @max.hash + @parseable.hash + 87 # fixed offset to minimize risk of collisions
+      end
       
       def min=(min)
         @min = (min.clone rescue min)
+        update_hash
       end
       
       def max=(max)
         @max = (max.clone rescue max)
+        update_hash
       end
       
     end # class ParsletRepetition

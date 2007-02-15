@@ -13,8 +13,7 @@ module Walrus
         last_caught       = nil # keep track of the last kind of throw to be caught
         augmented_options = options.clone
         augmented_options[:location] = 0 unless augmented_options.has_key? :location
-        components        = [@first, @second] + @others
-        components.each do |parseable|
+        @components.each do |parseable|
           catch :ProcessNextAlternative do    # TODO: can I replace this using next?
             catch :NotPredicateSuccess do
               catch :AndPredicateSuccess do
@@ -54,6 +53,22 @@ module Walrus
          state.results
         end
         
+      end
+      
+      def eql?(other)
+        return false if not other.kind_of? ParsletMerge
+        other_components = other.components
+        return false if @components.length != other_components.length
+        for i in 0..(@components.length - 1)
+          return false unless @components[i].eql? other_components[i]
+        end
+        true
+      end
+      
+    private
+      
+      def hash_offset
+        53
       end
       
     end # class ParsletMerge

@@ -11,9 +11,12 @@ module Walrus
     # A SymbolParslet allows for evaluation of a parslet to be deferred until runtime (or parse time, to be more precise).
     class SymbolParslet < Parslet
       
+      attr_reader :hash
+      
       def initialize(symbol)
         raise ArgumentError if symbol.nil?
         @symbol = symbol
+        @hash = @symbol.hash + 20 # fixed offset to avoid collisions with @parseable objects
       end
       
       # SymbolParslets don't actually know what Grammar they are associated with at the time of their definition. They expect the Grammar to be passed in with the options hash under the ":grammar" key.
@@ -36,6 +39,15 @@ module Walrus
       def to_s
         'rule: ' + @symbol.to_s
       end
+            
+      def eql?(other)
+        other.kind_of? SymbolParslet and other.symbol == @symbol
+      end
+      
+    protected
+      
+      # For equality comparisons.
+      attr_reader :symbol
       
     end # class SymbolParslet
     

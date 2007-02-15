@@ -14,6 +14,12 @@ module Walrus
         lambda { NotPredicate.new('irrelevant').parse(nil) }.should_raise ArgumentError
       end
       
+      specify 'should be able to compare for equality' do
+        NotPredicate.new('foo').should_eql NotPredicate.new('foo')      # same
+        NotPredicate.new('foo').should_not_eql NotPredicate.new('bar')  # different
+        NotPredicate.new('foo').should_not_eql Predicate.new('foo')     # same, but different classes
+      end
+      
     end
     
   end # class Grammar

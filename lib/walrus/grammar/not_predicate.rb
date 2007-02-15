@@ -21,6 +21,12 @@ module Walrus
         raise ParseError.new('predicate not satisfied ("%s" not allowed) while parsing "%s"' % [@parseable.to_s, string])
       end
       
+    private
+      
+      def hash_offset
+        11
+      end
+      
     end
     
   end # class Grammar

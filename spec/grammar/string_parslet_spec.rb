@@ -48,6 +48,13 @@ module Walrus
         lambda { @parslet.parse('HELL') }.should_raise ParseError, 'unexpected end-of-string (expected "O") while parsing "HELLO"'
       end
       
+      specify 'should be able to compare string parslets for equality' do
+        'foo'.to_parseable.should_eql 'foo'.to_parseable           # equal
+        'foo'.to_parseable.should_not_eql 'bar'.to_parseable    # different
+        'foo'.to_parseable.should_not_eql 'Foo'.to_parseable    # differing only in case
+        'foo'.to_parseable.should_not_eql /foo/                 # totally different classes
+      end
+      
     end
     
   end # class Grammar

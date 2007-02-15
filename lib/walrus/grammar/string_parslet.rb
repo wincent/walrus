@@ -11,7 +11,7 @@ module Walrus
     require 'walrus/grammar/parslet'
     class StringParslet < Parslet
       
-      attr_reader :expected_string
+      attr_reader :hash
       
       def initialize(string)
         raise ArgumentError if string.nil?
@@ -35,10 +35,24 @@ module Walrus
         parsed
       end
       
+      def eql?(other)
+        other.kind_of? StringParslet and other.expected_string == @expected_string
+      end
+      
+    protected
+      
+      # For equality comparisons.
+      attr_reader :expected_string
+      
     private
       
       def expected_string=(string)
         @expected_string = ( string.clone rescue string )
+        update_hash
+      end
+      
+      def update_hash
+        @hash = @expected_string.hash + 20 # fixed offset to avoid collisions with @parseable objects
       end
       
     end # class StringParslet

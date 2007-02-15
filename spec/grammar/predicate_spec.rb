@@ -18,6 +18,11 @@ module Walrus
         lambda { Predicate.new('foo').parse('bar') }.should_raise NotImplementedError
       end
       
+      specify 'should be able to compare predicates for equality' do
+        Predicate.new('foo').should_eql Predicate.new('foo')
+        Predicate.new('foo').should_not_eql Predicate.new('bar')
+      end
+      
     end
     
   end # class Grammar

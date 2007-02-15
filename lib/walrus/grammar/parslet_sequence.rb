@@ -10,13 +10,14 @@ module Walrus
     require 'walrus/grammar/parslet_combination'
     class ParsletSequence < ParsletCombination
       
+      attr_reader :hash
+      
       # first and second may not be nil.
       def initialize(first, second, *others)
         raise ArgumentError if first.nil?
         raise ArgumentError if second.nil?
-        @first  = first
-        @second = second
-        @others = others
+        @components = [first, second] + others
+        update_hash
       end
       
       # Override so that sequences are appended to an existing sequence:
@@ -50,8 +51,7 @@ module Walrus
         last_caught       = nil # keep track of the last kind of throw to be caught
         augmented_options = options.clone
         augmented_options[:location] = 0 unless augmented_options.has_key? :location
-        components        = [@first, @second] + @others
-        components.each do |parseable|
+        @components.each do |parseable|
           catch :ProcessNextAlternative do
             catch :NotPredicateSuccess do
               catch :AndPredicateSuccess do
@@ -107,14 +107,39 @@ module Walrus
         
       end
       
+      def eql?(other)
+        return false if not other.kind_of? ParsletSequence
+        other_components = other.components
+        return false if @components.length != other_components.length
+        for i in 0..(@components.length - 1)
+          return false unless @components[i].eql? other_components[i]
+        end
+        true
+      end
+      
+    protected
+      
+      # For determining equality.
+      attr_reader :components
+      
     private
+      
+      def hash_offset
+        40
+      end
+      
+      def update_hash
+        @hash = hash_offset # fixed offset to avoid unwanted collisions with similar classes
+        @components.each { |parseable| @hash += parseable.hash }
+      end
       
       # Appends another Parslet, ParsletCombination or Predicate to the receiver and returns the receiver.
       # Raises if next_parslet is nil.
       # Cannot use << as a method name because Ruby cannot parse it without the self, and self is not allowed as en explicit receiver for private messages.
       def append(next_parslet)
         raise ArgumentError if next_parslet.nil?
-        @others << next_parslet.to_parseable
+        @components << next_parslet.to_parseable
+        update_hash
         self
       end
       

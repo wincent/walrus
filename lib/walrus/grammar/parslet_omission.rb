@@ -9,10 +9,13 @@ module Walrus
     require 'walrus/grammar/parslet_combination'
     class ParsletOmission < ParsletCombination
       
+      attr_reader :hash
+      
       # Raises an ArgumentError if parseable is nil.
       def initialize(parseable)
         raise ArgumentError if parseable.nil?
         @parseable = parseable
+        @hash = @parseable.hash + 46 # fixed offset to avoid unwanted collisions with similar classes
       end
       
       def parse(string, options = {})
@@ -31,6 +34,15 @@ module Walrus
         # not enough to just return a ZeroWidthParseSuccess here; that could cause higher levels to stop parsing and in any case there'd be no clean way to embed the scanned substring in the symbol
         raise SkippedSubstringException.new(substring)
       end
+      
+      def eql?(other)
+        other.kind_of? ParsletOmission and other.parseable.eql? @parseable
+      end
+      
+    protected
+      
+      # For determining equality.
+      attr_reader :parseable
       
     end # class ParsletOmission
   end # class Grammar

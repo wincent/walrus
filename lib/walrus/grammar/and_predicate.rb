@@ -22,6 +22,12 @@ module Walrus
         throw :AndPredicateSuccess # pass succeeded
       end
       
+    private
+      
+      def hash_offset
+        12
+      end
+      
     end
     
   end # class Grammar

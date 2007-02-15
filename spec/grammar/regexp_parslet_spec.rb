@@ -4,6 +4,7 @@
 require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 
 require 'walrus/grammar/regexp_parslet'
+require 'walrus/grammar/additions/regexp'
 
 module Walrus
   class Grammar
@@ -68,6 +69,13 @@ module Walrus
         lambda { @parslet.parse('9fff') }.should_raise ParseError            # identifiers must not start with numbers
         lambda { @parslet.parse(' identifier') }.should_raise ParseError     # note the leading whitespace
         lambda { @parslet.parse('') }.should_raise ParseError                # empty strings can't match
+      end
+      
+      specify 'should be able to compare parslets for equality' do
+        /foo/.to_parseable.should_eql /foo/.to_parseable           # equal
+        /foo/.to_parseable.should_not_eql /bar/.to_parseable    # different
+        /foo/.to_parseable.should_not_eql /Foo/.to_parseable    # differing only in case
+        /foo/.to_parseable.should_not_eql 'foo'                 # totally different classes
       end
       
     end
