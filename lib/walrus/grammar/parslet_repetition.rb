@@ -21,29 +21,35 @@ module Walrus
       
       def parse(string, options = {})
         raise ArgumentError if string.nil?
-        state     = ParserState.new(string)
+        state             = ParserState.new(string)
+        augmented_options = options.clone
+        augmented_options[:location] = 0 unless augmented_options.has_key? :location
         
         catch :ZeroWidthParseSuccess do          # a zero-width match is grounds for immediate abort
           while @max.nil? or state.count < @max   # try forever if max is nil; otherwise keep trying while match count < max
             begin
-              parsed = @parseable.memoizing_parse(state.remainder, options)
+              starting_location = state.length  # remember current location within current ParserState instance
+              parsed = @parseable.memoizing_parse(state.remainder, augmented_options)
               state.parsed(parsed)
               state.skipped(parsed.omitted.to_s)  # in case any sub-parslets skipped tokens along the way
+              augmented_options[:location] = augmented_options[:location] + (state.length - starting_location)
             rescue SkippedSubstringException => e
               state.skipped(e.to_s)
+              augmented_options[:location] = augmented_options[:location] + (state.length - starting_location)
             rescue ParseError => e # failed, will try to skip; save original error in case skipping fails
               skipping_parslet = nil
-              if options.has_key?(:skipping_override) : skipping_parslet = options[:skipping_override]
-              elsif options.has_key?(:skipping)       : skipping_parslet = options[:skipping]
+              if augmented_options.has_key?(:skipping_override) : skipping_parslet = augmented_options[:skipping_override]
+              elsif augmented_options.has_key?(:skipping)       : skipping_parslet = augmented_options[:skipping]
               end
               if skipping_parslet
                 begin
-                  parsed = skipping_parslet.memoizing_parse(state.remainder, options) # potentially guard against self references (possible infinite recursion) here
+                  parsed = skipping_parslet.memoizing_parse(state.remainder, augmented_options) # guard against self references (possible infinite recursion) here?
                 rescue ParseError
                   break # skipping didn't help either, raise original error
                 end
                 state.skipped(parsed)
                 state.skipped(parsed.omitted.to_s)
+                augmented_options[:location] = augmented_options[:location] + (state.length - starting_location)
                 redo # skipping succeeded, try to redo
               end
               break # give up

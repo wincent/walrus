@@ -32,7 +32,7 @@ module Walrus
       #     [a, b, c]
       # It returns a nested array:
       #     [[a, b], c]
-      # The solution to this unwanted nesting is to allowing appending to an existing sequence by using the private "<<" method.
+      # The solution to this unwanted nesting is to allowing appending to an existing sequence by using the private "append" method.
       # This ensures that:
       #     A & B & C
       # Translates to a single sequence:
@@ -46,34 +46,39 @@ module Walrus
       
       def parse(string, options = {})
         raise ArgumentError if string.nil?
-        state               = ParserState.new(string)
-        last_caught         = nil # keep track of the last kind of throw to be caught
-        alternatives        = [@first, @second] + @others
-        
-        alternatives.each do |parseable|
+        state             = ParserState.new(string)
+        last_caught       = nil # keep track of the last kind of throw to be caught
+        augmented_options = options.clone
+        augmented_options[:location] = 0 unless augmented_options.has_key? :location
+        components        = [@first, @second] + @others
+        components.each do |parseable|
           catch :ProcessNextAlternative do
             catch :NotPredicateSuccess do
               catch :AndPredicateSuccess do
                 catch :ZeroWidthParseSuccess do
                   begin
-                    parsed = parseable.memoizing_parse(state.remainder, options)
+                    starting_location = state.length  # remember current location within current ParserState instance
+                    parsed = parseable.memoizing_parse(state.remainder, augmented_options)
                     state.parsed(parsed)
                     state.skipped(parsed.omitted.to_s)  # in case any sub-parslets skipped tokens along the way
+                    augmented_options[:location] = augmented_options[:location] + (state.length - starting_location)
                   rescue SkippedSubstringException => e
                     state.skipped(e.to_s)
+                    augmented_options[:location] = augmented_options[:location] + (state.length - starting_location)
                   rescue ParseError => e # failed, will try to skip; save original error in case skipping fails                    
                     skipping_parslet = nil
-                    if options.has_key?(:skipping_override) : skipping_parslet = options[:skipping_override]
-                    elsif options.has_key?(:skipping)       : skipping_parslet = options[:skipping]
+                    if augmented_options.has_key?(:skipping_override) : skipping_parslet = augmented_options[:skipping_override]
+                    elsif augmented_options.has_key?(:skipping)       : skipping_parslet = augmented_options[:skipping]
                     end
                     if skipping_parslet
                       begin
-                        parsed = skipping_parslet.memoizing_parse(state.remainder, options) # potentially guard against self references (possible infinite recursion) here
+                        parsed = skipping_parslet.memoizing_parse(state.remainder, augmented_options) # guard against self references (possible infinite recursion) here?
                       rescue ParseError
                         raise e # skipping didn't help either, raise original error
                       end
                       state.skipped(parsed)
                       state.skipped(parsed.omitted.to_s)
+                      augmented_options[:location] = augmented_options[:location] + (state.length - starting_location)
                       redo # skipping succeeded, try to redo
                     end
                     raise e # no skipper defined, raise original error
@@ -85,7 +90,7 @@ module Walrus
                 throw :ProcessNextAlternative
               end
               last_caught = :AndPredicateSuccess
-              throw :ProcessNextAlternative
+              throw :ProcessNextAlternative # TODO: these can all probably be replaced with "next"
             end
             last_caught = :NotPredicateSuccess
           end
@@ -104,8 +109,8 @@ module Walrus
       
     private
       
-      # Appends another Parslet (or ParsletCombination) to the receiver and returns the receiver.
-      # Raises if parslet is nil.
+      # Appends another Parslet, ParsletCombination or Predicate to the receiver and returns the receiver.
+      # Raises if next_parslet is nil.
       # Cannot use << as a method name because Ruby cannot parse it without the self, and self is not allowed as en explicit receiver for private messages.
       def append(next_parslet)
         raise ArgumentError if next_parslet.nil?

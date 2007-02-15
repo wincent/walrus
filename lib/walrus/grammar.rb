@@ -37,10 +37,10 @@ module Walrus
     end
     
     def initialize(&block)
-      @rules              = Hash.new { |hash, key| raise StandardError.new('no value for key "%s"' % key.to_s) }
-      @productions        = Hash.new { |hash, key| raise StandardError.new('no value for key "%s"' % key.to_s) }
-      @skipping_overrides = Hash.new { |hash, key| raise StandardError.new('no value for key "%s"' % key.to_s) }
-      @memoizing          = false
+      @rules              = Hash.new { |hash, key| raise StandardError.new('no rule for key "%s"' % key.to_s) }
+      @productions        = Hash.new { |hash, key| raise StandardError.new('no production for key "%s"' % key.to_s) }
+      @skipping_overrides = Hash.new { |hash, key| raise StandardError.new('no skipping override for key "%s"' % key.to_s) }
+      @memoizing          = false # memoizing defaults to off until performance measurements suggest it should be otherwise
       self.instance_eval(&block) if block_given?
     end
     
@@ -56,6 +56,7 @@ module Walrus
       options[:grammar]   = self
       options[:rule_name] = @starting_symbol
       options[:skipping]  = @skipping
+      options[:location]  = 0 # where we are in the input stream: only ParsletMerge, ParsletRepetion and ParsletSequence objects advance this index
       options[:memoizer]  = MemoizingCache.new if @memoizing
       
       #catch :AndPredicateSuccess do     # not sure whether to let these go through to the caller
