@@ -12,6 +12,9 @@ module Walrus
       require 'walrus/grammar/parslet_combining'
       include Walrus::Grammar::ParsletCombining
       
+      require 'walrus/grammar/memoizing'
+      include Walrus::Grammar::Memoizing
+      
       # Raises if parseable is nil.
       def initialize(parseable)
         raise ArgumentError if parseable.nil?

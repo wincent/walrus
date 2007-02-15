@@ -16,6 +16,11 @@ module Walrus
     module ParsletCombining
       
       # Convenience method.
+      def memoizing_parse(string, options = {})
+        self.to_parseable.memoizing_parse(string, options)
+      end
+      
+      # Convenience method.
       def parse(string, options = {})
         self.to_parseable.parse(string, options)
       end

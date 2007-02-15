@@ -25,7 +25,7 @@ module Walrus
         augmented_options = options.clone
         augmented_options[:rule_name] = @symbol
         augmented_options[:skipping_override] = grammar.skipping_overrides[@symbol] if grammar.skipping_overrides.has_key?(@symbol)
-        result = grammar.rules[@symbol].parse(string, augmented_options)
+        result = grammar.rules[@symbol].memoizing_parse(string, augmented_options)
         grammar.wrap(result, @symbol)
       end
       

@@ -41,6 +41,11 @@ module Walrus
       self.instance_eval(&block) if block_given?
     end
     
+    # TODO: consider making grammars copiable (could be used in threaded context then)
+    #def initialize_copy(from); end
+    #def clone; end
+    #def dupe; end
+    
     # Starts with starting_symbol.
     def parse(string, options = {})
       raise ArgumentError if string.nil?
@@ -50,7 +55,7 @@ module Walrus
       options[:skipping]  = @skipping
       #catch :AndPredicateSuccess do     # not sure whether to let these go through to the caller
       #catch :ZeroWidthParseSuccess do   # not sure whether to let these go through to the caller
-        result              = @rules[@starting_symbol].parse(string, options)
+        result              = @rules[@starting_symbol].memoizing_parse(string, options)
         self.wrap(result, @starting_symbol)
       #end
       #end

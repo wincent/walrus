@@ -8,6 +8,9 @@ module Walrus
       require 'walrus/grammar/parslet_combining'
       include Walrus::Grammar::ParsletCombining
       
+      require 'walrus/grammar/memoizing'
+      include Walrus::Grammar::Memoizing
+      
       def to_parseable
         self
       end

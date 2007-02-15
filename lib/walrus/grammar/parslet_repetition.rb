@@ -26,7 +26,7 @@ module Walrus
         catch :ZeroWidthParseSuccess do          # a zero-width match is grounds for immediate abort
           while @max.nil? or state.count < @max   # try forever if max is nil; otherwise keep trying while match count < max
             begin
-              parsed = @parseable.parse(state.remainder, options)
+              parsed = @parseable.memoizing_parse(state.remainder, options)
               state.parsed(parsed)
               state.skipped(parsed.omitted.to_s)  # in case any sub-parslets skipped tokens along the way
             rescue SkippedSubstringException => e
@@ -38,7 +38,7 @@ module Walrus
               end
               if skipping_parslet
                 begin
-                  parsed = skipping_parslet.parse(state.remainder, options) # potentially guard against self references (possible infinite recursion) here
+                  parsed = skipping_parslet.memoizing_parse(state.remainder, options) # potentially guard against self references (possible infinite recursion) here
                 rescue ParseError
                   break # skipping didn't help either, raise original error
                 end

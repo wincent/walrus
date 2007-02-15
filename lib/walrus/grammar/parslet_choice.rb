@@ -42,7 +42,7 @@ module Walrus
         alternatives = [@left, @right] + @others
         alternatives.each do |parseable|
           begin
-            return parseable.parse(string, options)
+            return parseable.memoizing_parse(string, options)
           rescue ParseError
             next
           end

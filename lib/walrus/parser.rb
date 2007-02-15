@@ -7,6 +7,31 @@ module Walrus
   
   class Parser
     
+    # In order to parse "here documents" we adopt a model similar to the one proposed in this message to the ANTLR interest list:
+    # http://www.antlr.org:8080/pipermail/antlr-interest/2005-September/013673.html
+    class HereDocumentSubParser
+      
+      def initialize
+        @marker_parslet = /\A<<(-?)([a-zA-Z0-9_]+)[ \t\v]*$/.to_parseable
+      end
+      
+      def parse(string, options = {})
+        raise ArgumentError if string.nil?
+        state   = ParserState.new
+        parsed  = @marker_parslet.parse(string)
+        marker  = parsed.match_data
+        indents = (marker[0].nil?) ? false : true
+        
+        if idents # whitespace allowed before end marker
+          /^[ \t\v]*#{marker[1]}$\n/
+        else  # no whitespace allowed before end marker
+          /^#{marker[1]}$\n/
+        end
+        
+      end
+      
+    end
+    
     def parse(string)
       @@grammar.parse(string)
     end
@@ -120,18 +145,7 @@ module Walrus
         #
         # This may require some extensions to the parser generator (the ability to create a StringParslet during parsing and assign that somewhere, using it to detect the end of the block).
 #        rule            :raw_here_document,             '#raw'.skip & /<<[A-Z_]+/.store(:here_doc).skip & retrieve(:here_doc) 
-        
-        # in a "raw" block none of the Walrus special characters should have meaning
-        # the block continues until the parser hits an "#end" directive
-        # how would you include a literal "#end" in the raw section itself?
-        # you would need to escape it in some way
-        # does that mean that "\" can be used to escape #end?
-        # but then, how would you include a literal "\#end"?
-        # \\#end
-        # does that mean an escaped \ ? in which case the #end marks the end of the section
-        # or does it mean an escaped \#end ? in which case how would you write a literal "\\#end" ?
-        # these questions might be worth exploring because they could help me in the implementation of the #ruby directive (which will also accumulate stuff until it hits "#end")
-        rule            :raw_content,                   //
+#        rule            :raw_here_document,             '#raw'.skip & /<<[A-Z_]+/.and? & @here_document_subparser
         
         rule            :set_directive,                 '#set'.skip & :assignment_expression & :directive_end
         production      :set_directive.build(:directive, :assignment)
@@ -176,6 +190,7 @@ module Walrus
         rule            :method_parameter,              :ruby_expression
         
       end
+      
     end
     
   end # class Parser

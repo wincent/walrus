@@ -12,7 +12,7 @@ module Walrus
         parsed = "FOO"
         catch :ZeroWidthParseSuccess do
           begin
-            parsed = @parseable.parse(string, options)
+            parsed = @parseable.memoizing_parse(string, options)
           rescue ParseError
             raise ParseError.new('predicate not satisfied (expected "%s") while parsing "%s"' % [@parseable.to_s, string])
           end

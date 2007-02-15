@@ -11,7 +11,7 @@ module Walrus
         raise ArgumentError if string.nil?
         catch :ZeroWidthParseSuccess do
           begin
-            @parseable.parse(string, options)
+            @parseable.memoizing_parse(string, options)
           rescue ParseError # failed to pass (which is just what we wanted)
             throw :NotPredicateSuccess
           end
