@@ -8,6 +8,37 @@ require 'walrus/grammar/memoizing_cache'
 module Walrus
   class Grammar
     
+    class MemoizingCache
+      
+      context 'using the NoValueForKey class' do
+        
+        specify 'NoValueForKey should be a singleton' do
+          lambda { NoValueForKey.new }.should_raise
+          NoValueForKey.instance.object_id.should == NoValueForKey.instance.object_id
+        end
+        
+        specify 'should be able to use NoValueForKey as the default value for a hash' do
+          hash = Hash.new(NoValueForKey.instance)
+          hash.default.should == NoValueForKey.instance
+          hash[:foo].should == NoValueForKey.instance
+          hash[:foo] = 'bar'
+          hash[:foo].should == 'bar'
+          hash[:bar].should == NoValueForKey.instance
+        end
+        
+        specify 'the "hash" factory method should return a new hash set up to use NoValueForKey' do
+          hash = NoValueForKey.hash
+          hash.default.should == NoValueForKey.instance
+          hash[:foo].should == NoValueForKey.instance
+          hash[:foo] = 'bar'
+          hash[:foo].should == 'bar'
+          hash[:bar].should == NoValueForKey.instance
+        end
+        
+      end
+      
+    end
+    
     context 'using a memoizing cache' do
       
       specify 'should be able to parse with memoizing turned on' do

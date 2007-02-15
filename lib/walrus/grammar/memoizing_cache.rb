@@ -16,7 +16,7 @@ module Walrus
         
         # Convenience method that returns a new Hash instance configured to return the NoValueForKey instance for unset keys.
         def self.hash
-          Hash.new { |hash, key| hash[key] = NoValueForKey.instance }
+          Hash.new(NoValueForKey.instance)
         end
         
       end
