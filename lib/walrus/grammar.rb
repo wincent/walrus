@@ -16,9 +16,11 @@ module Walrus
     end
     
     autoload(:ContinuationWrapperException, 'walrus/grammar/continuation_wrapper_exception')
+    autoload(:MemoizingCache, 'walrus/grammar/memoizing_cache')
     
-    attr_reader :rules
-    attr_reader :skipping_overrides
+    attr_accessor :memoizing
+    attr_reader   :rules
+    attr_reader   :skipping_overrides
     
     # Creates a Grammar subclass named according to subclass_name and instantiates an instance of the new class, returning it after evaluating the optional block in the context of the newly created instance. The advantage of working inside a new subclass is that any constants defined in the new grammar will be in a separate namespace.
     # The subclass_name parameter should be a String.
@@ -38,6 +40,7 @@ module Walrus
       @rules              = Hash.new { |hash, key| raise StandardError.new('no value for key "%s"' % key.to_s) }
       @productions        = Hash.new { |hash, key| raise StandardError.new('no value for key "%s"' % key.to_s) }
       @skipping_overrides = Hash.new { |hash, key| raise StandardError.new('no value for key "%s"' % key.to_s) }
+      @memoizing          = false
       self.instance_eval(&block) if block_given?
     end
     
@@ -53,6 +56,8 @@ module Walrus
       options[:grammar]   = self
       options[:rule_name] = @starting_symbol
       options[:skipping]  = @skipping
+      options[:memoizer]  = MemoizingCache.new if @memoizing
+      
       #catch :AndPredicateSuccess do     # not sure whether to let these go through to the caller
       #catch :ZeroWidthParseSuccess do   # not sure whether to let these go through to the caller
         result              = @rules[@starting_symbol].memoizing_parse(string, options)
