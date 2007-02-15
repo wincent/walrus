@@ -11,7 +11,7 @@ module Walrus
       def memoizing_parse(string, options = {})
         # Will use memoizer if available and no instructions to ignore it
         if options.has_key?(:memoizer) and not (options.has_key?(:ignore_memoizer) and options[:ignore_memoizer])
-          options[:parslet] = self
+          options[:parseable] = self
           options[:memoizer].parse(string, options)
         else # otherwise will proceed as normal
           options[:ignore_memoizer] = false
