@@ -36,7 +36,7 @@ module Walrus
       end
       
       def eql?(other)
-        other.kind_of? ParsletOmission and other.parseable.eql? @parseable
+        other.instance_of? ParsletOmission and other.parseable.eql? @parseable
       end
       
     protected

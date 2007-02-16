@@ -41,7 +41,7 @@ module Walrus
       end
             
       def eql?(other)
-        other.kind_of? SymbolParslet and other.symbol == @symbol
+        other.instance_of? SymbolParslet and other.symbol == @symbol
       end
       
     protected

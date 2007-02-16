@@ -396,7 +396,8 @@ module Walrus
         # not sure if I can justify the difference in behaviour here compared with the previous grammar
         # if I catch these throws at the grammar level I can return nil
         # but note that the previous grammar returns an empty array, which to_s is just ""
-        lambda { grammar.parse('') }.should_throw :AndPredicateSuccess
+        lambda { grammar.parse('') }.should_throw :AndPredicateSuccess  # fails
+   #     lambda { grammar.parse('') }.should_throw :NotPredicateSuccess  # but this works, even though there are no not predicates! so this is officially a bug...
         
         grammar.parse('foo').should == 'foo'
         grammar.parse('foo bar').should == ['foo', 'bar']       # intervening whitespace

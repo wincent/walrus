@@ -14,7 +14,7 @@ module Walrus
         augmented_options = options.clone
         augmented_options[:location] = 0 unless augmented_options.has_key? :location
         @components.each do |parseable|
-          catch :ProcessNextAlternative do    # TODO: can I replace this using next?
+          catch :ProcessNextComponent do
             catch :NotPredicateSuccess do
               catch :AndPredicateSuccess do
                 catch :ZeroWidthParseSuccess do
@@ -32,13 +32,13 @@ module Walrus
                   # TODO: possiby try inter-token parslets on failure here? (have yet to find a failing spec that requires this)
                   end
                   last_caught = nil
-                  throw :ProcessNextAlternative
+                  throw :ProcessNextComponent # can't use "next" here because it will only break out of innermost "do"
                 end
                 last_caught = :ZeroWidthParseSuccess
-                throw :ProcessNextAlternative
+                throw :ProcessNextComponent
               end
               last_caught = :AndPredicateSuccess
-              throw :ProcessNextAlternative
+              throw :ProcessNextComponent
             end
             last_caught = :NotPredicateSuccess
           end
@@ -56,7 +56,7 @@ module Walrus
       end
       
       def eql?(other)
-        return false if not other.kind_of? ParsletMerge
+        return false if not other.instance_of? ParsletMerge
         other_components = other.components
         return false if @components.length != other_components.length
         for i in 0..(@components.length - 1)

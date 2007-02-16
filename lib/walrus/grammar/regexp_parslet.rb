@@ -27,7 +27,7 @@ module Walrus
       end
       
       def eql?(other)
-        other.kind_of? RegexpParslet and other.expected_regexp == @expected_regexp
+        other.instance_of? RegexpParslet and other.expected_regexp == @expected_regexp
       end
       
     protected

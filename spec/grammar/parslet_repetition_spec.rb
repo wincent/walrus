@@ -62,6 +62,12 @@ module Walrus
         
       end
       
+      specify 'should be able to compare for equality' do
+        ParsletRepetition.new('foo'.to_parseable, 1).should_eql ParsletRepetition.new('foo'.to_parseable, 1)
+        ParsletRepetition.new('foo'.to_parseable, 1).should_not_eql ParsletRepetition.new('bar'.to_parseable, 1)
+        ParsletRepetition.new('foo'.to_parseable, 1).should_not_eql ParsletRepetition.new('foo'.to_parseable, 2)
+      end
+      
     end
     
   end # class Grammar

@@ -51,7 +51,7 @@ module Walrus
       end
       
       def eql?(other)
-        return false if not other.kind_of? ParsletChoice
+        return false if not other.instance_of? ParsletChoice
         other_alternatives = other.alternatives
         return false if @alternatives.length != other_alternatives.length
         for i in 0..(@alternatives.length - 1)

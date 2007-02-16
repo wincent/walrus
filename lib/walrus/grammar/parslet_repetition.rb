@@ -71,7 +71,7 @@ module Walrus
       end
       
       def eql?(other)
-        other.kind_of? ParsletRepetition and @min == other.min and @max == other.max and @parseable.eql? other.parseable
+        other.instance_of? ParsletRepetition and @min == other.min and @max == other.max and @parseable.eql? other.parseable
       end
       
     protected

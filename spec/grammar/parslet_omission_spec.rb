@@ -45,6 +45,11 @@ module Walrus
         substring.should == ''
       end
       
+      specify 'should be able to compare for equality' do
+        ParsletOmission.new('foo').should_eql ParsletOmission.new('foo')
+        ParsletOmission.new('foo').should_not_eql ParsletOmission.new('bar')
+      end
+      
     end
     
   end # class Grammar

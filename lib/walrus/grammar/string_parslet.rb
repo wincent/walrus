@@ -36,7 +36,7 @@ module Walrus
       end
       
       def eql?(other)
-        other.kind_of? StringParslet and other.expected_string == @expected_string
+        other.instance_of? StringParslet and other.expected_string == @expected_string
       end
       
     protected

@@ -33,7 +33,7 @@ module Walrus
       end
       
       def eql?(other)
-        other.kind_of? self.class and other.parseable.eql? @parseable
+        other.instance_of? self.class and other.parseable.eql? @parseable
       end
       
     protected
