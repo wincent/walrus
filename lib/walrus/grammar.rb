@@ -10,13 +10,9 @@ require 'walrus/grammar/node'
 module Walrus
   class Grammar
     
-    class NoParameterMarker
-      require 'singleton'
-      include Singleton
-    end
-    
     autoload(:ContinuationWrapperException, 'walrus/grammar/continuation_wrapper_exception')
     autoload(:MemoizingCache, 'walrus/grammar/memoizing_cache')
+    autoload(:NoParameterMarker, 'walrus/no_parameter_marker')
     
     attr_accessor :memoizing
     attr_reader   :rules
