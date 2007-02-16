@@ -18,7 +18,7 @@ module Walrus
       end
       
       def parse(string, options = {})
-        raise ArgumentError if string.nil?
+          raise ArgumentError if string.nil?
         if (string =~ @expected_regexp)
           MatchDataWrapper.new($~)
         else

@@ -93,8 +93,8 @@ module Walrus
         # might be nice to have a "compress" or "to_string" or "raw" operator here; we're not really interested in the internal structure of the comment
         # basically, given a result, walk the structure (if any) calling "to_s" and "omitted" and reconstructing the original text? (or calling a "base_text" method)
                 
-        rule            :directive,                     :extends_directive | :import_directive | :include_directive | :raw_directive | :set_directive | :slurp_directive
-        # | :super_directive | :set_directive
+        rule            :directive,                     :extends_directive | :import_directive | :include_directive | :raw_directive | :set_directive | :slurp_directive |
+                                                        :super_directive
         
         node            :directive
         
@@ -160,10 +160,15 @@ module Walrus
         rule            :slurp_directive,               '#slurp' & :whitespace.optional.skip & :newline.skip
         production      :slurp_directive.build(:node)
         
-        rule            :super_directive,               '#super'.skip & :super_parameter_list.optional & :directive_end
+        rule            :super_directive,               '#super'.skip & :parameter_list.optional & :directive_end
+        production      :super_directive.build(:node, :params)
         
+        # The "def_parameter_list" is a special case of parameter list which disallows interpolated placeholders.
         rule            :def_parameter_list,            '('.skip & ( :def_parameter >> ( ','.skip & :def_parameter ).zero_or_more ).optional & ')'.skip
         rule            :def_parameter,                 :identifier | :assignment_expression
+        
+        rule            :parameter_list,                '('.skip & ( :parameter >> ( ','.skip & :parameter ).zero_or_more ).optional & ')'.skip
+        rule            :parameter,                     :placeholder | :ruby_expression
         
         # placeholders may be in long form (${foo}) or short form ($foo)
         rule            :placeholder,                   :long_placeholder | :short_placeholder
@@ -173,7 +178,7 @@ module Walrus
         rule            :placeholder_parameters,        '('.skip & (:placeholder_parameter >> (','.skip & :placeholder_parameter).zero_or_more).optional & ')'.skip
         rule            :placeholder_parameter,         :placeholder | :ruby_expression
         
-        # simplified Ruby subset
+        # simplified Ruby subset 
         rule            :ruby_expression,               :unary_expression | :assignment_expression | :addition_expression
         rule            :literal_expression,            :string_literal | :numeric_literal | :array_literal | :hash_literal | :identifier
         rule            :unary_expression,              :literal_expression | :message_expression

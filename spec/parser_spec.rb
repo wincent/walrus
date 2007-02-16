@@ -549,6 +549,61 @@ module Walrus
       
     end
     
+    specify 'should be able to parse the "super" directive' do
+      
+      # super with no params
+      result = @parser.parse('#super')
+      result.should_be_kind_of WalrusGrammar::SuperDirective
+      result.params.should == []
+      
+      # super with empty params
+      result = @parser.parse('#super()')
+      result.should_be_kind_of WalrusGrammar::SuperDirective
+      result.params.should == []
+      
+      # same with intervening whitespace
+      result = @parser.parse('#super ()')
+      result.should_be_kind_of WalrusGrammar::SuperDirective
+      result.params.should == []
+      
+      # super with one param
+      result = @parser.parse('#super("foo")')
+      result.should_be_kind_of WalrusGrammar::SuperDirective
+      result.params.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.params.lexeme.should == 'foo'
+      result.params.to_s.should == 'foo'
+      
+      # same with intervening whitespace
+      result = @parser.parse('#super ("foo")')
+      result.should_be_kind_of WalrusGrammar::SuperDirective
+      result.params.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.params.lexeme.should == 'foo'
+      result.params.to_s.should == 'foo'
+      
+      # super with two params
+      result = @parser.parse('#super("foo", "bar")')
+      result.should_be_kind_of WalrusGrammar::SuperDirective
+      result.params.should_be_kind_of Array
+      result.params[0].should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.params[0].lexeme.should == 'foo'
+      result.params[0].to_s.should == 'foo'
+      result.params[1].should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.params[1].lexeme.should == 'bar'
+      result.params[1].to_s.should == 'bar'
+      
+      # same with intervening whitespace
+      result = @parser.parse('#super ("foo", "bar")')
+      result.should_be_kind_of WalrusGrammar::SuperDirective
+      result.params.should_be_kind_of Array
+      result.params[0].should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.params[0].lexeme.should == 'foo'
+      result.params[0].to_s.should == 'foo'
+      result.params[1].should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.params[1].lexeme.should == 'bar'
+      result.params[1].to_s.should == 'bar'
+      
+    end
+    
   end
   
 end # module Walrus

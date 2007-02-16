@@ -10,9 +10,9 @@ module Walrus
       # position in string (irrespective of line number, column number)
       # line number, column number
       # filename
-      #def initialize(message)
-      # super message
-      #end
+      def initialize(message, info = {})
+        super message
+      end
       
     end # class ParseError
     
