@@ -217,10 +217,7 @@ module Walrus
         rule            :method_expression,                   :method_with_parentheses | :method_without_parentheses
         node            :method_expression, :ruby_expression
         
-        # slight hack here: the trailing parslet forces the optional parameter list to be returned as an empty array
-        # should really beef up the "optional" method so that it can take a parameter
-        #rule            :method_with_parentheses,             :identifier & :method_parameter_list.optional([]) & //
-        rule            :method_with_parentheses,             :identifier & :method_parameter_list.optional & //
+        rule            :method_with_parentheses,             :identifier & :method_parameter_list.optional([])
         production      :method_with_parentheses.build(:method_expression, :name, :params)
         rule            :method_without_parentheses,          :identifier & :method_parameter_list_without_parentheses
         production      :method_without_parentheses.build(:method_expression, :name, :params)

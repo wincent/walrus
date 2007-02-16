@@ -81,8 +81,12 @@ module Walrus
       
     private
       
+      def hash_offset
+        87
+      end
+      
       def update_hash
-        @hash = @min.hash + @max.hash + @parseable.hash + 87 # fixed offset to minimize risk of collisions
+        @hash = @min.hash + @max.hash + @parseable.hash + hash_offset # fixed offset to minimize risk of collisions
       end
       
       def min=(min)

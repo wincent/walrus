@@ -4,13 +4,15 @@
 module Walrus
   class Grammar
     
-    autoload(:AndPredicate,       'walrus/grammar/and_predicate')
-    autoload(:NotPredicate,       'walrus/grammar/not_predicate')
-    autoload(:ParsletChoice,      'walrus/grammar/parslet_choice')
-    autoload(:ParsletMerge,       'walrus/grammar/parslet_merge')
-    autoload(:ParsletOmission,    'walrus/grammar/parslet_omission')
-    autoload(:ParsletRepetition,  'walrus/grammar/parslet_repetition')
-    autoload(:ParsletSequence,    'walrus/grammar/parslet_sequence')
+    autoload(:AndPredicate,             'walrus/grammar/and_predicate')
+    autoload(:NoParameterMarker,        'walrus/no_parameter_marker')
+    autoload(:NotPredicate,             'walrus/grammar/not_predicate')
+    autoload(:ParsletChoice,            'walrus/grammar/parslet_choice')
+    autoload(:ParsletMerge,             'walrus/grammar/parslet_merge')
+    autoload(:ParsletOmission,          'walrus/grammar/parslet_omission')
+    autoload(:ParsletRepetition,        'walrus/grammar/parslet_repetition')
+    autoload(:ParsletRepetitionDefault, 'walrus/grammar/parslet_repetition_default')
+    autoload(:ParsletSequence,          'walrus/grammar/parslet_sequence')
     
     # The ParsletCombining module, together with the ParsletCombination class and its subclasses, provides simple container classes for encapsulating relationships among Parslets. By storing this information outside of the Parslet objects themselves their design is kept clean and they can become immutable objects which are much more easily copied and shared among multiple rules in a Grammar.
     module ParsletCombining
@@ -72,11 +74,22 @@ module Walrus
         self.repetition(self, min, max)
       end
       
+      def repetition_with_default(parslet, min, max, default)
+        Walrus::Grammar::ParsletRepetitionDefault.new(parslet.to_parseable, min, max, default)
+      end
+      
+      def repeat_with_default(min = nil, max = nil, default = nil)
+        self.repetition_with_default(self, min, max, default)
+      end
+      
       # Shorthand for ParsletCombining.repetition(0, 1).
-      # TODO: Allow this method to take an optional parameter specifying what object should be returned as a placeholder when there are no matches (useful for packing into ASTs).
-      # should be very quick to implement using a ParsletRepetition subclass which catches ZeroWidthParseSuccess and returns the placeholder (or better, a copy of it).
-      def optional
-        self.repeat(0, 1)
+      # This method optionally takes a single parameter specifying what object should be returned as a placeholder when there are no matches; this is useful for packing into ASTs where it may be better to parse an empty Array rather than nil. The specified objected is cloned and returned in the event that there are no matches.
+      def optional(default_return_value = NoParameterMarker.instance)
+        if default_return_value == NoParameterMarker.instance
+          self.repeat(0, 1) # default behaviour
+        else
+          self.repeat_with_default(0, 1, default_return_value)
+        end
       end
       
       # Alternative to optional.
