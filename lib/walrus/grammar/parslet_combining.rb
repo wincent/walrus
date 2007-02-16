@@ -73,7 +73,7 @@ module Walrus
       end
       
       # Shorthand for ParsletCombining.repetition(0, 1).
-      # TODO: All this method to take an optional parameter specifying what object should be returned as a placeholder when there are no matches (useful for packing into ASTs).
+      # TODO: Allow this method to take an optional parameter specifying what object should be returned as a placeholder when there are no matches (useful for packing into ASTs).
       # should be very quick to implement using a ParsletRepetition subclass which catches ZeroWidthParseSuccess and returns the placeholder (or better, a copy of it).
       def optional
         self.repeat(0, 1)

@@ -430,6 +430,213 @@ module Walrus
       
     end
     
+    # will use the #silent directive here because it's an easy way to make the parser look for a ruby expression
+    specify 'should be able to parse basic Ruby expressions' do
+      
+      # a numeric literal
+      result = @parser.parse('#silent 1')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::NumericLiteral
+      result.expression.lexeme.should == '1'
+      
+      # a single-quoted string literal
+      result = @parser.parse("#silent 'foo'")
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
+      result.expression.lexeme.should == 'foo'
+      
+      # a double-quoted string literal
+      result = @parser.parse('#silent "foo"')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.expression.lexeme.should == 'foo'
+      
+      # an identifier
+      result = @parser.parse('#silent foo')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::Identifier
+      result.expression.lexeme.should == 'foo'
+      
+      result = @parser.parse('#silent foo_bar')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::Identifier
+      result.expression.lexeme.should == 'foo_bar'
+      
+      # a constant
+      result = @parser.parse('#silent Foo')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::Constant
+      result.expression.lexeme.should == 'Foo'
+      
+      result = @parser.parse('#silent FooBar')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::Constant
+      result.expression.lexeme.should == 'FooBar'
+      
+      # a symbol
+      result = @parser.parse('#silent :foo')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::SymbolLiteral
+      result.expression.lexeme.should == ':foo'
+      
+      result = @parser.parse('#silent :Foo')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::SymbolLiteral
+      result.expression.lexeme.should == ':Foo'
+      
+      # an array literal
+      result = @parser.parse('#silent [1]')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::RubyExpression
+      result.expression.should_be_kind_of WalrusGrammar::ArrayLiteral
+      result.expression.elements.should_be_kind_of WalrusGrammar::NumericLiteral
+      result.expression.elements.lexeme.should == '1'
+      
+      result = @parser.parse('#silent [1, 2, 3]')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::RubyExpression
+      result.expression.should_be_kind_of WalrusGrammar::ArrayLiteral
+      result.expression.elements.should_be_kind_of Array
+      result.expression.elements[0].should_be_kind_of WalrusGrammar::NumericLiteral
+      result.expression.elements[0].lexeme.should == '1'
+      result.expression.elements[1].should_be_kind_of WalrusGrammar::NumericLiteral
+      result.expression.elements[1].lexeme.should == '2'
+      result.expression.elements[2].should_be_kind_of WalrusGrammar::NumericLiteral
+      result.expression.elements[2].lexeme.should == '3'
+      
+      # a hash literal
+      result = @parser.parse('#silent { :foo => "bar" }')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::RubyExpression
+      result.expression.should_be_kind_of WalrusGrammar::HashLiteral
+      result.expression.pairs.should_be_kind_of WalrusGrammar::RubyExpression
+      result.expression.pairs.should_be_kind_of WalrusGrammar::HashAssignment
+      result.expression.pairs.lvalue.should_be_kind_of WalrusGrammar::SymbolLiteral
+      result.expression.pairs.lvalue.lexeme.should == ':foo'
+      result.expression.pairs.expression.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.expression.pairs.expression.lexeme.should == 'bar'
+      
+      result = @parser.parse('#silent { :foo => "bar", :baz => "xyz" }')
+      result.expression.should_be_kind_of WalrusGrammar::HashLiteral
+      result.expression.pairs.should_be_kind_of Array
+      result.expression.pairs[0].should_be_kind_of WalrusGrammar::HashAssignment
+      result.expression.pairs[0].lvalue.should_be_kind_of WalrusGrammar::SymbolLiteral
+      result.expression.pairs[0].lvalue.lexeme.should == ':foo'
+      result.expression.pairs[0].expression.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.expression.pairs[0].expression.lexeme.should == 'bar'
+      result.expression.pairs[1].should_be_kind_of WalrusGrammar::HashAssignment
+      result.expression.pairs[1].lvalue.should_be_kind_of WalrusGrammar::SymbolLiteral
+      result.expression.pairs[1].lvalue.lexeme.should == ':baz'
+      result.expression.pairs[1].expression.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.expression.pairs[1].expression.lexeme.should == 'xyz'
+      
+      # an addition expression
+      result = @parser.parse('#silent 1 + 2')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::RubyExpression
+      result.expression.should_be_kind_of WalrusGrammar::AdditionExpression
+      result.expression.left.should_be_kind_of WalrusGrammar::NumericLiteral
+      result.expression.left.lexeme.should == '1'
+      result.expression.right.should_be_kind_of WalrusGrammar::NumericLiteral
+      result.expression.right.lexeme.should == '2'
+      
+      # an assignment expression
+      result = @parser.parse('#silent foo = 1')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::RubyExpression
+      result.expression.should_be_kind_of WalrusGrammar::AssignmentExpression
+      result.expression.lvalue.should_be_kind_of WalrusGrammar::Identifier
+      result.expression.lvalue.lexeme.should == 'foo'
+      result.expression.expression.should_be_kind_of WalrusGrammar::NumericLiteral
+      result.expression.expression.lexeme.should == '1'
+      
+      # a method invocation
+      result = @parser.parse('#silent foo.delete')
+#      result.should_be_kind_of WalrusGrammar::Directive
+#      result.should_be_kind_of WalrusGrammar::SilentDirective
+#      result.expression.should_be_kind_of WalrusGrammar::RubyExpression
+#      result.expression.should_be_kind_of WalrusGrammar::MessageExpression
+      
+      result = @parser.parse('#silent foo.delete()')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::MessageExpression
+      result.expression.target.should_be_kind_of WalrusGrammar::Identifier
+      result.expression.target.lexeme.should == 'foo'
+      result.expression.message.should_be_kind_of WalrusGrammar::RubyExpression
+      result.expression.message.should_be_kind_of WalrusGrammar::MethodExpression
+      result.expression.message.name.should_be_kind_of WalrusGrammar::Identifier
+      result.expression.message.name.lexeme.should == 'delete'
+      result.expression.message.params.should_be_kind_of Array
+      result.expression.message.params.should == []
+      
+      result = @parser.parse('#silent foo.delete(1)')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::MessageExpression
+      result.expression.target.should_be_kind_of WalrusGrammar::Identifier
+      result.expression.target.lexeme.should == 'foo'
+      result.expression.message.should_be_kind_of WalrusGrammar::MethodExpression
+      result.expression.message.name.should_be_kind_of WalrusGrammar::Identifier
+      result.expression.message.name.lexeme.should == 'delete'
+      result.expression.message.params.should_be_kind_of WalrusGrammar::NumericLiteral
+      result.expression.message.params.lexeme.should == '1'
+      
+      result = @parser.parse('#silent foo.delete(bar, baz)')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::MessageExpression
+      result.expression.target.should_be_kind_of WalrusGrammar::Identifier
+      result.expression.target.lexeme.should == 'foo'
+      result.expression.message.should_be_kind_of WalrusGrammar::MethodExpression
+      result.expression.message.name.should_be_kind_of WalrusGrammar::Identifier
+      result.expression.message.name.lexeme.should == 'delete'
+      result.expression.message.params.should_be_kind_of Array
+      result.expression.message.params[0].should_be_kind_of WalrusGrammar::Identifier
+      result.expression.message.params[0].lexeme.should == 'bar'
+      result.expression.message.params[1].should_be_kind_of WalrusGrammar::Identifier
+      result.expression.message.params[1].lexeme.should == 'baz'
+      
+      # nested arrays
+      result = @parser.parse('#silent [1, 2, [foo, bar]]')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::ArrayLiteral
+      
+      # nesting in a hash
+      result = @parser.parse('#silent { :foo => [1, 2] }')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::HashLiteral
+      
+      # multiple addition expressions
+      result = @parser.parse('#silent 1 + 2 + 3')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::AdditionExpression
+      
+      # addition and assignment
+      result = @parser.parse('#silent foo = bar + 1')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::AssignmentExpression
+      
+    end
+    
     specify 'should be able to parse the "def" directive' do
       
       # simple case: no parameters
@@ -508,12 +715,6 @@ module Walrus
       
     end
     
-    specify 'should be able to parse basic Ruby expressions' do
-      
-      # will use the #silent directive here because it's an easy way to make the parser look for a ruby expression
-      
-    end
-    
     specify 'should be able to parse the "set" directive' do
       
       # assign a string literal 
@@ -521,6 +722,23 @@ module Walrus
       
       # assign a local variable
       result = @parser.parse('#set foo = bar')
+      
+    end
+    
+    specify 'should be able to parse the "silent" directive' do
+      
+      # for more detailed tests see "should be able to parse basic Ruby expressions above"
+      lambda { @parser.parse('#silent') }.should_raise Grammar::ParseError
+      
+      # allow multiple expressions separated by semicolons
+      result = @parser.parse('#silent foo; bar')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of Array
+      result.expression[0].should_be_kind_of WalrusGrammar::Identifier
+      result.expression[0].lexeme.should == 'foo'
+      result.expression[1].should_be_kind_of WalrusGrammar::Identifier
+      result.expression[1].lexeme.should == 'bar'
       
     end
     
