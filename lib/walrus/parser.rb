@@ -153,21 +153,27 @@ module Walrus
         # "#silent is the opposite of #echo. It executes an expression but discards the output."
         # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.silent.html
         rule            :silent_directive,              '#silent'.skip & :ruby_expression & :directive_end
+        production      :silent_directive.build(:directive, :expression)
         
         # "The #slurp directive eats up the trailing newline on the line it appears in, joining the following line onto the current line."
         # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.slurp.html
         # The "slurp" directive must be the last thing on the line (not followed by a comment or directive end marker)
         rule            :slurp_directive,               '#slurp' & :whitespace.optional.skip & :newline.skip
-        production      :slurp_directive.build(:node)
+        production      :slurp_directive.build(:directive)
         
-        rule            :super_directive,               '#super'.skip & :parameter_list.optional & :directive_end
-        production      :super_directive.build(:node, :params)
+        rule            :super_directive,               :super_with_parentheses | :super_without_parentheses
+        node            :super_directive
+        rule            :super_with_parentheses,        '#super'.skip & :parameter_list.optional & :directive_end
+        production      :super_with_parentheses.build(:super_directive, :params)
+        rule            :super_without_parentheses,     '#super'.skip & :parameter_list_without_parentheses & :directive_end
+        production      :super_without_parentheses.build(:super_directive, :params)
         
         # The "def_parameter_list" is a special case of parameter list which disallows interpolated placeholders.
         rule            :def_parameter_list,            '('.skip & ( :def_parameter >> ( ','.skip & :def_parameter ).zero_or_more ).optional & ')'.skip
         rule            :def_parameter,                 :identifier | :assignment_expression
         
         rule            :parameter_list,                '('.skip & ( :parameter >> ( ','.skip & :parameter ).zero_or_more ).optional & ')'.skip
+        rule            :parameter_list_without_parentheses,  :parameter >> ( ','.skip & :parameter ).zero_or_more
         rule            :parameter,                     :placeholder | :ruby_expression
         
         # placeholders may be in long form (${foo}) or short form ($foo)

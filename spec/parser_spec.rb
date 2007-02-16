@@ -508,6 +508,12 @@ module Walrus
       
     end
     
+    specify 'should be able to parse basic Ruby expressions' do
+      
+      # will use the #silent directive here because it's an easy way to make the parser look for a ruby expression
+      
+    end
+    
     specify 'should be able to parse the "set" directive' do
       
       # assign a string literal 
@@ -549,12 +555,7 @@ module Walrus
       
     end
     
-    specify 'should be able to parse the "super" directive' do
-      
-      # super with no params
-      result = @parser.parse('#super')
-      result.should_be_kind_of WalrusGrammar::SuperDirective
-      result.params.should == []
+    specify 'should be able to parse the "super" directive with parentheses' do
       
       # super with empty params
       result = @parser.parse('#super()')
@@ -593,6 +594,33 @@ module Walrus
       
       # same with intervening whitespace
       result = @parser.parse('#super ("foo", "bar")')
+      result.should_be_kind_of WalrusGrammar::SuperDirective
+      result.params.should_be_kind_of Array
+      result.params[0].should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.params[0].lexeme.should == 'foo'
+      result.params[0].to_s.should == 'foo'
+      result.params[1].should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.params[1].lexeme.should == 'bar'
+      result.params[1].to_s.should == 'bar'
+      
+    end
+    
+    specify 'should be able to parse the "super" directive without parentheses' do
+      
+      # super with no params
+      result = @parser.parse('#super')
+      result.should_be_kind_of WalrusGrammar::SuperDirective
+      result.params.should == []
+      
+      # super with one param
+      result = @parser.parse('#super "foo"')
+      result.should_be_kind_of WalrusGrammar::SuperDirective
+      result.params.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.params.lexeme.should == 'foo'
+      result.params.to_s.should == 'foo'
+      
+      # super with two params
+      result = @parser.parse('#super "foo", "bar"')
       result.should_be_kind_of WalrusGrammar::SuperDirective
       result.params.should_be_kind_of Array
       result.params[0].should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
