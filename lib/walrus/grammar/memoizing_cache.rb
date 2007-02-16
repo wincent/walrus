@@ -42,15 +42,14 @@ module Walrus
         raise ArgumentError if string.nil?
         raise ArgumentError unless options.has_key? :location
         raise ArgumentError unless options.has_key? :parseable
-        
         parseable, location = options[:parseable], options[:location]
-        results = @cache[parseable]
-        if results == NoValueForKey.instance      # nothing cached for parseable yet
-          @cache[parseable] = NoValueForKey.hash  # set up new empty hash for use by parseable
+        
+        if (results = @cache[parseable]) == NoValueForKey.instance  # nothing cached for parseable yet
+          results = (@cache[parseable] = NoValueForKey.hash)        # set up new empty hash for use by parseable
         end
         
         # First check if we have seen this parseable/location combination before: if so, propagate result
-        if (result = @cache[parseable][location]) != NoValueForKey.instance
+        if (result = results[location]) != NoValueForKey.instance
           if result.kind_of? Symbol       : throw result
           elsif result.kind_of? Exception : raise result
           else                              return result
@@ -61,16 +60,16 @@ module Walrus
               catch :ZeroWidthParseSuccess do
                 begin
                   options[:ignore_memoizer] = true
-                  return @cache[parseable][location] = parseable.memoizing_parse(string, options) # store and return
+                  return results[location] = parseable.memoizing_parse(string, options) # store and return
                 rescue Exception => e
-                  raise @cache[parseable][location] = e                                           # store and re-raise
+                  raise results[location] = e                                           # store and re-raise
                 end
               end
-              throw @cache[parseable][location] = :ZeroWidthParseSuccess                          # store and re-throw
+              throw results[location] = :ZeroWidthParseSuccess                          # store and re-throw
             end
-            throw @cache[parseable][location] = :AndPredicateSuccess                              # store and re-throw
+            throw results[location] = :AndPredicateSuccess                              # store and re-throw
           end
-          throw @cache[parseable][location] = :NotPredicateSuccess                                # store and re-throw
+          throw results[location] = :NotPredicateSuccess                                # store and re-throw
         end
       end
       
