@@ -36,7 +36,7 @@ module Walrus
       @rules              = Hash.new { |hash, key| raise StandardError.new('no rule for key "%s"' % key.to_s) }
       @productions        = Hash.new { |hash, key| raise StandardError.new('no production for key "%s"' % key.to_s) }
       @skipping_overrides = Hash.new { |hash, key| raise StandardError.new('no skipping override for key "%s"' % key.to_s) }
-      @memoizing          = true # memoizing defaults to off until performance measurements suggest it should be otherwise
+      @memoizing          = false # memoizing defaults to off until performance measurements suggest it should be otherwise
       self.instance_eval(&block) if block_given?
     end
     

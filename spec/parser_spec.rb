@@ -566,10 +566,10 @@ module Walrus
       
       # a method invocation
       result = @parser.parse('#silent foo.delete')
-#      result.should_be_kind_of WalrusGrammar::Directive
-#      result.should_be_kind_of WalrusGrammar::SilentDirective
-#      result.expression.should_be_kind_of WalrusGrammar::RubyExpression
-#      result.expression.should_be_kind_of WalrusGrammar::MessageExpression
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::RubyExpression
+      result.expression.should_be_kind_of WalrusGrammar::MessageExpression
       
       result = @parser.parse('#silent foo.delete()')
       result.should_be_kind_of WalrusGrammar::Directive
