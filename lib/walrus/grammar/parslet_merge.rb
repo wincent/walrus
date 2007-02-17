@@ -20,7 +20,7 @@ module Walrus
                 catch :ZeroWidthParseSuccess do
                   begin
                     starting_location = state.length  # remember current location within current ParserState instance
-                    parsed = parseable.memoizing_parse(state.remainder, options)
+                    parsed = parseable.memoizing_parse(state.remainder, augmented_options)
                     if parsed.respond_to? :each : parsed.each { |element| state.parsed(element) }
                     else                          state.parsed(parsed)
                     end
@@ -29,7 +29,27 @@ module Walrus
                   rescue SkippedSubstringException => e
                     state.skipped(e.to_s)
                     augmented_options[:location] = augmented_options[:location] + (state.length - starting_location)
-                  # TODO: possiby try inter-token parslets on failure here? (have yet to find a failing spec that requires this)
+                  
+                  # TODO: possiby try inter-token parslets on failure here?
+                  # (have yet to find a failing spec that requires this; although uncommenting this code doesn't cause any specs to fail either)
+#                  rescue ParseError => e # failed, will try to skip; save original error in case skipping fails                    
+#                    skipping_parslet = nil
+#                    if augmented_options.has_key?(:skipping_override) : skipping_parslet = augmented_options[:skipping_override]
+#                    elsif augmented_options.has_key?(:skipping)       : skipping_parslet = augmented_options[:skipping]
+#                    end
+#                    if skipping_parslet
+#                      begin
+#                        parsed = skipping_parslet.memoizing_parse(state.remainder, augmented_options) # guard against self references (possible infinite recursion) here?
+#                      rescue ParseError
+#                        raise e # skipping didn't help either, raise original error
+#                      end
+#                      state.skipped(parsed)
+#                      state.skipped(parsed.omitted.to_s)
+#                      augmented_options[:location] = augmented_options[:location] + (state.length - starting_location)
+#                      redo # skipping succeeded, try to redo
+#                    end
+#                    raise e # no skipper defined, raise original error  
+                    
                   end
                   last_caught = nil
                   throw :ProcessNextComponent # can't use "next" here because it will only break out of innermost "do"

@@ -26,15 +26,6 @@ module Walrus
           hash[:bar].should == NoValueForKey.instance
         end
         
-        specify 'the "hash" factory method should return a new hash set up to use NoValueForKey' do
-          hash = NoValueForKey.hash
-          hash.default.should == NoValueForKey.instance
-          hash[:foo].should == NoValueForKey.instance
-          hash[:foo] = 'bar'
-          hash[:foo].should == 'bar'
-          hash[:bar].should == NoValueForKey.instance
-        end
-        
       end
       
     end

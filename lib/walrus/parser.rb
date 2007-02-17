@@ -61,6 +61,7 @@ module Walrus
         production      :raw_text.build(:node)
         
         rule            :string_literal,                      :single_quoted_string_literal | :double_quoted_string_literal
+        skipping        :string_literal, nil
         node            :string_literal
         
         rule            :single_quoted_string_literal,        "'".skip & :single_quoted_string_content.optional & "'".skip
