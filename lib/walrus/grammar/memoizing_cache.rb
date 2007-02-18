@@ -36,7 +36,7 @@ module Walrus
         raise ArgumentError if string.nil?
         
         # construct a unique identifier
-        identifier = [options[:parseable], options[:location], options[:rule_name]]
+        identifier = [options[:parseable], options[:location]]#, options[:rule_name]]
         identifier << options[:skipping_override] if options.has_key? :skipping_override
         
         if (result = @cache[identifier]) != NoValueForKey.instance
