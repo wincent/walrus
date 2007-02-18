@@ -637,6 +637,14 @@ module Walrus
       
     end
     
+    specify 'should be able go from AST representation of a Ruby expression to an evaluable string form' do
+      
+      result = @parser.parse('#silent 1 + 2 + 3')
+      
+      # given that ruby expressions might be able to contain placeholders, i am not sure if a simple "reverse to original string" method will be enough...
+      
+    end
+    
     specify 'should be able to parse the "def" directive' do
       
       # simple case: no parameters
