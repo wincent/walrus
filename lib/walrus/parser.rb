@@ -71,8 +71,8 @@ module Walrus
         # might be nice to have a "compress" or "to_string" or "raw" operator here; we're not really interested in the internal structure of the comment
         # basically, given a result, walk the structure (if any) calling "to_s" and "omitted" and reconstructing the original text? (or calling a "base_text" method)
                 
-        rule            :directive,                           :extends_directive  | :import_directive | :include_directive | :raw_directive | :set_directive | 
-                                                              :silent_directive   | :slurp_directive  | :super_directive
+        rule            :directive,                           :extends_directive  | :import_directive | :include_directive  | :raw_directive    | :ruby_directive |
+                                                              :set_directive      | :silent_directive | :slurp_directive    | :super_directive
         
         node            :directive
         
@@ -124,48 +124,43 @@ module Walrus
         #
         # Here "END_MARKER" may be preceeded by whitespace (and whitespace only) but it must be the last thing on the line. The preceding whitespace is not considered to be part of the quoted text.
         #
-        # This may require some extensions to the parser generator (the ability to create a StringParslet during parsing and assign that somewhere, using it to detect the end of the block).
-#        rule            :raw_here_document,             '#raw'.skip & /<<[A-Z_]+/.store(:here_doc).skip & retrieve(:here_doc) 
-#        rule            :raw_here_document,             '#raw'.skip & /<<[A-Z_]+/.and? & @here_document_subparser
         
         # In order to parse "here documents" we adopt a model similar to the one proposed in this message to the ANTLR interest list:
         # http://www.antlr.org:8080/pipermail/antlr-interest/2005-September/013673.html
         rule            :here_document,                       lambda { |string, options|
           
-          directive_parslet  = /#[a-zA-Z]+[ \t\v]*/.skip
-          marker_parslet     = /<<(-?)([a-zA-Z0-9_]+)[ \t\v]*$/.to_parseable
+          # for the time-being, not sure if there is much benefit in calling memoizing_parse here (would have to track location)
+          state     = Grammar::ParserState.new(string)
+          parsed    = /<<(-?)([a-zA-Z0-9_]+)[ \t\v]*\n/.to_parseable.parse(state.remainder, options)
+          state.skipped(parsed.to_s)
+          marker    = parsed.match_data
+          indenting = (marker[1] == '') ? false : true
           
-          # first scan the opening directive #ruby or #raw, skipping it and any following spaces and tabs (the actual directive doesn't matter)
-          # if there is a marker on the opening line, scan it, store it and skip it
-          # now eat lines one by one
-          # your "last line" detection will depend on the opening line scanned above:
-          # 1. if there was no marker on the opening line, you'll stop as soon as you hit #end (doesn't have to be first or last thing on line)
-          # 2. if the marker began with << you'll stop IFF you find a line which begins and ends with that.
-          # 3. if the marker began with <<- you'll stop as in case "2", except the marker may be indented
-          # return result will be a string with the skipped stuff stored in the "omitted" ivar
-
-          state   = ParserState.new
-          begin
-            parsed = directive_parslet.memoizing_parse(string)
-          rescue SkippedSubstringException => e
-            state.skipped(e.to_s)
-          end
-
-
-          parsed  = marker_parslet.memoizing_parse(string)
-          marker  = parsed.match_data
-          indents = (marker[1] == '') ? false : true
-
-          if idents # whitespace allowed before end marker
-            /^[ \t\v]*#{marker[1]}$\n/
-          else  # no whitespace allowed before end marker
-            /^#{marker[1]}$\n/
+          if indenting  # whitespace allowed before end marker
+            end_marker  = /^[ \t\v]*#{marker[2]}(\n|\z)/.to_parseable # will eat trailing newline
+          else          # no whitespace allowed before end marker
+            end_marker  = /^#{marker[2]}(\n|\z)/.to_parseable         # will eat trailing newline
           end
           
+          line = /^.*\n/.to_parseable # for gobbling a line
           
+          while true do
+            begin
+              skipped = end_marker.parse(state.remainder, options)
+              state.skipped(skipped.to_s)     # found end marker, skip it
+              break                           # all done
+            rescue Grammar::ParseError        # didn't find end marker yet, consume a line
+              parsed = line.parse(state.remainder, options)
+              state.parsed(parsed.to_s)
+            end
+          end
+          
+          result          = state.results.to_s  # caller will want a String, not an Array
+          result.omitted  = state.omitted       # make sure info about skipped material is included in return value
+          result
         }
         
-        rule            :ruby_directive,                      '#ruby'.skip & (:here_document | (:directive_end & /([^#]+|#(?!end)+)*/ & '#end'.skip & :directive_end))
+        rule            :ruby_directive,                      '#ruby'.skip & ((:directive_end & /([^#]+|#(?!end)+)*/ & '#end'.skip & :directive_end) | :here_document)
         production      :ruby_directive.build(:directive, :content)
         
         rule            :set_directive,                       '#set'.skip & :assignment_expression & :directive_end

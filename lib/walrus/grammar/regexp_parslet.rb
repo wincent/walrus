@@ -28,6 +28,10 @@ module Walrus
         other.instance_of? RegexpParslet and other.expected_regexp == @expected_regexp
       end
       
+      def inspect
+        '#<%s:0x%x @expected_regexp=%s>' % [self.class.to_s, self.object_id, @expected_regexp.inspect]
+      end
+      
     protected
       
       # For equality comparisons.

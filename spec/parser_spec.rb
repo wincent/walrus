@@ -721,6 +721,62 @@ module Walrus
       
     end
     
+    specify 'should be able to parse the "ruby" directive' do
+      
+      # the end marker is required
+      lambda { @parser.parse('#ruby') }.should_raise Grammar::ParseError
+      lambda { @parser.parse('#ruby#foo') }.should_raise Grammar::ParseError
+      
+      # shortest possible version
+      result = @parser.parse('#ruby##end')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::RubyDirective
+      result.content.should == ''
+      
+      # two line version, also short
+      result = @parser.parse("#ruby\n#end")
+      result.should_be_kind_of WalrusGrammar::RubyDirective
+      result.content.should == ''
+      
+      # simple examples with content
+      result = @parser.parse('#ruby#hello world#end')
+      result.should_be_kind_of WalrusGrammar::RubyDirective
+      result.content.should == 'hello world'
+      
+      result = @parser.parse("#ruby\nfoobar#end")
+      result.should_be_kind_of WalrusGrammar::RubyDirective
+      result.content.should == 'foobar'
+      
+      # can include anything at all in the block, escape sequences, placeholders, directives etc and all will be ignored
+      result = @parser.parse("#ruby\n#ignored,$ignored,\\#ignored,\\$ignored#end")
+      result.should_be_kind_of WalrusGrammar::RubyDirective
+      result.content.should == '#ignored,$ignored,\\#ignored,\\$ignored'
+      
+      # to include a literal "#end" you must use a here document
+      result = @parser.parse("#ruby <<HERE_DOCUMENT
+#end
+HERE_DOCUMENT")
+      result.should_be_kind_of WalrusGrammar::RubyDirective
+      result.content.should == "#end\n"
+      
+      # indented end marker
+      
+      
+      # empty here document
+      
+      
+      # invalid here document (whitespace before end marker)
+      
+      
+      # invalid here document (whitespace after end marker)
+      
+      
+      # invalid here document (non-matching end marker)
+      
+      
+      
+    end
+    
     specify 'should be able to parse the "set" directive' do
       
       # assign a string literal 
