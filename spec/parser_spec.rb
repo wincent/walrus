@@ -718,7 +718,52 @@ module Walrus
       lambda { @parser.parse('#raw# here is my #end! #end') }.should_raise Grammar::ParseError
       
       # must use a "here doc" in order to do that
+      result = @parser.parse('#raw <<HERE_DOCUMENT
+#end
+HERE_DOCUMENT')
+      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.content.should == "#end\n"
       
+      # optionally indented end marker
+      result = @parser.parse('#raw <<-HERE_DOCUMENT
+#end
+HERE_DOCUMENT')
+      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.content.should == "#end\n"
+      
+      # actually indented end marker
+      result = @parser.parse('#raw <<-HERE_DOCUMENT
+#end
+      HERE_DOCUMENT')
+      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.content.should == "#end\n"
+      
+      # empty here document
+      result = @parser.parse('#raw <<HERE_DOCUMENT
+HERE_DOCUMENT')
+      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.content.should == ''
+      
+      result = @parser.parse('#raw <<-HERE_DOCUMENT
+HERE_DOCUMENT')
+      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.content.should == ''
+      
+      # invalid here document (whitespace before end marker)
+      lambda { @parser.parse('#raw <<HERE_DOCUMENT
+#end
+    HERE_DOCUMENT') }.should_raise Grammar::ParseError
+      
+      # invalid here document (whitespace after end marker)
+      lambda { @parser.parse('#raw <<HERE_DOCUMENT
+#end
+HERE_DOCUMENT     ') }.should_raise Grammar::ParseError
+      
+      # invalid here document (non-matching end marker)
+      lambda { @parser.parse('#raw <<HERE_DOCUMENT
+#end
+THERE_DOCUMENT') }.should_raise Grammar::ParseError
+
     end
     
     specify 'should be able to parse the "ruby" directive' do
