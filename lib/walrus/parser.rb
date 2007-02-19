@@ -7,51 +7,6 @@ module Walrus
   
   class Parser
     
-    # In order to parse "here documents" we adopt a model similar to the one proposed in this message to the ANTLR interest list:
-    # http://www.antlr.org:8080/pipermail/antlr-interest/2005-September/013673.html
-    class HereDocumentSubParser
-      
-      def initialize
-        @directive_parslet  = /#[a-zA-Z]+[ \t\v]*/.skip
-        @marker_parslet     = /<<(-?)([a-zA-Z0-9_]+)[ \t\v]*$/.to_parseable
-      end
-      
-      # Rather than creating a separate class here I could also introduce a LambdaParslet that allows me to specify a block of code from within my grammar
-      def parse(string, options = {})
-        raise ArgumentError if string.nil?
-        
-        
-        # first scan the opening directive #ruby or #raw, skipping it and any following spaces and tabs (the actual directive doesn't matter)
-        # if there is a marker on the opening line, scan it, store it and skip it
-        # now eat lines one by one
-        # your "last line" detection will depend on the opening line scanned above:
-        # 1. if there was no marker on the opening line, you'll stop as soon as you hit #end (doesn't have to be first or last thing on line)
-        # 2. if the marker began with << you'll stop IFF you find a line which begins and ends with that.
-        # 3. if the marker began with <<- you'll stop as in case "2", except the marker may be indented
-        # return result will be a string with the skipped stuff stored in the "omitted" ivar
-        
-        state   = ParserState.new
-        begin
-          parsed = @directive_parslet.memoizing_parse(string)
-        rescue SkippedSubstringException => e
-          state.skipped(e.to_s)
-        end
-        
-        
-        parsed  = @marker_parslet.memoizing_parse(string)
-        marker  = parsed.match_data
-        indents = (marker[1] == '') ? false : true
-        
-        if idents # whitespace allowed before end marker
-          /^[ \t\v]*#{marker[1]}$\n/
-        else  # no whitespace allowed before end marker
-          /^#{marker[1]}$\n/
-        end
-        
-      end
-      
-    end
-    
     def parse(string)
       @@grammar.parse(string)
     end
@@ -150,8 +105,7 @@ module Walrus
         # "Any section of a template definition that is inside a #raw ... #end raw tag pair will be printed verbatim without any parsing of $placeholders or other directives."
         # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.raw.html
         # Unlike Cheetah, Walrus uses a bare "#end" marker and not an "#end raw" to mark the end of the raw block.
-        # I suspect that the regular expression used here is probably very slow; if it proves to be cripplingly slow I may need to write another kind of parslet, similar to a RegexpParslet but which uses a different implementation under the hood (see http://swtch.com/~rsc/regexp/regexp1.html).
-        rule            :raw_directive,                       '#raw'.skip & :directive_end & /.*?(?=#end)/m & '#end'.skip & :directive_end
+        rule            :raw_directive,                       '#raw'.skip & :directive_end & /([^#]+|#(?!end)+)*/ & '#end'.skip & :directive_end
         production      :raw_directive.build(:directive, :content)
         
         # May be able to allow the presence of a literal #end within a raw block by using a "here doc"-style delimiter:
@@ -174,20 +128,45 @@ module Walrus
 #        rule            :raw_here_document,             '#raw'.skip & /<<[A-Z_]+/.store(:here_doc).skip & retrieve(:here_doc) 
 #        rule            :raw_here_document,             '#raw'.skip & /<<[A-Z_]+/.and? & @here_document_subparser
         
-        rule            :raw_block,                           lambda { |string, options|
+        # In order to parse "here documents" we adopt a model similar to the one proposed in this message to the ANTLR interest list:
+        # http://www.antlr.org:8080/pipermail/antlr-interest/2005-September/013673.html
+        rule            :here_document,                       lambda { |string, options|
+          
+          directive_parslet  = /#[a-zA-Z]+[ \t\v]*/.skip
+          marker_parslet     = /<<(-?)([a-zA-Z0-9_]+)[ \t\v]*$/.to_parseable
+          
+          # first scan the opening directive #ruby or #raw, skipping it and any following spaces and tabs (the actual directive doesn't matter)
+          # if there is a marker on the opening line, scan it, store it and skip it
+          # now eat lines one by one
+          # your "last line" detection will depend on the opening line scanned above:
+          # 1. if there was no marker on the opening line, you'll stop as soon as you hit #end (doesn't have to be first or last thing on line)
+          # 2. if the marker began with << you'll stop IFF you find a line which begins and ends with that.
+          # 3. if the marker began with <<- you'll stop as in case "2", except the marker may be indented
+          # return result will be a string with the skipped stuff stored in the "omitted" ivar
+
+          state   = ParserState.new
+          begin
+            parsed = directive_parslet.memoizing_parse(string)
+          rescue SkippedSubstringException => e
+            state.skipped(e.to_s)
+          end
+
+
+          parsed  = marker_parslet.memoizing_parse(string)
+          marker  = parsed.match_data
+          indents = (marker[1] == '') ? false : true
+
+          if idents # whitespace allowed before end marker
+            /^[ \t\v]*#{marker[1]}$\n/
+          else  # no whitespace allowed before end marker
+            /^#{marker[1]}$\n/
+          end
+          
           
         }
         
-        rule            :here_document,                       lambda { |string, options|
-        
-        }
-        
-        rule            :ruby_directive,                      '#ruby' & ((:directive_end & :raw_block & '#end'.skip & :directive_end) | :here_document)
-        
-        
-#        rule            :ruby_directive,                      /#ruby[ \t\v]+/.and? & :here_document_subparser & :directive_end
-#        rule            :skipping, nil
-#        production      :ruby_directive.build(:directive, :content)
+        rule            :ruby_directive,                      '#ruby'.skip & (:here_document | (:directive_end & /([^#]+|#(?!end)+)*/ & '#end'.skip & :directive_end))
+        production      :ruby_directive.build(:directive, :content)
         
         rule            :set_directive,                       '#set'.skip & :assignment_expression & :directive_end
         production      :set_directive.build(:directive, :assignment)

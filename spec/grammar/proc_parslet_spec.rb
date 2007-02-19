@@ -33,9 +33,12 @@ module Walrus
       end
       
       specify 'should be able to compare parslets for equality' do
+        
+        # in practice only parslets created with the exact same Proc instance will be eql because Proc returns different hashes for each
         @parslet.should_eql @parslet.clone
         @parslet.should_eql @parslet.dup
         @parslet.should_not_eql lambda { nil }.to_parseable
+        
       end
       
     end
