@@ -266,6 +266,8 @@ module Walrus
         rule            :method_parameter,                    :ruby_expression
         rule            :method_parameter_list_without_parentheses, :method_parameter >> ( ','.skip & :method_parameter ).zero_or_more
         
+        # TODO: regexp literal expression
+        
       end
       
     end
