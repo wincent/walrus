@@ -1,6 +1,8 @@
 # Copyright 2007 Wincent Colaiuta
 # $Id$
 
+require 'walrus'
+
 module Test
   module Unit
     

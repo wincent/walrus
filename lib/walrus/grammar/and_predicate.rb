@@ -1,15 +1,15 @@
 # Copyright 2007 Wincent Colaiuta
 # $Id$
 
+require 'walrus'
+
 module Walrus
   class Grammar
     
-    require 'walrus/grammar/predicate'
     class AndPredicate < Predicate
       
       def parse(string, options = {})
         raise ArgumentError if string.nil?
-        parsed = "FOO"
         catch :ZeroWidthParseSuccess do
           begin
             parsed = @parseable.memoizing_parse(string, options)

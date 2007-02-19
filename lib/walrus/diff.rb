@@ -1,6 +1,7 @@
 # Copyright 2007 Wincent Colaiuta
 # $Id$
 
+require 'walrus'
 require 'open3'
 require 'pathname'
 require 'tempfile'

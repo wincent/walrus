@@ -3,12 +3,8 @@
 
 require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 
-require 'walrus/grammar'
-
 module Walrus
   class Grammar
-    
-    autoload(:Node, 'walrus/grammar/node')
     
     context 'working in the default namespace' do
       

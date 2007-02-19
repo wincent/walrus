@@ -1,6 +1,8 @@
 # Copyright 2007 Wincent Colaiuta
 # $Id$
 
+require 'walrus'
+
 # Additions to String class for Unicode support.
 class String
   

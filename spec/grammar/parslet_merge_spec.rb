@@ -3,14 +3,8 @@
 
 require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 
-require 'walrus/grammar/parslet_merge'
-require 'walrus/grammar/additions/string'
-
 module Walrus
   class Grammar
-    
-    autoload(:ParsletOmission, 'walrus/grammar/parslet_omission')
-    autoload(:ParsletSequence, 'walrus/grammar/parslet_sequence')
     
     context 'using a Parslet Merge' do
       

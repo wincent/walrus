@@ -3,8 +3,6 @@
 
 require File.join(File.dirname(__FILE__), '..', '..', 'spec_helper.rb')
 
-require 'walrus/grammar/additions/string'
-
 module Walrus
   class Grammar
     
@@ -67,9 +65,9 @@ module Walrus
         enumerator.next.should_be_nil
       end
       
-      specify 'the "length" method should correctly report the number of characters in a string' do
-        @string.length.should == 10
-        "€".length.should     == 1  # three bytes long, but one character
+      specify 'the "jlength" method should correctly report the number of characters in a string' do
+        @string.jlength.should  == 10
+        "€".jlength.should      == 1  # three bytes long, but one character
       end
       
     end

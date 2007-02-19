@@ -3,18 +3,15 @@
 
 require 'pathname'
 require 'walrus'
-require 'walrus/parser'
 
 module Walrus
   class Template
-
-    include Walrus::CamelCase
-  
+    
     attr_accessor :base_text
-  
+    
     # If initialized using a Pathname or File, returns the pathname. Otherwise returns nil.
     attr_reader   :origin
-  
+    
     # Accepts an optional input argument of class String, Pathname or File
     def initialize(input = nil)
       @origin = nil
@@ -36,7 +33,7 @@ module Walrus
         raise "Unknown input class"
       end
     end
-  
+    
     # The fill method returns a string containing the output produced when executing the compiled template.
     def fill
       compiled = ""
@@ -50,7 +47,7 @@ module Walrus
       end
       result || ""
     end
-  
+    
     # Parses template, returning compiled input (suitable for writing to disk).
     def compile
       
@@ -104,11 +101,11 @@ module Walrus
       EOS
     
     end
-  
+    
     def compiled_text
       self.compile
     end
-  
+    
     # Prints output obtained by running the compiled template.
     def run
       p self.fill

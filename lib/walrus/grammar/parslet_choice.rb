@@ -1,12 +1,11 @@
 # Copyright 2007 Wincent Colaiuta
 # $Id$
 
+require 'walrus'
+
 module Walrus
   class Grammar
     
-    autoload(:ParseError, 'walrus/grammar/parse_error')
-    
-    require 'walrus/grammar/parslet_combination'
     class ParsletChoice < ParsletCombination
       
       attr_reader :hash

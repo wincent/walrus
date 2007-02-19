@@ -1,6 +1,8 @@
 # Copyright 2007 Wincent Colaiuta
 # $Id$
 
+require 'walrus'
+
 module Walrus
   class Grammar
     
@@ -10,7 +12,6 @@ module Walrus
     # Upon creation a clone of the passed in MatchData object is stored; this means that the $~ global variable can be conveniently wrapped without having to worry that subsequent operations will alter the contents of the variable.
     class MatchDataWrapper
       
-      require 'walrus/grammar/omission_data'
       include Walrus::Grammar::OmissionData
       
       attr_reader :match_data
@@ -42,8 +43,8 @@ module Walrus
         @match_data[0]
       end
       
-      def length
-        self.to_s.length
+      def jlength
+        self.to_s.jlength
       end
       
     private

@@ -1,18 +1,10 @@
 # Copyright 2007 Wincent Colaiuta
 # $Id$
 
-require 'walrus/additions/string'
-require 'walrus/grammar/additions/regexp'
-require 'walrus/grammar/additions/string'
-require 'walrus/grammar/additions/symbol'
-require 'walrus/grammar/node'
+require 'walrus'
 
 module Walrus
   class Grammar
-    
-    autoload(:ContinuationWrapperException, 'walrus/grammar/continuation_wrapper_exception')
-    autoload(:MemoizingCache,               'walrus/grammar/memoizing_cache')
-    autoload(:NoParameterMarker,            'walrus/no_parameter_marker')
     
     attr_accessor :memoizing
     attr_reader   :rules

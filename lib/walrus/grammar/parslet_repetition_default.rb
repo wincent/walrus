@@ -1,10 +1,10 @@
 # Copyright 2007 Wincent Colaiuta
 # $Id$
 
+require 'walrus'
+
 module Walrus
   class Grammar
-    
-    require 'walrus/grammar/parslet_repetition'
     
     # ParsletRepetitionDefault is a subclass that modifies the behaviour of its parent, ParsletRepetition, in a very small way. Namely, if the outcome of parsing is a ZeroWidthParse success then it is caught and the default value (defined at initialization time) is returned instead.
     class ParsletRepetitionDefault < ParsletRepetition

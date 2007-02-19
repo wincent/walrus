@@ -21,3 +21,5 @@ module Walrus
     
   end # module SpecHelper
 end # module Walrus
+
+require 'walrus'

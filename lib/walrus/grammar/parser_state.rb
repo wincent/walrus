@@ -1,8 +1,7 @@
 # Copyright 2007 Wincent Colaiuta
 # $Id$
 
-require 'walrus/grammar/additions/array'
-require 'walrus/grammar/additions/string'
+require 'walrus'
 
 module Walrus
   class Grammar
@@ -18,7 +17,7 @@ module Walrus
       attr_reader :count
       
       # Returns the number of characters scanned so far (including skipped characters).
-      attr_reader :length
+      attr_reader :jlength
       
       # Raises an ArgumentError if string is nil.
       def initialize(string)
@@ -26,7 +25,7 @@ module Walrus
         self.base_string  = string
         @results          = []              # for accumulating results
         @skipped          = []              # for accumulating skipped text
-        @length           = 0               # for counting number of characters parsed so far
+        @jlength          = 0               # for counting number of characters parsed so far
         @count            = 0               # for counting number of results parsed so far
         @remainder        = @base_string
       end
@@ -40,8 +39,8 @@ module Walrus
         raise ArgumentError if substring.nil?
         @results << substring
         @count += 1
-        @length += substring.to_s.length
-        @remainder = @base_string.chars[@length..-1].join # use chars method here to correctly support multi-byte characters
+        @jlength += substring.to_s.jlength
+        @remainder = @base_string.chars[@jlength..-1].join # use chars method here to correctly support multi-byte characters
       end
       
       # The skipped method is used to inform the receiver of a successful parsing event where the parsed substring should be consumed but not included in the accumulated results.
@@ -49,8 +48,8 @@ module Walrus
       def skipped(substring)
         raise ArgumentError if substring.nil?
         @skipped << substring
-        @length += substring.to_s.length
-        @remainder = @base_string.chars[@length..-1].join # use chars method here to correctly support multi-byte characters
+        @jlength += substring.to_s.jlength
+        @remainder = @base_string.chars[@jlength..-1].join # use chars method here to correctly support multi-byte characters
       end
       
       # Returns the results accumulated so far.

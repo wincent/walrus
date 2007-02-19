@@ -1,6 +1,8 @@
 # Copyright 2007 Wincent Colaiuta
 # $Id$
 
+require 'walrus'
+
 module Walrus
   class Grammar
     
@@ -9,10 +11,7 @@ module Walrus
     # On failure they raise a ParseError.
     class Predicate
       
-      require 'walrus/grammar/parslet_combining'
       include Walrus::Grammar::ParsletCombining
-      
-      require 'walrus/grammar/memoizing'
       include Walrus::Grammar::Memoizing
       
       attr_reader :hash

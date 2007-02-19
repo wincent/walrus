@@ -3,8 +3,6 @@
 
 require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 
-require 'walrus/grammar/match_data_wrapper'
-
 module Walrus
   class Grammar
     

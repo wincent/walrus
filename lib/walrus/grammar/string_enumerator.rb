@@ -2,11 +2,13 @@
 # $Id$
 
 require 'strscan'
+require 'walrus'
 
 module Walrus
   class Grammar
     
     # Unicode-aware (UTF-8) string enumerator.
+    # For Unicode support $KCODE must be set to 'U' (UTF-8).
     class StringEnumerator
       
       def initialize(string)
@@ -14,12 +16,9 @@ module Walrus
         @scanner = StringScanner.new(string)
       end
       
+      # This method will only work as expected if $KCODE is set to 'U' (UTF-8).
       def next
-        old_kcode = $KCODE
-        $KCODE    = "U"     # UTF-8
-        char      = @scanner.scan(/./m) # must use multiline mode or "." won't match newlines
-        $KCODE    = old_kcode
-        char
+        @scanner.scan(/./m) # must use multiline mode or "." won't match newlines
       end
       
     end # class StringEnumerator

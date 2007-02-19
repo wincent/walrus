@@ -1,12 +1,7 @@
 # Copyright 2007 Wincent Colaiuta
 # $Id$
 
-module Walrus
-  class Grammar
-    autoload(:StringEnumerator, 'walrus/grammar/string_enumerator')
-    autoload(:StringParslet,    'walrus/grammar/string_parslet')
-  end
-end
+require 'walrus'
 
 # Additions to String class for Unicode support.
 class String
@@ -26,15 +21,6 @@ class String
     chars
   end
   
-  # Redefine length in terms of the chars method (necessary because otherwise String reports length in bytes even when working with multi-byte characters).
-  # For example, before:
-  #   "€".length # 3
-  # After:
-  #   "€".length # 1
-  def length
-    self.chars.length
-  end
-  
   # Returns a character-level enumerator for the receiver.
   def enumerator
     Walrus::Grammar::StringEnumerator.new(self)
@@ -45,10 +31,7 @@ end # class String
 class String
   
   # Rationale: it's ok to add "&" and "|" methods to string because they don't exist yet (they're not overrides).
-  require 'walrus/grammar/parslet_combining'
   include Walrus::Grammar::ParsletCombining
-  
-  require 'walrus/grammar/omission_data'
   include Walrus::Grammar::OmissionData
   
   # Returns a StringParslet based on the receiver

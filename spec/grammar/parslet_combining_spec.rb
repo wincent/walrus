@@ -3,10 +3,6 @@
 
 require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 
-require 'walrus/grammar/additions/regexp'
-require 'walrus/grammar/additions/string'
-require 'walrus/grammar/additions/symbol'
-
 module Walrus
   class Grammar
     

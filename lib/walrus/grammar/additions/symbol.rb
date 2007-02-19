@@ -1,19 +1,10 @@
 # Copyright 2007 Wincent Colaiuta
 # $Id$
 
-module Walrus
-  class Grammar
-    autoload(:SymbolParslet, 'walrus/grammar/symbol_parslet')
-  end
-end
-
-require 'walrus/additions/string'
+require 'walrus'
 
 class Symbol
   
-  autoload(:ContinuationWrapperException, 'walrus/grammar/continuation_wrapper_exception')
-  
-  require 'walrus/grammar/parslet_combining'
   include Walrus::Grammar::ParsletCombining
   
   # Returns a SymbolParslet based on the receiver.

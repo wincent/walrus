@@ -3,8 +3,6 @@
 
 require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 
-require 'walrus/grammar/string_parslet'
-
 module Walrus
   class Grammar
     

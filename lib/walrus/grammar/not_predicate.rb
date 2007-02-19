@@ -1,10 +1,11 @@
 # Copyright 2007 Wincent Colaiuta
 # $Id$
 
+require 'walrus'
+
 module Walrus
   class Grammar
     
-    require 'walrus/grammar/predicate'
     class NotPredicate < Predicate
       
       def parse(string, options = {})

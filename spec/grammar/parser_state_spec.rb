@@ -3,12 +3,8 @@
 
 require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 
-require 'walrus/grammar/parser_state'
-
 module Walrus
   class Grammar
-    
-    autoload(:MatchDataWrapper, 'walrus/grammar/match_data_wrapper')
     
     context 'using a parser state object' do
       

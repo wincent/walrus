@@ -3,8 +3,6 @@
 
 require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 
-require 'walrus/additions/string'
-
 context 'converting from class names to require names' do
   
   specify 'should work with single letters' do

@@ -1,14 +1,13 @@
 # Copyright 2007 Wincent Colaiuta
 # $Id$
 
+require 'walrus'
+
 module Walrus
   class Grammar
     class Parslet
       
-      require 'walrus/grammar/parslet_combining'
       include Walrus::Grammar::ParsletCombining
-      
-      require 'walrus/grammar/memoizing'
       include Walrus::Grammar::Memoizing
       
       def to_parseable

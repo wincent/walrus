@@ -1,13 +1,11 @@
 # Copyright 2007 Wincent Colaiuta
 # $Id$
 
+require 'walrus'
+
 module Walrus
   class Grammar
     
-    autoload(:MatchDataWrapper, 'walrus/grammar/match_data_wrapper')
-    autoload(:ParseError,       'walrus/grammar/parse_error')
-    
-    require 'walrus/grammar/parslet'
     class RegexpParslet < Parslet
       
       attr_reader :hash
@@ -18,7 +16,7 @@ module Walrus
       end
       
       def parse(string, options = {})
-          raise ArgumentError if string.nil?
+        raise ArgumentError if string.nil?
         if (string =~ @expected_regexp)
           MatchDataWrapper.new($~)
         else

@@ -1,11 +1,7 @@
 # Copyright 2007 Wincent Colaiuta
 # $Id$
 
-module Walrus
-  class Grammar
-    autoload(:RegexpParslet, 'walrus/grammar/regexp_parslet')
-  end
-end
+require 'walrus'
 
 class Regexp
   

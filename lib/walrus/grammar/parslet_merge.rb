@@ -1,10 +1,11 @@
 # Copyright 2007 Wincent Colaiuta
 # $Id$
 
+require 'walrus'
+
 module Walrus
   class Grammar
     
-    require 'walrus/grammar/parslet_sequence'
     class ParsletMerge < ParsletSequence
       
       def parse(string, options = {})
@@ -19,16 +20,16 @@ module Walrus
               catch :AndPredicateSuccess do
                 catch :ZeroWidthParseSuccess do
                   begin
-                    starting_location = state.length  # remember current location within current ParserState instance
+                    starting_location = state.jlength  # remember current location within current ParserState instance
                     parsed = parseable.memoizing_parse(state.remainder, augmented_options)
                     if parsed.respond_to? :each : parsed.each { |element| state.parsed(element) }
                     else                          state.parsed(parsed)
                     end
                     state.skipped(parsed.omitted.to_s)  # in case any sub-parslets skipped tokens along the way
-                    augmented_options[:location] = augmented_options[:location] + (state.length - starting_location)
+                    augmented_options[:location] = augmented_options[:location] + (state.jlength - starting_location)
                   rescue SkippedSubstringException => e
                     state.skipped(e.to_s)
-                    augmented_options[:location] = augmented_options[:location] + (state.length - starting_location)
+                    augmented_options[:location] = augmented_options[:location] + (state.jlength - starting_location)
                   
                   # TODO: possiby try inter-token parslets on failure here?
                   # (have yet to find a failing spec that requires this; although uncommenting this code doesn't cause any specs to fail either)
@@ -45,7 +46,7 @@ module Walrus
 #                      end
 #                      state.skipped(parsed)
 #                      state.skipped(parsed.omitted.to_s)
-#                      augmented_options[:location] = augmented_options[:location] + (state.length - starting_location)
+#                      augmented_options[:location] = augmented_options[:location] + (state.jlength - starting_location)
 #                      redo # skipping succeeded, try to redo
 #                    end
 #                    raise e # no skipper defined, raise original error  

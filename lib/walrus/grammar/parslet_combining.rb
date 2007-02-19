@@ -1,18 +1,10 @@
 # Copyright 2007 Wincent Colaiuta
 # $Id$
 
+require 'walrus'
+
 module Walrus
   class Grammar
-    
-    autoload(:AndPredicate,             'walrus/grammar/and_predicate')
-    autoload(:NoParameterMarker,        'walrus/no_parameter_marker')
-    autoload(:NotPredicate,             'walrus/grammar/not_predicate')
-    autoload(:ParsletChoice,            'walrus/grammar/parslet_choice')
-    autoload(:ParsletMerge,             'walrus/grammar/parslet_merge')
-    autoload(:ParsletOmission,          'walrus/grammar/parslet_omission')
-    autoload(:ParsletRepetition,        'walrus/grammar/parslet_repetition')
-    autoload(:ParsletRepetitionDefault, 'walrus/grammar/parslet_repetition_default')
-    autoload(:ParsletSequence,          'walrus/grammar/parslet_sequence')
     
     # The ParsletCombining module, together with the ParsletCombination class and its subclasses, provides simple container classes for encapsulating relationships among Parslets. By storing this information outside of the Parslet objects themselves their design is kept clean and they can become immutable objects which are much more easily copied and shared among multiple rules in a Grammar.
     module ParsletCombining

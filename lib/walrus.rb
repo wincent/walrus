@@ -1,53 +1,54 @@
 # Copyright 2007 Wincent Colaiuta
 # $Id$
 
-# General purpose utility methods useful across all Walrus classes
+require 'jcode'   # jlength method
+$KCODE  = 'U'     # UTF-8 (necessary for Unicode support)
+
 module Walrus
   
-  VERSION='1.0b'
+  VERSION = '1.0b'
   
-  module CamelCase
-    
-    # Converts strings of the form "FooBar" to "foo_bar".
-    # Note that some information loss may be incurred; for example, "EOLToken" would be reduced to "eol_token".
-    # Raises an ArgumentError if the string parameter is nil.
-    def require_name_from_classname(string)
-      
-      raise ArgumentError.new("string is not a valid classname") unless string =~ /^[A-Z][A-Za-z0-9_]*$/
-      
-      # insert an underscore before any initial capital letters
-      base = string.gsub(/([^A-Z_])([A-Z])/, '\1_\2')
+  autoload(:Grammar,                      'walrus/grammar')
+  autoload(:Parser,                       'walrus/parser')
+  autoload(:NoParameterMarker,            'walrus/no_parameter_marker')
   
-      # consecutive capitals are words too, excluding any following capital that belongs to the next word
-      base.gsub!(/([A-Z])([A-Z])([^A-Z0-9_])/, '\1_\2\3')
-      
-      # numbers mark the start of a new word
-      base.gsub!(/([^0-9_])(\d)/, '\1_\2')
-      
-      # numbers also mark the end of a word
-      base.gsub!(/(\d)([^0-9_])/, '\1_\2')
-      
-      # lowercase everything
-      base.downcase
-      
-    end
+  class Grammar
     
-    # Converts strings of the form "foo_bar" to "FooBar".
-    # Note that this method cannot recover information lost during a conversion using the require_name_from_classname method; for example, "EOL", when converted to "token", would be transformed back to "EolToken". Likewise, "Foo__bar" would be reduced to "foo__bar" and then in the reverse conversion would become "FooBar".
-    # Raises an ArgumentError if the string parameter is nil.
-    def classname_from_require_name(string)
-      raise ArgumentError.new("string is not a valid require name") unless string =~ /^[a-z][a-z0-9_]*$/
-      string.split("_").collect { |component| component.capitalize}.join
-    end
+    autoload(:AndPredicate,                 'walrus/grammar/and_predicate')
+    autoload(:ContinuationWrapperException, 'walrus/grammar/continuation_wrapper_exception')
+    autoload(:MatchDataWrapper,             'walrus/grammar/match_data_wrapper')
+    autoload(:Memoizing,                    'walrus/grammar/memoizing')
+    autoload(:MemoizingCache,               'walrus/grammar/memoizing_cache')
+    autoload(:NotPredicate,                 'walrus/grammar/not_predicate')
+    autoload(:Node,                         'walrus/grammar/node')
+    autoload(:OmissionData,                 'walrus/grammar/omission_data')
+    autoload(:ParseError,                   'walrus/grammar/parse_error')
+    autoload(:ParserState,                  'walrus/grammar/parser_state')
+    autoload(:Parslet,                      'walrus/grammar/parslet')
+    autoload(:ParsletChoice,                'walrus/grammar/parslet_choice')
+    autoload(:ParsletCombination,           'walrus/grammar/parslet_combination')
+    autoload(:ParsletCombining,             'walrus/grammar/parslet_combining')
+    autoload(:ParsletMerge,                 'walrus/grammar/parslet_merge')
+    autoload(:ParsletOmission,              'walrus/grammar/parslet_omission')
+    autoload(:ParsletRepetition,            'walrus/grammar/parslet_repetition')
+    autoload(:ParsletRepetitionDefault,     'walrus/grammar/parslet_repetition_default')
+    autoload(:ParsletSequence,              'walrus/grammar/parslet_sequence')
+    autoload(:Predicate,                    'walrus/grammar/predicate')
+    autoload(:ProcParslet,                  'walrus/grammar/proc_parslet')
+    autoload(:RegexpParslet,                'walrus/grammar/regexp_parslet')
+    autoload(:SkippedSubstringException,    'walrus/grammar/skipped_substring_exception')
+    autoload(:StringEnumerator,             'walrus/grammar/string_enumerator')
+    autoload(:StringParslet,                'walrus/grammar/string_parslet')
+    autoload(:SymbolParslet,                'walrus/grammar/symbol_parslet')
     
-    def to_class_name
-      classname_from_require_name(self)
-    end
-    
-    def to_require_name
-      require_name_from_classname(self)
-    end
-    
-  end # module CamelCase
-    
+  end
+  
 end # module Walrus
+
+require 'walrus/additions/module'
+require 'walrus/additions/string'
+require 'walrus/grammar/additions/array'
+require 'walrus/grammar/additions/proc'
+require 'walrus/grammar/additions/regexp'
+require 'walrus/grammar/additions/string'
+require 'walrus/grammar/additions/symbol'

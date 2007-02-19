@@ -1,9 +1,9 @@
 # Copyright 2007 Wincent Colaiuta
 # $Id$
 
+require 'walrus'
+
 module Walrus
-  
-  autoload(:Grammar, 'walrus/grammar')
   
   class Parser
     
@@ -12,15 +12,35 @@ module Walrus
     class HereDocumentSubParser
       
       def initialize
-        @marker_parslet = /\A<<(-?)([a-zA-Z0-9_]+)[ \t\v]*$/.to_parseable
+        @directive_parslet  = /#[a-zA-Z]+[ \t\v]*/.skip
+        @marker_parslet     = /<<(-?)([a-zA-Z0-9_]+)[ \t\v]*$/.to_parseable
       end
       
+      # Rather than creating a separate class here I could also introduce a LambdaParslet that allows me to specify a block of code from within my grammar
       def parse(string, options = {})
         raise ArgumentError if string.nil?
+        
+        
+        # first scan the opening directive #ruby or #raw, skipping it and any following spaces and tabs (the actual directive doesn't matter)
+        # if there is a marker on the opening line, scan it, store it and skip it
+        # now eat lines one by one
+        # your "last line" detection will depend on the opening line scanned above:
+        # 1. if there was no marker on the opening line, you'll stop as soon as you hit #end (doesn't have to be first or last thing on line)
+        # 2. if the marker began with << you'll stop IFF you find a line which begins and ends with that.
+        # 3. if the marker began with <<- you'll stop as in case "2", except the marker may be indented
+        # return result will be a string with the skipped stuff stored in the "omitted" ivar
+        
         state   = ParserState.new
-        parsed  = @marker_parslet.parse(string)
+        begin
+          parsed = @directive_parslet.memoizing_parse(string)
+        rescue SkippedSubstringException => e
+          state.skipped(e.to_s)
+        end
+        
+        
+        parsed  = @marker_parslet.memoizing_parse(string)
         marker  = parsed.match_data
-        indents = (marker[0].nil?) ? false : true
+        indents = (marker[1] == '') ? false : true
         
         if idents # whitespace allowed before end marker
           /^[ \t\v]*#{marker[1]}$\n/
@@ -140,15 +160,34 @@ module Walrus
         #     content goes here
         # END_MARKER
         #
-        # or, if the end marker is to be indented:
+        # Here the opening "END_MARKER" must be the last thing on the line (trailing whitespace up to and including the newline is allowed but it is not considered to be part of the quoted text). The final "END_MARKER" must be the very first and last thing on the line, or it will not be considered to be an end marker at all and will be considered part of the quoted text. The newline immediately prior to the end marker is included in the quoted text.
+        #
+        # Or, if the end marker is to be indented:
         #
         # #raw <<-END_MARKER
         #     content
         #      END_MARKER
         #
+        # Here "END_MARKER" may be preceeded by whitespace (and whitespace only) but it must be the last thing on the line. The preceding whitespace is not considered to be part of the quoted text.
+        #
         # This may require some extensions to the parser generator (the ability to create a StringParslet during parsing and assign that somewhere, using it to detect the end of the block).
 #        rule            :raw_here_document,             '#raw'.skip & /<<[A-Z_]+/.store(:here_doc).skip & retrieve(:here_doc) 
 #        rule            :raw_here_document,             '#raw'.skip & /<<[A-Z_]+/.and? & @here_document_subparser
+        
+        rule            :raw_block,                           lambda { |string, options|
+          
+        }
+        
+        rule            :here_document,                       lambda { |string, options|
+        
+        }
+        
+        rule            :ruby_directive,                      '#ruby' & ((:directive_end & :raw_block & '#end'.skip & :directive_end) | :here_document)
+        
+        
+#        rule            :ruby_directive,                      /#ruby[ \t\v]+/.and? & :here_document_subparser & :directive_end
+#        rule            :skipping, nil
+#        production      :ruby_directive.build(:directive, :content)
         
         rule            :set_directive,                       '#set'.skip & :assignment_expression & :directive_end
         production      :set_directive.build(:directive, :assignment)

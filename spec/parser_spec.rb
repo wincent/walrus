@@ -3,8 +3,6 @@
 
 require File.join(File.dirname(__FILE__), 'spec_helper.rb')
 
-require 'walrus/parser'
-
 module Walrus
   
   context 'parsing raw text, escape markers and comments' do

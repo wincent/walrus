@@ -1,12 +1,10 @@
 # Copyright 2007 Wincent Colaiuta
 # $Id$
 
+require 'walrus'
+
 module Walrus
   class Grammar
-    
-    autoload(:ContinuationWrapperException, 'walrus/grammar/continuation_wrapper_exception')
-    
-    require 'walrus/grammar/parslet'
     
     # A SymbolParslet allows for evaluation of a parslet to be deferred until runtime (or parse time, to be more precise).
     class SymbolParslet < Parslet

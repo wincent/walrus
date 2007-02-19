@@ -3,8 +3,6 @@
 
 require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 
-require 'walrus/grammar/continuation_wrapper_exception'
-
 module Walrus
   class Grammar
     

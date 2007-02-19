@@ -1,12 +1,11 @@
 # Copyright 2007 Wincent Colaiuta
 # $Id$
 
+require 'walrus'
+
 module Walrus
   class Grammar
     
-    autoload(:SkippedSubstringException, 'walrus/grammar/skipped_substring_exception')
-    
-    require 'walrus/grammar/parslet_combination'
     class ParsletOmission < ParsletCombination
       
       attr_reader :hash
