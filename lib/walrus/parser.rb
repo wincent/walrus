@@ -105,7 +105,7 @@ module Walrus
         # "Any section of a template definition that is inside a #raw ... #end raw tag pair will be printed verbatim without any parsing of $placeholders or other directives."
         # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.raw.html
         # Unlike Cheetah, Walrus uses a bare "#end" marker and not an "#end raw" to mark the end of the raw block.
-        rule            :raw_directive,                       '#raw'.skip & :directive_end & /([^#]+|#(?!end)+)*/ & '#end'.skip & :directive_end
+        rule            :raw_directive,                       '#raw'.skip & ((:directive_end & /([^#]+|#(?!end)+)*/ & '#end'.skip & :directive_end) | :here_document)
         production      :raw_directive.build(:directive, :content)
         
         # May be able to allow the presence of a literal #end within a raw block by using a "here doc"-style delimiter:
