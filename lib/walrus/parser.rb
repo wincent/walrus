@@ -73,6 +73,7 @@ module Walrus
                 
         rule            :directive,                           :block_directive    |
                                                               :def_directive      | 
+                                                              :echo_directive     |
                                                               :extends_directive  | 
                                                               :import_directive   | 
                                                               :include_directive  | 
@@ -105,7 +106,8 @@ module Walrus
         
         # "The #echo directive is used to echo the output from expressions that can't be written as simple $placeholders."
         # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.echo.html
-        rule            :echo_directive,                      '#echo'.skip & :ruby_expression & :directive_end
+        rule            :echo_directive,                      '#echo'.skip & :ruby_expression_list & :directive_end
+        production      :echo_directive.build(:directive, :expression)
         
         rule            :extends_directive,                   '#extends'.skip & :constant & :directive_end
         production      :extends_directive.build(:directive, :class_name)

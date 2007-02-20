@@ -869,6 +869,29 @@ world
       
     end
     
+    specify 'should be able to parse the "echo" directive' do
+      
+      # success case
+      result = @parser.parse('#echo foo')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::EchoDirective
+      result.expression.should_be_kind_of WalrusGrammar::Identifier
+      result.expression.lexeme.should == 'foo'
+      
+      # failing case
+      lambda { @parser.parse('#echo') }.should_raise Grammar::ParseError
+      
+      # allow multiple expressions separated by semicolons
+      result = @parser.parse('#echo foo; bar')
+      result.should_be_kind_of WalrusGrammar::EchoDirective
+      result.expression.should_be_kind_of Array
+      result.expression[0].should_be_kind_of WalrusGrammar::Identifier
+      result.expression[0].lexeme.should == 'foo'
+      result.expression[1].should_be_kind_of WalrusGrammar::Identifier
+      result.expression[1].lexeme.should == 'bar'
+      
+    end
+    
     specify 'should be able to parse the "raw" directive' do
       
       # shortest example possible
