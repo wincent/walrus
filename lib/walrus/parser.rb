@@ -72,16 +72,16 @@ module Walrus
         # basically, given a result, walk the structure (if any) calling "to_s" and "omitted" and reconstructing the original text? (or calling a "base_text" method)
                 
         rule            :directive,                           :block_directive    |
-                                                              :def_directive      | 
+                                                              :def_directive      |
                                                               :echo_directive     |
-                                                              :extends_directive  | 
-                                                              :import_directive   | 
-                                                              :include_directive  | 
-                                                              :raw_directive      | 
+                                                              :extends_directive  |
+                                                              :import_directive   |
+                                                              :include_directive  |
+                                                              :raw_directive      |
                                                               :ruby_directive     |
-                                                              :set_directive      | 
-                                                              :silent_directive   | 
-                                                              :slurp_directive    | 
+                                                              :set_directive      |
+                                                              :silent_directive   |
+                                                              :slurp_directive    |
                                                               :super_directive
         
         node            :directive
