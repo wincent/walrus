@@ -90,8 +90,12 @@ module Walrus
       end
       
       # possible synonym "star"
-      def zero_or_more
-        self.repeat(0)
+      def zero_or_more(default_return_value = NoParameterMarker.instance)
+        if default_return_value == NoParameterMarker.instance
+          self.repeat(0) # default behaviour
+        else
+          self.repeat_with_default(0, nil, default_return_value)
+        end
       end
       
       # possible synonym "plus"

@@ -645,8 +645,52 @@ module Walrus
     
     specify 'should be able to parse the "def" directive' do
       
-      # simple case: no parameters
+      # simple case: no parameters, no content
+      result = @parser.parse("#def foo\n#end")
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::DefDirective
+      result.identifier.to_s.should == 'foo'
+      result.params.should == []
+      result.content.should == []
       
+      # pathologically short case
+      result = @parser.parse('#def foo##end')
+      result.should_be_kind_of WalrusGrammar::DefDirective
+      result.identifier.to_s.should == 'foo'
+      result.params.should == []
+      result.content.should == []
+      
+      # some content
+      result = @parser.parse('#def foo#hello#end')
+      result.should_be_kind_of WalrusGrammar::DefDirective
+      result.identifier.to_s.should == 'foo'
+      result.params.should == []
+      result.content.should_be_kind_of WalrusGrammar::RawText
+      result.content.lexeme.should == 'hello'
+      
+      result = @parser.parse("#def foo\nhello\n#end")
+      result.should_be_kind_of WalrusGrammar::DefDirective
+      result.identifier.to_s.should == 'foo'
+      result.params.should == []
+      result.content.should_be_kind_of WalrusGrammar::RawText
+      result.content.lexeme.should == "hello\n"
+      
+      # empty params list
+      
+      
+      # one param
+      
+      
+      # two params
+      
+      
+      # nested def block
+      
+      
+      
+      # missing identifier
+      
+      # 
       
     end
     

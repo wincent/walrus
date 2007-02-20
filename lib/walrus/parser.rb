@@ -71,8 +71,16 @@ module Walrus
         # might be nice to have a "compress" or "to_string" or "raw" operator here; we're not really interested in the internal structure of the comment
         # basically, given a result, walk the structure (if any) calling "to_s" and "omitted" and reconstructing the original text? (or calling a "base_text" method)
                 
-        rule            :directive,                           :extends_directive  | :import_directive | :include_directive  | :raw_directive    | :ruby_directive |
-                                                              :set_directive      | :silent_directive | :slurp_directive    | :super_directive
+        rule            :directive,                           :def_directive      | 
+                                                              :extends_directive  | 
+                                                              :import_directive   | 
+                                                              :include_directive  | 
+                                                              :raw_directive      | 
+                                                              :ruby_directive     |
+                                                              :set_directive      | 
+                                                              :silent_directive   | 
+                                                              :slurp_directive    | 
+                                                              :super_directive
         
         node            :directive
         
@@ -84,10 +92,15 @@ module Walrus
         # Note that "skipping" the end_of_input here is harmless as it isn't actually consumed
         rule            :directive_end,                       ( /#/ | :newline | :end_of_input ).skip
         
-        # TODO: make block directive keep consuming content until it hits an #end directive, store this in a content attribute
-        rule            :block_directive,                     '#block' & :identifier & :def_parameter_list.optional & :directive_end
+        rule            :block_directive,                     '#block' & :identifier & :def_parameter_list.optional([]) & :directive_end &
+                                                              :template_element.zero_or_more([]) &
+                                                              '#end'.skip & :directive_end
+        production      :block_directive.build(:directive, :identifier, :params, :content)
         
-        rule            :def_directive,                       '#def' & :identifier & :def_parameter_list.optional & :directive_end
+        rule            :def_directive,                       '#def'.skip & :identifier & :def_parameter_list.optional([]) & :directive_end &
+                                                              :template_element.zero_or_more([]) &
+                                                              '#end'.skip & :directive_end
+        production      :def_directive.build(:directive, :identifier, :params, :content)
         
         # "The #echo directive is used to echo the output from expressions that can't be written as simple $placeholders."
         # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.echo.html
@@ -105,10 +118,7 @@ module Walrus
         # "Any section of a template definition that is inside a #raw ... #end raw tag pair will be printed verbatim without any parsing of $placeholders or other directives."
         # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.raw.html
         # Unlike Cheetah, Walrus uses a bare "#end" marker and not an "#end raw" to mark the end of the raw block.
-        rule            :raw_directive,                       '#raw'.skip & ((:directive_end & /([^#]+|#(?!end)+)*/ & '#end'.skip & :directive_end) | :here_document)
-        production      :raw_directive.build(:directive, :content)
-        
-        # May be able to allow the presence of a literal #end within a raw block by using a "here doc"-style delimiter:
+        # The presence of a literal #end within a raw block is made possible by using a "here doc"-style delimiter:
         #
         # #raw <<END_MARKER
         #     content goes here
@@ -123,7 +133,8 @@ module Walrus
         #      END_MARKER
         #
         # Here "END_MARKER" may be preceeded by whitespace (and whitespace only) but it must be the last thing on the line. The preceding whitespace is not considered to be part of the quoted text.
-        #
+        rule            :raw_directive,                       '#raw'.skip & ((:directive_end & /([^#]+|#(?!end)+)*/ & '#end'.skip & :directive_end) | :here_document)
+        production      :raw_directive.build(:directive, :content)
         
         # In order to parse "here documents" we adopt a model similar to the one proposed in this message to the ANTLR interest list:
         # http://www.antlr.org:8080/pipermail/antlr-interest/2005-September/013673.html
