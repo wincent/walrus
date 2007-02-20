@@ -62,12 +62,12 @@ module Walrus
         production      :comment.build(:node)
         
         # nested multiline comments
-        rule            :multiline_comment,                   '#*'.skip & :comment_content.optional & '*#'.skip
+        rule            :multiline_comment,                   '#*'.skip & :comment_content.zero_or_more('') & '*#'.skip
         skipping        :multiline_comment, nil
         production      :multiline_comment.build(:comment, :content)
         
         # human-language version of the regex: "any run of characters other than # or *, any # not followed by another # or a *, or any * not followed by a #"
-        rule            :comment_content,                     ( (:comment & :newline) | :multiline_comment | :whitespace_or_newlines | /([^*#]+|#(?!#|\*)|\*(?!#))+/ ).one_or_more
+        rule            :comment_content,                     (:comment & :newline.skip) | :multiline_comment | /([^*#]+|#(?!#|\*)|\*(?!#))+/
         # might be nice to have a "compress" or "to_string" or "raw" operator here; we're not really interested in the internal structure of the comment
         # basically, given a result, walk the structure (if any) calling "to_s" and "omitted" and reconstructing the original text? (or calling a "base_text" method)
                 

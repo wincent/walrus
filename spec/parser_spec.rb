@@ -50,28 +50,40 @@ module Walrus
       result = @parser.parse('#**#')
       result.should_be_kind_of WalrusGrammar::Comment
       result.should_be_kind_of WalrusGrammar::MultilineComment
-      result.content.should == [] # might be nice to automatically flatten this stuff into a string
+      result.content.should == ''
       
       # multi-line comment (with content)
       result = @parser.parse('#* hello world *#')
       result.should_be_kind_of WalrusGrammar::MultilineComment
-#      result.content.should == ' hello world '     #FAILS
+      result.content.should == ' hello world '
       
       # multi-line comment (spanning multiple lines)
       result = @parser.parse("#* hello\nworld *#")
       result.should_be_kind_of WalrusGrammar::MultilineComment
+      result.content.should == " hello\nworld "
       
       # multi-line comment (with nested comment)
       result = @parser.parse('#* hello #*world*# *#')
       result.should_be_kind_of WalrusGrammar::MultilineComment
+      result.content[0].should == ' hello '
+      result.content[1].should_be_kind_of WalrusGrammar::MultilineComment
+      result.content[1].content.should == 'world'
+      result.content[2].should == ' '
       
       # multi-line comment (with nested comment, spanning multiple lines)
       result = @parser.parse("#* hello\n#* world\n... *# *#")
       result.should_be_kind_of WalrusGrammar::MultilineComment
+      result.content[0].should == " hello\n"
+      result.content[1].should_be_kind_of WalrusGrammar::MultilineComment
+      result.content[1].content.should == " world\n... "
+      result.content[2].should == ' '
       
       # multi-line comment (with nested single-line comment)
       result = @parser.parse("#* ##hello\n*#")
       result.should_be_kind_of WalrusGrammar::MultilineComment
+      result.content[0].should == ' '
+      result.content[1].should_be_kind_of WalrusGrammar::Comment
+      result.content[1].lexeme.should == 'hello' # here the newline gets eaten
       
     end
     
