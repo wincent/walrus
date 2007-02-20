@@ -40,7 +40,7 @@ module Walrus
         @results << substring
         @count += 1
         @jlength += substring.to_s.jlength
-        @remainder = @base_string.chars[@jlength..-1].join # use chars method here to correctly support multi-byte characters
+        @remainder = @base_string[@jlength..-1]
       end
       
       # The skipped method is used to inform the receiver of a successful parsing event where the parsed substring should be consumed but not included in the accumulated results.
@@ -49,7 +49,7 @@ module Walrus
         raise ArgumentError if substring.nil?
         @skipped << substring
         @jlength += substring.to_s.jlength
-        @remainder = @base_string.chars[@jlength..-1].join # use chars method here to correctly support multi-byte characters
+        @remainder = @base_string[@jlength..-1]
       end
       
       # Returns the results accumulated so far.

@@ -6,19 +6,23 @@ require 'walrus'
 # Additions to String class for Unicode support.
 class String
   
-  # Although the Ruby documentation mentions an each_char method it is not implemented in Ruby 1.8.5.
-  def each_char(&block)
-    enumerator = self.enumerator
-    while char = enumerator.next
-      yield char
-    end
-  end
-  
   # Returns an array of Unicode characters.
   def chars
-    chars = []
-    self.each_char { |c| chars << c }
-    chars
+    scan(/./m)
+  end
+  
+  alias old_range []
+  
+  def [](range, other = Walrus::NoParameterMarker.instance)
+    if other == Walrus::NoParameterMarker.instance
+      if range.kind_of? Range
+        chars[range].join
+      else
+        old_range range
+      end
+    else
+      old_range range, other
+    end
   end
   
   # Returns a character-level enumerator for the receiver.
