@@ -198,14 +198,6 @@ module Walrus
       result.class_name.lexeme.should == 'OtherTemplate'
     end
     
-    specify 'should be able to parse a directive with no parameters' do
-      # basic test
-      
-      # TODO: rewrite this test... are there any directives which don't take any parameters now that #end is not parsed separately?
-#      result = @parser.parse('#end')
-#      result.should_be_kind_of WalrusGrammar::EndDirective
-    end
-    
     specify 'should be able to follow a directive by a comment on the same line, only if the directive has an explicit termination marker' do
       
       # no intervening whitespace ("extends" directive, takes one parameter)
@@ -237,21 +229,6 @@ module Walrus
       
       # counter-example
       lambda { @parser.parse('#extends          OtherTemplate           ## comment') }.should_raise Grammar::ParseError
-      
-      # same but with "end" directive (no parameters)
-      # TODO: new test with a directive that takes no parameters
-#      result = @parser.parse('#end## comment')
-#      result[0].should_be_kind_of WalrusGrammar::EndDirective
-#      result[0].lexeme.should == '#end'
-#      result[1].should_be_kind_of WalrusGrammar::Comment
-#      result[1].lexeme.should == ' comment'
-      
-      # intervening whitespace
-#      result = @parser.parse('#end           ## comment')
-#      result[0].should_be_kind_of WalrusGrammar::EndDirective
-#      result[0].lexeme.should == '#end'
-#      result[1].should_be_kind_of WalrusGrammar::Comment
-#      result[1].lexeme.should == ' comment'
       
     end
     

@@ -8,6 +8,8 @@ module Walrus
   
   VERSION = '1.0b'
   
+  autoload(:CompileError,                 'walrus/compile_error')
+  autoload(:Compiler,                     'walrus/compiler')
   autoload(:Grammar,                      'walrus/grammar')
   autoload(:Parser,                       'walrus/parser')
   autoload(:NoParameterMarker,            'walrus/no_parameter_marker')

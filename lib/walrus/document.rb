@@ -6,7 +6,8 @@
 require 'walrus'
 
 module Walrus
-  # All compiled templates inherit from this class. In order to keep its namespace as clean as possible Document is a root class that does not inherit from Object or any other class.
+  
+  # All compiled templates inherit from this class.
   class Document
     
     def initialize

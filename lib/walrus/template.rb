@@ -12,31 +12,22 @@ module Walrus
     # If initialized using a Pathname or File, returns the pathname. Otherwise returns nil.
     attr_reader   :origin
     
-    # Accepts an optional input argument of class String, Pathname or File
-    def initialize(input = nil)
-      @origin = nil
-      if (input.nil?)
-        @base_text  = ''
-      elsif (input.kind_of? String)
-        @base_text  = input.clone
-      elsif (input.kind_of? Pathname)
-        contents    = input.read
-        raise IOError.new("Couldn't read file into string") if not contents.kind_of? String
+    # Accepts input of class String, Pathname or File
+    def initialize(input)
+      raise ArgumentError if @origin.nil?
+      if input.respond_to? :read # should work with Pathname or File
+        contents = input.read
+        raise IOError if not contents.kind_of? String
         @base_text  = contents
         @origin     = input.to_s
-      elsif (input.kind_of? File)
-        contents    = input.read
-        raise IOError.new("Couldn't read file into string") if not contents.kind_of? String
-        @base_text  = contents
-        @origin     = input.path
       else
-        raise "Unknown input class"
+        @base_text  = input.clone
       end
     end
     
     # The fill method returns a string containing the output produced when executing the compiled template.
     def fill
-      compiled = ""
+      compiled = ''
       result = nil
       begin
         compiled = self.compiled_text
@@ -45,7 +36,7 @@ module Walrus
         source = @origin ? @origin : @base_text
         #raise Exception.exception(' %s (%s: %s)' % [ exception.message, source, compiled ])
       end
-      result || ""
+      result || ''
     end
     
     # Parses template, returning compiled input (suitable for writing to disk).
@@ -112,10 +103,9 @@ module Walrus
     end
     
     def class_name
-      return "DocumentSubclass" if @origin.nil?
-      basename = File.basename(@origin, ".rb")
-      basename.extend(Walrus::CamelCase)
-      basename.to_class_name
+      if @origin.nil? : "DocumentSubclass"
+      else              File.basename(@origin, ".rb").to_class_name
+      end
     end
     
   end # class Template

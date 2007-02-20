@@ -113,7 +113,7 @@ module Walrus
         else                  params        = 'result[0]'
         end
         for i in 1..(param_count - 1)
-          params        << ", result[#{i.to_s}]"
+          params << ", result[#{i.to_s}]"
         end
         
         # ParserState may have packed info into the "omitted" instance variable of "results", make sure our node has a copy of it
