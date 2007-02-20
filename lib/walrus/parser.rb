@@ -200,7 +200,7 @@ module Walrus
         
         # The "def_parameter_list" is a special case of parameter list which disallows interpolated placeholders.
         rule            :def_parameter_list,                  '('.skip & ( :def_parameter >> ( ','.skip & :def_parameter ).zero_or_more ).optional & ')'.skip
-        rule            :def_parameter,                       :identifier | :assignment_expression
+        rule            :def_parameter,                       :assignment_expression | :identifier
         
         rule            :parameter_list,                      '('.skip & ( :parameter >> ( ','.skip & :parameter ).zero_or_more ).optional & ')'.skip
         rule            :parameter_list_without_parentheses,  :parameter >> ( ','.skip & :parameter ).zero_or_more

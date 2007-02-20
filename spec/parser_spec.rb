@@ -676,21 +676,83 @@ module Walrus
       result.content.lexeme.should == "hello\n"
       
       # empty params list
-      
+      result = @parser.parse("#def foo()\n#end")
+      result.should_be_kind_of WalrusGrammar::DefDirective
+      result.identifier.to_s.should == 'foo'
+      result.params.should == []
+      result.content.should == []
       
       # one param
+      result = @parser.parse("#def foo(bar)\n#end")
+      result.should_be_kind_of WalrusGrammar::DefDirective
+      result.identifier.to_s.should == 'foo'
+      result.params.should_be_kind_of WalrusGrammar::Identifier
+      result.params.lexeme.should == 'bar'
+      result.content.should == []
       
+      # one param with default value
+      result = @parser.parse("#def foo(bar = 1)\n#end")
+      result.should_be_kind_of WalrusGrammar::DefDirective
+      result.identifier.to_s.should == 'foo'
+      result.params.should_be_kind_of WalrusGrammar::AssignmentExpression
+      result.params.lvalue.should_be_kind_of WalrusGrammar::Identifier
+      result.params.lvalue.lexeme.should == 'bar'
+      result.params.expression.should_be_kind_of WalrusGrammar::NumericLiteral
+      result.params.expression.lexeme.should == '1'
+      result.content.should == []
+      
+      result = @parser.parse("#def foo(bar = nil)\n#end")
+      result.should_be_kind_of WalrusGrammar::DefDirective
+      result.identifier.to_s.should == 'foo'
+      result.params.should_be_kind_of WalrusGrammar::AssignmentExpression
+      result.params.lvalue.should_be_kind_of WalrusGrammar::Identifier
+      result.params.lvalue.lexeme.should == 'bar'
+      result.params.expression.should_be_kind_of WalrusGrammar::Identifier
+      result.params.expression.lexeme.should == 'nil'
+      result.content.should == []
       
       # two params
-      
+      result = @parser.parse("#def foo(bar, baz)\n#end")
+      result.should_be_kind_of WalrusGrammar::DefDirective
+      result.identifier.to_s.should == 'foo'
+      result.params[0].should_be_kind_of WalrusGrammar::Identifier
+      result.params[0].lexeme.should == 'bar'
+      result.params[1].should_be_kind_of WalrusGrammar::Identifier
+      result.params[1].lexeme.should == 'baz'
+      result.content.should == []
       
       # nested def block
-      
-      
+      result = @parser.parse(%Q{#def outer
+hello
+#def inner
+world
+#end
+...
+#end})
+      result.should_be_kind_of WalrusGrammar::DefDirective
+      result.identifier.to_s.should == 'outer'
+      result.params.should == []
+      result.content[0].should_be_kind_of WalrusGrammar::RawText
+      result.content[0].lexeme.should == "hello\n"
+      result.content[1].should_be_kind_of WalrusGrammar::DefDirective
+      result.content[1].identifier.to_s.should == 'inner'
+      result.content[1].params.should == []
+      result.content[1].content.should_be_kind_of WalrusGrammar::RawText
+      result.content[1].content.lexeme.should == "world\n"
+      result.content[2].should_be_kind_of WalrusGrammar::RawText
+      result.content[2].lexeme.should == "...\n"
       
       # missing identifier
+      lambda { @parser.parse("#def\n#end") }.should_raise Grammar::ParseError
+      lambda { @parser.parse("#def ()\n#end") }.should_raise Grammar::ParseError
       
-      # 
+      # non-terminated parameter list
+      lambda { @parser.parse("#def foo(bar\n#end") }.should_raise Grammar::ParseError
+      lambda { @parser.parse("#def foo(bar,)\n#end") }.should_raise Grammar::ParseError
+      
+      # illegal parameter type
+      lambda { @parser.parse("#def foo(1)\n#end") }.should_raise Grammar::ParseError
+      lambda { @parser.parse("#def foo($bar)\n#end") }.should_raise Grammar::ParseError
       
     end
     
