@@ -71,7 +71,8 @@ module Walrus
         # might be nice to have a "compress" or "to_string" or "raw" operator here; we're not really interested in the internal structure of the comment
         # basically, given a result, walk the structure (if any) calling "to_s" and "omitted" and reconstructing the original text? (or calling a "base_text" method)
                 
-        rule            :directive,                           :def_directive      | 
+        rule            :directive,                           :block_directive    |
+                                                              :def_directive      | 
                                                               :extends_directive  | 
                                                               :import_directive   | 
                                                               :include_directive  | 
@@ -92,7 +93,7 @@ module Walrus
         # Note that "skipping" the end_of_input here is harmless as it isn't actually consumed
         rule            :directive_end,                       ( /#/ | :newline | :end_of_input ).skip
         
-        rule            :block_directive,                     '#block' & :identifier & :def_parameter_list.optional([]) & :directive_end &
+        rule            :block_directive,                     '#block'.skip & :identifier & :def_parameter_list.optional([]) & :directive_end &
                                                               :template_element.zero_or_more([]) &
                                                               '#end'.skip & :directive_end
         production      :block_directive.build(:directive, :identifier, :params, :content)
