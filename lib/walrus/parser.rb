@@ -101,12 +101,13 @@ module Walrus
       rule            :block_directive,                     '#block'.skip & :identifier & :def_parameter_list.optional([]) & :directive_end &
                                                             :template_element.zero_or_more([]) &
                                                             '#end'.skip & :directive_end
-      production      :block_directive.build(:directive, :identifier, :params, :content)
       
       rule            :def_directive,                       '#def'.skip & :identifier & :def_parameter_list.optional([]) & :directive_end &
                                                             :template_element.zero_or_more([]) &
                                                             '#end'.skip & :directive_end
-      production      :def_directive.build(:directive, :identifier, :params, :content)
+      
+      production      :def_directive.build(:directive, :identifier, :params, :content)        # superclass (DefDirective) must be created
+      production      :block_directive.build(:def_directive, :identifier, :params, :content)  # before the subclass (BlockDirective)
       
       # "The #echo directive is used to echo the output from expressions that can't be written as simple $placeholders."
       # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.echo.html
@@ -268,6 +269,7 @@ module Walrus
       
       # only after defining the grammar is it safe to extend the classes dynamically created during the grammar definition
       require 'walrus/walrus_grammar/comment'
+      require 'walrus/walrus_grammar/escape_sequence'
       require 'walrus/walrus_grammar/multiline_comment'
       require 'walrus/walrus_grammar/raw_text'
       

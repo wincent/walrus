@@ -36,10 +36,10 @@ module Walrus
           # how to handle nesting here: if a two element array is returned, expect it to be [outside, inside] (nil is ok)
           # otherwise, just assume it is for the inside?
           
-          outside_body  << OUTSIDE_INDENT + element.compile
-        elsif element.kind_of? WalrusGrammar::BlockDirective    # defines a block and includes its output in the template_body
-          outside_body  << OUTSIDE_INDENT + element.compile
-          template_body << BODY_INDENT    + "accumulate($#{element.identifier})\n"
+          element.compile.each { |line| outside_body  << OUTSIDE_INDENT + line } 
+          if element.kind_of? WalrusGrammar::BlockDirective    # special case of block: defines a block and includes its output in the template_body
+            template_body << BODY_INDENT    + "accumulate($#{element.identifier})\n"
+          end
         elsif element.kind_of? WalrusGrammar::ExtendsDirective  # defines superclass and automatically invoke #super (super) at the head of the template_body
           raise CompileError.new('#extends may be used only once per template') unless extends_directive.nil?
           raise CompileError.new('illegal #extends (#import already used in this template)') unless import_directive.nil?
@@ -48,8 +48,10 @@ module Walrus
           raise CompileError.new('#import may be used only once per template') unless import_directive.nil?
           raise CompileError.new('illegal #import (#extends already used in this template)') unless extends_directive.nil?
           import_directive = element.class_name
+        elsif element.kind_of? WalrusGrammar::RawText           # special case: don't split RawText into lines because it may already include literal newline
+          template_body << BODY_INDENT + element.compile
         else                                                    # everything else gets added to the template_body
-          template_body << BODY_INDENT + element.compile        # indent by 6 spaces
+          element.compile.each { |line| template_body << BODY_INDENT + line } # indent by 6 spaces
         end
       end
       
