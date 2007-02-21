@@ -24,7 +24,24 @@ module Walrus
           compiled.sub!(/, \z/, ' ')   # trailing comma is harmless, but suppress it anyway for aesthetics
           compiled << "].pack('U*')) # RawText\n"
         else # try for human readable output
-          "accumulate('" + @lexeme.to_s.to_source_string + "') # RawText\n"
+          compiled  = []
+          first     = true
+          @lexeme.to_s.to_source_string.each do |line|
+            newline = ''
+            if line =~ /(\r\n|\r|\n)\z/       # check for literal newline at end of line
+              line.chomp!                     # get rid of it
+              newline = ' + ' + $~[0].dump    # include non-literal newline instead
+            end
+            
+            if first
+              compiled << "accumulate('%s'%s) # RawText\n" % [ line, newline ]
+              first = false
+            else
+              compiled << "accumulate('%s'%s) # RawText (continued)\n" % [ line, newline ]
+            end
+            
+          end
+          compiled.join
         end
       end
       

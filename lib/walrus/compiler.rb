@@ -48,8 +48,8 @@ module Walrus
           raise CompileError.new('#import may be used only once per template') unless import_directive.nil?
           raise CompileError.new('illegal #import (#extends already used in this template)') unless extends_directive.nil?
           import_directive = element.class_name
-        elsif element.kind_of? WalrusGrammar::RawText           # special case: don't split RawText into lines because it may already include literal newline
-          template_body << BODY_INDENT + element.compile
+#        elsif element.kind_of? WalrusGrammar::RawText           # special case: don't split RawText into lines because it may already include literal newlines
+#          template_body << BODY_INDENT + element.compile
         else                                                    # everything else gets added to the template_body
           element.compile.each { |line| template_body << BODY_INDENT + line } # indent by 6 spaces
         end
