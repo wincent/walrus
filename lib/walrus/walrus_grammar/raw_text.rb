@@ -16,14 +16,14 @@ module Walrus
         @@use_pack = value
       end
       
-      # Returns a string containing the compiled (Ruby) version of receiver. By using a format string that accepts as input an array of UTF-8 characters we avoid having to escape characters or sequences that would otherwise have a special meaning in Ruby.
+      # Returns a string containing the compiled (Ruby) version of receiver.
       def compile
-        if @@use_pack
+        if @@use_pack # avoid having to escape characters or sequences that would otherwise have a special meaning in Ruby.
           compiled = 'accumulate([ '
           @lexeme.to_s.unpack('U*').each { |number| compiled << '%d, ' % number } 
           compiled.sub!(/, \z/, ' ')   # trailing comma is harmless, but suppress it anyway for aesthetics
-          compiled << "].pack('U*')) # RawText\n"
-        else # try for human readable output
+          compiled << "].pack('U*')) # RawText (packed)\n"
+        else          # try for human readable output
           compiled  = []
           first     = true
           @lexeme.to_s.to_source_string.each do |line|
