@@ -36,6 +36,10 @@ module Walrus
         comment = @parser.compile("#* hello ## <-- first line\n   world #* <-- second line *# *#")
         eval(comment).should == ''
         
+        # multiple comments
+        comment = @parser.compile("#* hello *##* world *#")
+        eval(comment).should == ''
+        
       end
       
     end
