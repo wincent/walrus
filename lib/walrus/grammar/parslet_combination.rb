@@ -9,6 +9,7 @@ module Walrus
     class ParsletCombination
       
       include Walrus::Grammar::ParsletCombining
+      include Walrus::Grammar::LocationTracking
       include Walrus::Grammar::Memoizing
       
       def to_parseable

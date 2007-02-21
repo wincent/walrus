@@ -12,6 +12,7 @@ module Walrus
       
       def initialize(string)
         raise ArgumentError if string.nil?
+        super
         self.expected_string = string
       end
       
@@ -26,6 +27,12 @@ module Walrus
           elsif actual_char != expected_char
             raise ParseError.new('unexpected character "%s" (expected "%s") while parsing "%s"' % [ actual_char, expected_char, expected_string])
           else
+            if actual_char == "\n"    # TODO: support other possible line endings here
+              @column_offset  =   0
+              @line_offset    +=  1
+            else
+              @column_offset  +=  1
+            end
             parsed << actual_char
           end
         end

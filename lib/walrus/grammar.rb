@@ -45,6 +45,8 @@ module Walrus
       options[:rule_name] = @starting_symbol
       options[:skipping]  = @skipping
       options[:location]  = 0 # where we are in the input stream: only ParsletMerge, ParsletRepetion and ParsletSequence objects advance this index
+      options[:line]      = 0 # richer information than that provided in "location"
+      options[:column]    = 0 # richer information than that provided in "location"
       options[:memoizer]  = MemoizingCache.new if @memoizing
       
       #catch :AndPredicateSuccess do     # not sure whether to let these go through to the caller

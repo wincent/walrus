@@ -19,6 +19,12 @@ module Walrus
       # Returns the number of characters scanned so far (including skipped characters).
       attr_reader :jlength
       
+      # To make it easier to calculate where we are in the input stream, the receiver keeps track of how many columns we have moved to the right through the input since the last newline.
+      attr_reader :column_offset
+      
+      # To make it easier to calculate where we are in the input stream, the receiver keeps track of how many lines we have moved down through in the input since initialization.
+      attr_reader :line_offset
+      
       # Raises an ArgumentError if string is nil.
       def initialize(string)
         raise ArgumentError if string.nil?

@@ -18,7 +18,19 @@ module Walrus
       def parse(string, options = {})
         raise ArgumentError if string.nil?
         if (string =~ @expected_regexp)
-          MatchDataWrapper.new($~)
+          wrapper = MatchDataWrapper.new($~)
+          match   = $~[0]
+          
+          # count lines in match
+          @line_offset  = match.scan(/\r\n|\r|\n/).length
+          
+          # count characters on last line
+          last_newline = match.rindex(/\r|\n/)
+          if last_newline :   @column_offset = match.length - last_newline - 1
+          else                @column_offset = match.length
+          end
+          
+          wrapper
         else
           raise ParseError.new('non-matching characters "%s" while parsing regular expression "%s"' % [string, @expected_regexp.inspect])
         end
