@@ -62,6 +62,7 @@ module Walrus
       rule            :escape_sequence,                     '\\'.skip & /[\$\\#]/
       production      :escape_sequence.build(:node)
       
+      # Would be nice to make it that if a comment is the only thing on a line then it consumes its trailing newline as well; but this would require us to look behind where we are in the input (because /^##/ will always succeed wherever /##/ succeeds, and it doesn't handle the more complex cases, like where a comment is preceeded by a directive); this is therfore a task for the compiler, not the parser.
       rule            :comment,                             '##'.skip & /.*$/
       production      :comment.build(:node)
       
@@ -72,9 +73,7 @@ module Walrus
       
       # human-language version of the regex: "any run of characters other than # or *, any # not followed by another # or a *, or any * not followed by a #"
       rule            :comment_content,                     (:comment & :newline.skip) | :multiline_comment | /([^*#]+|#(?!#|\*)|\*(?!#))+/
-      # might be nice to have a "compress" or "to_string" or "raw" operator here; we're not really interested in the internal structure of the comment
-      # basically, given a result, walk the structure (if any) calling "to_s" and "omitted" and reconstructing the original text? (or calling a "base_text" method)
-              
+      
       rule            :directive,                           :block_directive    |
                                                             :def_directive      |
                                                             :echo_directive     |
