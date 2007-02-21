@@ -15,10 +15,8 @@ module Walrus
         compiled = ''
         if @content.respond_to? :each
           @content.each do |item|
-            if item.kind_of? MultilineComment
-              compiled << '# MultilineComment:' + item.compile
-            elsif item.kind_of? Comment
-              compiled << '# MultilineComment:' + item.compile 
+            if item.kind_of? Comment
+              compiled << '# (nested) ' + item.compile 
             else
               compiled << '# MultilineComment:' + item.to_s + "\n"
             end
