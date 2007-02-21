@@ -11,7 +11,7 @@ module Walrus
     
     # Walks the Abstract Syntax Tree, tree, that represents a parsed Walrus template.
     # Returns a String that defines a Document subclass corresponding to the compiled version of the tree.
-    def compile(tree, class_name)
+    def compile(tree, class_name = 'DocumentSubclass')
       
       # everything that produces output (placeholders, rawtext etc) is implicitly included in the "template_body" block
       # there are somethings which explicitly occur outside of the "template_body" block: #def blocks for example.
@@ -59,6 +59,7 @@ module Walrus
       end
       
       <<-RETURN
+#!/usr/bin/env ruby
 # Generated #{Time.new.to_s} by Walrus version #{VERSION}
 
 require '#{superclass_implementation}'
@@ -68,11 +69,11 @@ module Walrus
   class #{class_name} < #{superclass_name}
     
     def template_body
+      
 #{template_body.join}
     end
     
-#{outside_body.join}
-    
+#{outside_body.join}    
     if __FILE__ == $0   # when run from the command line the default action is to call 'run'
       self.new.run
     else                # in other cases, evaluate 'fill' (if run inside an eval, will return filled content)
@@ -82,6 +83,7 @@ module Walrus
   end # #{class_name}
   
 end # Walrus
+
       RETURN
       
     end

@@ -20,11 +20,11 @@ module Walrus
       def compile
         if @@use_pack
           compiled = 'accumulate([ '
-          @lexeme.unpack('U*').each { |number| compiled << '%d, ' % number } 
+          @lexeme.to_s.unpack('U*').each { |number| compiled << '%d, ' % number } 
           compiled.sub!(/, \z/, ' ')   # trailing comma is harmless, but suppress it anyway for aesthetics
           compiled << "].pack('U*')) # RawText\n"
         else # try for human readable output
-          "accumulate('" + @lexeme.to_source_string + "') # RawText\n"
+          "accumulate('" + @lexeme.to_s.to_source_string + "') # RawText\n"
         end
       end
       

@@ -1,4 +1,4 @@
-#! /usr/bin/env ruby
+#!/usr/bin/env ruby
 #
 # Copyright 2007 Wincent Colaiuta
 # $Id$
@@ -65,9 +65,9 @@ module Walrus
       @accumulators.last or ""
     end
     
-    # Prints to standard out the result of filling the receiver.
+    # Prints to standard out the result of filling the receiver. Note that no trailing newline is printed. As a result, if running a template from the terminal be aware that the last line may not be visible or may be partly obscured by the command prompt that is drawn (starting at the first column) after execution completes.
     def run
-      printf("%s", self.fill)
+      printf('%s', self.fill)
       $stdout.flush
     end
     
@@ -75,8 +75,11 @@ module Walrus
     def template_body
     end
     
-    # When run from the command line the default action is to call "run".
-    self.new().run if __FILE__ == $0
+    if __FILE__ == $0
+      self.new.run      # When run from the command line the default action is to call "run".
+    else
+      self.new.fill     # in other cases, evaluate 'fill' (if run inside an eval, will return filled content)
+    end
     
   end # class Document
 end # module Walrus

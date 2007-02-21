@@ -11,6 +11,11 @@ module Walrus
       @@grammar.parse(string)
     end
     
+    def compile(string)
+      @@compiler ||= Compiler.new
+      @@compiler.compile(parse(string))
+    end
+    
     @@grammar ||= Grammar.subclass('WalrusGrammar') do
       
       starting_symbol :template
