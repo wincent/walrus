@@ -61,3 +61,34 @@ context 'converting from require names to class names' do
   end
   
 end
+
+context 'converting to source strings' do
+  
+  specify 'standard strings should be unchanged' do
+    ''.to_source_string.should == ''
+    'hello world'.to_source_string.should == 'hello world'
+    "hello\nworld".to_source_string.should == "hello\nworld"
+  end
+  
+  specify 'single quotes should be escaped' do
+    "'foo'".to_source_string.should == "\\'foo\\'"
+  end
+  
+  specify 'backslashes should be escaped' do
+    'hello\\nworld'.to_source_string.should == "hello\\\\nworld"
+  end
+  
+  specify 'should work with Unicode characters' do
+    '€ información…'.to_source_string.should == '€ información…'
+  end
+  
+  specify 'should be able to round trip' do
+    eval("'" + ''.to_source_string + "'").should == ''
+    eval("'" + 'hello world'.to_source_string + "'").should == 'hello world'
+    eval("'" + "hello\nworld".to_source_string + "'").should == "hello\nworld"
+    eval("'" + "'foo'".to_source_string + "'").should == '\'foo\''
+    eval("'" + 'hello\\nworld'.to_source_string + "'").should == 'hello\\nworld'
+    eval("'" + '€ información…'.to_source_string + "'").should == '€ información…'
+  end
+  
+end

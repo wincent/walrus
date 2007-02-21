@@ -21,9 +21,16 @@ module Walrus
       
       specify 'should be able to round trip' do
         @accumulator  = RawTextAccumulator.new
-        @raw_text     = RawText.new('hello world... €')
+        @raw_text     = RawText.new('hello \'world\'\\... €')
         @accumulator.instance_eval(@raw_text.compile)
-        @accumulator.content.should == 'hello world... €'
+        @accumulator.content.should == 'hello \'world\'\\... €'
+      end
+      
+    end
+    
+    context 'producing a Document containing RawText' do
+      
+      specify 'should be able to round trip' do
       end
       
     end

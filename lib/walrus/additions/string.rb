@@ -24,4 +24,9 @@ class String
     self.split('_').collect { |component| component.capitalize}.join
   end
   
+  # Returns a copy of the receiver with occurrences of \ replaced with \\, and occurrences of ' replaced with \'
+  def to_source_string
+    gsub(/(\\|')/, '\\\\\1') # need 5 slashes here, although I would have thought that 3 would be enough
+  end
+  
 end # class String
