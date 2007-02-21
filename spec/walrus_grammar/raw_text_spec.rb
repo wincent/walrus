@@ -2,7 +2,7 @@
 # $Id$
 
 require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
-require 'walrus/walrus_grammar/raw_text'
+require 'walrus/parser'
 
 module Walrus
   class WalrusGrammar
@@ -30,7 +30,24 @@ module Walrus
     
     context 'producing a Document containing RawText' do
       
+      setup do
+        @parser = Parser.new()
+      end
+      
       specify 'should be able to round trip' do
+        
+        # simple example
+        raw_text = @parser.compile('hello world')
+        eval(raw_text).should == 'hello world'
+        
+        # containing single quotes
+        raw_text = @parser.compile("hello 'world'")
+        eval(raw_text).should == "hello 'world'"
+        
+        # containing a newline
+        raw_text = @parser.compile("hello\nworld")
+        eval(raw_text).should == "hello\nworld"
+        
       end
       
     end

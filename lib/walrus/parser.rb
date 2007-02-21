@@ -266,18 +266,13 @@ module Walrus
       
       rule            :extended_unary_expression,           :placeholder | :unary_expression
       
+      # only after defining the grammar is it safe to extend the classes dynamically created during the grammar definition
+      require 'walrus/walrus_grammar/comment'
+      require 'walrus/walrus_grammar/multiline_comment'
+      require 'walrus/walrus_grammar/raw_text'
+      
     end
     
   end # class Parser
-  
-  class Grammar
-    class Node
-      
-      # By default Node and its subclasses compile down to nothing at all. 
-      def compile
-        ''
-      end
-    end
-  end
   
 end # module Walrus
