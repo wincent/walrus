@@ -27,11 +27,11 @@ module Walrus
           elsif actual_char != expected_char
             raise ParseError.new('unexpected character "%s" (expected "%s") while parsing "%s"' % [ actual_char, expected_char, expected_string])
           else
-            if actual_char == "\n"    # TODO: support other possible line endings here
+            if actual_char == "\r" or (actual_char == "\n" and chars.last != "\r")  # catches Mac, Windows and UNIX end-of-line markers
               @column_offset  =   0
               @line_offset    +=  1
-            else
-              @column_offset  +=  1
+            elsif actual_char != "\n" # \n is ignored if it is preceded by an \r (already counted above)
+              @column_offset  +=  1   # everything else gets counted
             end
             parsed << actual_char
           end

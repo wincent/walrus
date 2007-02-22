@@ -11,14 +11,27 @@ module Walrus
     # For Unicode support $KCODE must be set to 'U' (UTF-8).
     class StringEnumerator
       
+      # Returns the char most recently scanned before the last "next" call, or nil if nothing previously scanned.
+      attr_reader :last
+      
       def initialize(string)
         raise ArgumentError if string.nil?
-        @scanner = StringScanner.new(string)
+        @scanner  = StringScanner.new(string)
+        @current  = nil
+        @last     = nil
       end
       
       # This method will only work as expected if $KCODE is set to 'U' (UTF-8).
       def next
-        @scanner.scan(/./m) # must use multiline mode or "." won't match newlines
+        @last     = @current
+        @current  = @scanner.scan(/./m) # must use multiline mode or "." won't match newlines
+      end
+      
+      # Take a peek at the next character without actually consuming it. Returns nil if there is no next character.
+      # TODO: consider deleting this method as it's not currently used.
+      def peek
+        if char = self.next : @scanner.unscan; end
+        char
       end
       
     end # class StringEnumerator

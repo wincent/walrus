@@ -21,7 +21,7 @@ module Walrus
           wrapper = MatchDataWrapper.new($~)
           match   = $~[0]
           
-          # count lines in match
+          # count number of newlines in match
           @line_offset  = match.scan(/\r\n|\r|\n/).length
           
           # count characters on last line
