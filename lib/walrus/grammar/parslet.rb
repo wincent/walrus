@@ -11,7 +11,7 @@ module Walrus
       include Walrus::Grammar::LocationTracking
       include Walrus::Grammar::Memoizing
       
-      def initialize(string)
+      def initialize
         @column_offset  = 0
         @line_offset    = 0
       end

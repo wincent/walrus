@@ -12,12 +12,13 @@ module Walrus
       
       def initialize(string)
         raise ArgumentError if string.nil?
-        super
+        super()
         self.expected_string = string
       end
       
       def parse(string, options = {})
         raise ArgumentError if string.nil?
+        @column_offset, @line_offset = [0, 0] # reset
         chars = StringEnumerator.new(string)
         parsed = ''
         expected_string.each_char do |expected_char|

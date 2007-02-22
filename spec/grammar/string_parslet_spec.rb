@@ -53,6 +53,80 @@ module Walrus
         'foo'.to_parseable.should_not_eql /foo/                 # totally different classes
       end
       
+      specify 'should accurately count line and column offsets' do
+        
+        # single word
+        parslet = 'hello'.to_parseable
+        parslet.line_offset.should == 0
+        parslet.column_offset.should == 0
+        parslet.parse('hello')
+        parslet.line_offset.should == 0
+        parslet.column_offset.should == 5
+        
+        # single word with newline at end (UNIX style)
+        parslet = "hello\n".to_parseable
+        parslet.parse("hello\n")
+        parslet.line_offset.should == 1
+        parslet.column_offset.should == 0
+        
+        # single word with newline at end (Classic Mac style)
+        parslet = "hello\r".to_parseable
+        parslet.parse("hello\r")
+        parslet.line_offset.should == 1
+        parslet.column_offset.should == 0
+        
+        # single word with newline at end (Windows style)
+        parslet = "hello\r\n".to_parseable
+        parslet.parse("hello\r\n")
+        parslet.line_offset.should == 1
+        parslet.column_offset.should == 0
+        
+        # two lines (UNIX style)
+        parslet = "hello\nworld".to_parseable
+        parslet.parse("hello\nworld")
+        parslet.line_offset.should == 1
+        parslet.column_offset.should == 5
+        
+        # two lines (Classic Mac style)
+        parslet = "hello\rworld".to_parseable
+        parslet.parse("hello\rworld")
+        parslet.line_offset.should == 1
+        parslet.column_offset.should == 5
+        
+        # two lines (Windows style)
+        parslet = "hello\r\nworld".to_parseable
+        parslet.parse("hello\r\nworld")
+        parslet.line_offset.should == 1
+        parslet.column_offset.should == 5
+        
+      end
+      
+      specify 'line and column offset should reflect last succesfully scanned position prior to failure' do
+        
+        # fail right at start
+        parslet = "hello\r\nworld".to_parseable
+        begin
+          parslet.parse('foobar')
+        rescue ParseError; end
+        parslet.line_offset.should == 0
+        parslet.column_offset.should == 0
+        
+        # fail after 1 character
+        begin
+          parslet.parse('hfoobar')
+        rescue ParseError; end
+        parslet.line_offset.should == 0
+        parslet.column_offset.should == 1
+        
+        # fail after end-of-line
+        begin
+          parslet.parse("hello\r\nfoobar")
+        rescue ParseError; end
+        parslet.line_offset.should == 1
+        parslet.column_offset.should == 0
+        
+      end
+      
     end
     
   end # class Grammar

@@ -12,11 +12,13 @@ module Walrus
       
       def initialize(regexp)
         raise ArgumentError if regexp.nil?
+        super()
         self.expected_regexp = /\A#{regexp}/ # for efficiency, anchor all regexps to the start of the string
       end
       
       def parse(string, options = {})
         raise ArgumentError if string.nil?
+        @column_offset, @line_offset = [0, 0] # reset
         if (string =~ @expected_regexp)
           wrapper = MatchDataWrapper.new($~)
           match   = $~[0]
