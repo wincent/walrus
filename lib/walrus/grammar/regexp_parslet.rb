@@ -12,29 +12,30 @@ module Walrus
       
       def initialize(regexp)
         raise ArgumentError if regexp.nil?
-        super()
         self.expected_regexp = /\A#{regexp}/ # for efficiency, anchor all regexps to the start of the string
       end
       
       def parse(string, options = {})
         raise ArgumentError if string.nil?
-        @column_offset, @line_offset = [0, 0] # reset
+        column_offset, line_offset = [0, 0] # reset
         if (string =~ @expected_regexp)
           wrapper = MatchDataWrapper.new($~)
           match   = $~[0]
           
           # count number of newlines in match
-          @line_offset  = match.scan(/\r\n|\r|\n/).length
+          line_offset  = match.scan(/\r\n|\r|\n/).length
           
           # count characters on last line
           last_newline = match.rindex(/\r|\n/)
-          if last_newline :   @column_offset = match.length - last_newline - 1
-          else                @column_offset = match.length
+          if last_newline :   column_offset = match.length - last_newline - 1
+          else                column_offset = match.length
           end
           
+          wrapper.offset = [line_offset, column_offset]
           wrapper
         else
-          raise ParseError.new('non-matching characters "%s" while parsing regular expression "%s"' % [string, @expected_regexp.inspect])
+          raise ParseError.new('non-matching characters "%s" while parsing regular expression "%s"' % [string, @expected_regexp.inspect], 
+                               :line_offset => line_offset, :column_offset => column_offset)
         end
       end
       

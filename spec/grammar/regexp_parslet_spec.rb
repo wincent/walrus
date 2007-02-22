@@ -69,51 +69,49 @@ module Walrus
       end
       
       specify 'should be able to compare parslets for equality' do
-        /foo/.to_parseable.should_eql /foo/.to_parseable           # equal
+        /foo/.to_parseable.should_eql /foo/.to_parseable        # equal
         /foo/.to_parseable.should_not_eql /bar/.to_parseable    # different
         /foo/.to_parseable.should_not_eql /Foo/.to_parseable    # differing only in case
         /foo/.to_parseable.should_not_eql 'foo'                 # totally different classes
       end
       
-      specify 'should accurately count line and column offsets' do
+      specify 'should accurately pack line and column offsets into whatever gets returned from "parse"' do
         
         # single word
         parslet = /.+/m.to_parseable
-        parslet.line_offset.should == 0
-        parslet.column_offset.should == 0
-        parslet.parse('hello')
-        parslet.line_offset.should == 0
-        parslet.column_offset.should == 5
+        result = parslet.parse('hello')
+        result.line_offset.should == 0
+        result.column_offset.should == 5
         
         # single word with newline at end (UNIX style)
-        parslet.parse("hello\n")
-        parslet.line_offset.should == 1
-        parslet.column_offset.should == 0
+        result = parslet.parse("hello\n")
+        result.line_offset.should == 1
+        result.column_offset.should == 0
         
         # single word with newline at end (Classic Mac style)
-        parslet.parse("hello\r")
-        parslet.line_offset.should == 1
-        parslet.column_offset.should == 0
+        result = parslet.parse("hello\r")
+        result.line_offset.should == 1
+        result.column_offset.should == 0
         
         # single word with newline at end (Windows style)
-        parslet.parse("hello\r\n")
-        parslet.line_offset.should == 1
-        parslet.column_offset.should == 0
+        result = parslet.parse("hello\r\n")
+        result.line_offset.should == 1
+        result.column_offset.should == 0
         
         # two lines (UNIX style)
-        parslet.parse("hello\nworld")
-        parslet.line_offset.should == 1
-        parslet.column_offset.should == 5
+        result = parslet.parse("hello\nworld")
+        result.line_offset.should == 1
+        result.column_offset.should == 5
         
         # two lines (Classic Mac style)
-        parslet.parse("hello\rworld")
-        parslet.line_offset.should == 1
-        parslet.column_offset.should == 5
+        result = parslet.parse("hello\rworld")
+        result.line_offset.should == 1
+        result.column_offset.should == 5
         
         # two lines (Windows style)
-        parslet.parse("hello\r\nworld")
-        parslet.line_offset.should == 1
-        parslet.column_offset.should == 5
+        result = parslet.parse("hello\r\nworld")
+        result.line_offset.should == 1
+        result.column_offset.should == 5
         
       end
       
@@ -124,23 +122,29 @@ module Walrus
         parslet = /hello\r\nworld/.to_parseable
         begin
           parslet.parse('foobar')
-        rescue ParseError; end
-        parslet.line_offset.should == 0
-        parslet.column_offset.should == 0
+        rescue ParseError => e
+          exception = e
+        end
+        exception.line_offset.should == 0
+        exception.column_offset.should == 0
         
         # fail after 1 character
         begin
           parslet.parse('hfoobar')
-        rescue ParseError; end
-        parslet.line_offset.should == 0
-        parslet.column_offset.should == 0
+        rescue ParseError => e
+          exception = e
+        end
+        exception.line_offset.should == 0
+        exception.column_offset.should == 0
         
         # fail after end-of-line
         begin
           parslet.parse("hello\r\nfoobar")
-        rescue ParseError; end
-        parslet.line_offset.should == 0
-        parslet.column_offset.should == 0
+        rescue ParseError => e
+          exception = e
+        end
+        exception.line_offset.should == 0
+        exception.column_offset.should == 0
         
       end
       

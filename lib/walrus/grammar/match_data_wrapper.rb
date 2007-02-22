@@ -12,6 +12,7 @@ module Walrus
     # Upon creation a clone of the passed in MatchData object is stored; this means that the $~ global variable can be conveniently wrapped without having to worry that subsequent operations will alter the contents of the variable.
     class MatchDataWrapper
       
+      include Walrus::Grammar::LocationTracking
       include Walrus::Grammar::OmissionData
       
       attr_reader :match_data

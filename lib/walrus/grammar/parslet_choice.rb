@@ -36,13 +36,17 @@ module Walrus
         append(next_parslet)
       end
       
-      # First tries to parse the left option, falling back and trying the right option and then the any subsequent options in the others instance variable on failure. If no options successfully complete parsing then an ParseError is raised. Any zero-width parse successes throw by alternative parsers will flow on to a higher level.
+      # First tries to parse the left option, falling back and trying the right option and then the any subsequent options in the others instance variable on failure. If no options successfully complete parsing then an ParseError is raised. Any zero-width parse successes thrown by alternative parsers will flow on to a higher level.
       def parse(string, options = {})
         raise ArgumentError if string.nil?
+        error = nil # for error reporting purposes will track which parseable gets farthest to the right before failing
         @alternatives.each do |parseable|
           begin
             return parseable.memoizing_parse(string, options)
-          rescue ParseError
+          rescue ParseError => e
+#            if error.nil?   :   error = e
+#            else                error = e.rightmost?(error) ? e : error
+#            end
             next
           end
         end
