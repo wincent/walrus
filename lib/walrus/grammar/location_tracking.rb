@@ -21,12 +21,11 @@ module Walrus
         raise ArgumentError if array.length != 2
         @line_offset    = array[0]
         @column_offset  = array[1]
-        self
       end
       
-      # Given an other object that responds to column_offset and line_offset, returns true if the receiver is rightmost or equal.
+      # Given another object that responds to column_offset and line_offset, returns true if the receiver is rightmost or equal.
       # If the other object is farther to the right returns false.
-      def righmost?(other)
+      def rightmost?(other)
         if @line_offset > other.line_offset         : true
         elsif other.line_offset > @line_offset      : false
         elsif @column_offset >= other.column_offset : true

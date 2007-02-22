@@ -16,8 +16,9 @@ module Walrus
       # filename
       def initialize(message, info = {})
         super message
-        @line_offset    = info[:line_offset] or 0
-        @column_offset  = info[:column_offset] or 0
+        @line_offset    = (info[:line_offset] or 0)
+        @column_offset  = (info[:column_offset] or 0)
+        @rightmost      = info[:rightmost]           # (optional) rightmost exception that was thrown by a sub-parser while trying to parse
       end
       
     end # class ParseError

@@ -44,13 +44,13 @@ module Walrus
           begin
             return parseable.memoizing_parse(string, options)
           rescue ParseError => e
-#            if error.nil?   :   error = e
-#            else                error = e.rightmost?(error) ? e : error
-#            end
+            if error.nil?   :   error = e
+            else                error = e unless error.rightmost?(e)
+            end
             next
           end
         end
-        raise ParseError.new('no valid alternatives while parsing "%s"' % string)
+        raise ParseError.new('no valid alternatives while parsing "%s"' % string, :rightmost => error)
       end
       
       def eql?(other)
