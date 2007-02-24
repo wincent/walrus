@@ -18,7 +18,7 @@ module Walrus
       def initialize(string, options = {})
         raise ArgumentError if string.nil?
         self.base_string        = string
-        @results                = []              # for accumulating results
+        @results                = ArrayResult.new                     # for accumulating results
         @remainder              = @base_string.clone
         @options                = options.clone
         @options[:line_start]   = 0 if @options[:line_start].nil?

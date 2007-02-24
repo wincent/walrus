@@ -75,7 +75,7 @@ module Walrus
       end
       
       # Shorthand for ParsletCombining.repetition(0, 1).
-      # This method optionally takes a single parameter specifying what object should be returned as a placeholder when there are no matches; this is useful for packing into ASTs where it may be better to parse an empty Array rather than nil. The specified objected is cloned and returned in the event that there are no matches.
+      # This method optionally takes a single parameter specifying what object should be returned as a placeholder when there are no matches; this is useful for packing into ASTs where it may be better to parse an empty Array rather than nil. The specified object is cloned and returned in the event that there are no matches. As a convenience, the specified object is automatically extended using the LocationTracking module (this is a convenience so that you can specify empty Arrays, "[]", rather than explicitly passing an "ArrayResult.new")
       def optional(default_return_value = NoParameterMarker.instance)
         if default_return_value == NoParameterMarker.instance
           self.repeat(0, 1) # default behaviour

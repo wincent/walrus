@@ -44,6 +44,7 @@ module Walrus
       
       def default=(default)
         @default = (default.clone rescue default)
+        @default.extend(LocationTracking)
         update_hash
       end
       

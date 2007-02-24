@@ -17,6 +17,7 @@ module Walrus
   class Grammar
     
     autoload(:AndPredicate,                 'walrus/grammar/and_predicate')
+    autoload(:ArrayResult,                  'walrus/grammar/array_result')
     autoload(:ContinuationWrapperException, 'walrus/grammar/continuation_wrapper_exception')
     autoload(:LocationTracking,             'walrus/grammar/location_tracking')
     autoload(:MatchDataWrapper,             'walrus/grammar/match_data_wrapper')
@@ -50,7 +51,6 @@ end # module Walrus
 
 require 'walrus/additions/module'
 require 'walrus/additions/string'
-require 'walrus/grammar/additions/array'
 require 'walrus/grammar/additions/proc'
 require 'walrus/grammar/additions/regexp'
 require 'walrus/grammar/additions/string'
