@@ -13,7 +13,6 @@ module Walrus
     class MatchDataWrapper
       
       include Walrus::Grammar::LocationTracking
-      include Walrus::Grammar::OmissionData
       
       attr_reader :match_data
       

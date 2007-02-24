@@ -392,8 +392,7 @@ module Walrus
         # not sure if I can justify the difference in behaviour here compared with the previous grammar
         # if I catch these throws at the grammar level I can return nil
         # but note that the previous grammar returns an empty array, which to_s is just ""
-        lambda { grammar.parse('') }.should_throw :AndPredicateSuccess  # fails
-   #     lambda { grammar.parse('') }.should_throw :NotPredicateSuccess  # but this works, even though there are no not predicates! so this is officially a bug...
+        lambda { grammar.parse('') }.should_throw :AndPredicateSuccess
         
         grammar.parse('foo').should == 'foo'
         grammar.parse('foo bar').should == ['foo', 'bar']       # intervening whitespace
@@ -464,7 +463,7 @@ module Walrus
         end
         
         # words in word lists can be separated by whitespace or newlines
-        grammar.parse('hello world').should == ['hello', 'world']
+        grammar.parse('hello world').should ==  ['hello', 'world']
         grammar.parse("hello\nworld").should == ['hello', 'world']
         grammar.parse("hello world\nworld hello").should == ['hello', 'world', 'world', 'hello']
         
@@ -474,6 +473,13 @@ module Walrus
         grammar.parse("123 456\n456 123").should == [['123', '456'], ['456', '123']]
         
         # intermixing word lists and number lists
+        grammar.parse("bar\n123").should == ['bar', '123']
+        grammar.parse("123\n456\nbar").should == ['123', '456', 'bar']
+        
+        # these were buggy at one point: "123\n456" was getting mashed into "123456" due to misguided use of String#delete! to delete first newline
+        grammar.parse("\n123\n456").should == ['123', '456']
+        grammar.parse("bar\n123\n456").should == ['bar', '123', '456']
+        grammar.parse("baz bar\n123\n456").should == [['baz', 'bar'], '123', '456']
         grammar.parse("hello world\nfoo\n123 456 baz bar\n123\n456").should == [['hello', 'world', 'foo'], ['123', '456'], ['baz', 'bar'], '123', '456']
         
       end

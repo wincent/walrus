@@ -75,16 +75,32 @@ module Walrus
         @state.results.should_be_empty
       end
       
-      specify '"parsed" should complain if passed something that doesn\'t respond to the "to_s" message' do
-        my_mock = mock('mock_which_does_not_implement_to_s') 
-        my_mock.should_receive(:to_s).once.and_raise(NoMethodError) 
+      specify '"parsed" should complain if passed something that doesn\'t respond to the "line_end" and "column_end" messages' do
+        
+        # line_end
+        my_mock = mock('mock_which_does_not_implement_line_end', :null_object => true) 
+        my_mock.should_receive(:line_end).and_raise(NoMethodError) 
         lambda { @state.parsed(my_mock) }.should_raise NoMethodError
+        
+        # column_end
+        my_mock = mock('mock_which_does_not_implement_column_end', :null_object => true) 
+        my_mock.should_receive(:column_end).and_raise(NoMethodError) 
+        lambda { @state.parsed(my_mock) }.should_raise NoMethodError
+        
       end
       
-      specify '"skipped" should complain if passed something that doesn\'t respond to the "to_s" message' do
-        my_mock = mock('mock_which_does_not_implement_to_s') 
-        my_mock.should_receive(:to_s).once.and_raise(NoMethodError) 
+      specify '"skipped" should complain if passed something that doesn\'t respond to the "line_end" and "column_end" messages' do
+        
+        # line_end
+        my_mock = mock('mock_which_does_not_implement_line_end', :null_object => true) 
+        my_mock.should_receive(:line_end).and_raise(NoMethodError) 
         lambda { @state.skipped(my_mock) }.should_raise NoMethodError
+        
+        # column_end
+        my_mock = mock('mock_which_does_not_implement_column_end', :null_object => true) 
+        my_mock.should_receive(:column_end).and_raise(NoMethodError) 
+        lambda { @state.skipped(my_mock) }.should_raise NoMethodError
+        
       end
       
       specify 'should be able to mix use of "parsed" and "skipped" methods' do
@@ -109,18 +125,27 @@ module Walrus
       end
       
       specify '"parsed" and "results" methods should work with multi-byte Unicode strings' do
+        
+        # basic test
         state = ParserState.new('400€, foo')
         state.remainder.should == '400€, foo'
         state.parsed('40').should == '0€, foo'
         state.results.should == '40'
-        
-        # this next one was failing only from the command line (retured ", foo")
-        # solution was to use the "chars" method under the hood for multibyte character support
         state.parsed('0€, ').should == 'foo'
-        
         state.results.should == ['40', '0€, ']
         state.parsed('foo').should == ''
         state.results.should == ['40', '0€, ', 'foo']
+        
+        # test with newlines before and after multi-byte chars
+        state = ParserState.new("400\n or more €...\nfoo")
+        state.remainder.should == "400\n or more €...\nfoo"
+        state.parsed("400\n or more").should == " €...\nfoo"
+        state.results.should == "400\n or more"
+        state.parsed(' €..').should == ".\nfoo"
+        state.results.should == ["400\n or more", ' €..']
+        state.parsed(".\nfoo").should == ''
+        state.results.should == ["400\n or more", ' €..', ".\nfoo"]
+        
       end
       
       specify '"skipped" and "results" methods should work with multi-byte Unicode strings' do
@@ -134,35 +159,6 @@ module Walrus
         state.results.should == '0'
         state.parsed('foo').should == ''
         state.results.should == ['0', 'foo']
-      end
-      
-      specify 'whatever is returned from the "results" method should respond to "omitted"' do
-        
-        # nil (nothing skipped)
-        state = ParserState.new('hello world')
-        state.parsed('hello world')
-        state.results.omitted.should_be_empty
-        
-        # String
-        state = ParserState.new('hello world')
-        state.skipped('hello')
-        state.results.omitted.should == 'hello'
-        
-        # MatchDataWrapper
-        'hello' =~ /(\w+)/
-        wrapper = MatchDataWrapper.new($~)
-        state = ParserState.new('hello world')
-        state.skipped(wrapper)
-        state.results.omitted.should == 'hello'
-        
-        # Array
-        state = ParserState.new('hello world')
-        state.skipped('hello')
-        state.parsed(' ')
-        state.skipped('world')
-        state.results.should == ' '
-        state.results.omitted.should == ['hello', 'world']
-        
       end
       
     end

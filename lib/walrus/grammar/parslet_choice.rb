@@ -50,7 +50,8 @@ module Walrus
             next
           end
         end
-        raise ParseError.new('no valid alternatives while parsing "%s"' % string, :rightmost => error)
+        raise ParseError.new('no valid alternatives while parsing "%s" (%s)' % [string, error.to_s],
+                             :line_end => error.line_end, :column_end => error.column_end)                  # should generally report the rightmost error
       end
       
       def eql?(other)

@@ -1212,6 +1212,77 @@ THERE_DOCUMENT') }.should_raise Grammar::ParseError
       
     end
     
+    specify 'parse results should contain information about their location in the original source (line and column start/end)' do
+      
+      # simple raw text
+      result = @parser.parse('hello world')
+      result.line_start.should    == 0  # where the node starts
+      result.column_start.should  == 0  # where the node starts
+      result.line_end.should      == 0  # how far the parser got
+      result.column_end.should    == 11 # how far the parser got
+      
+      # super with two params
+      result = @parser.parse('#super "foo", "bar"')
+      result.line_start.should              == 0
+      result.column_start.should            == 0
+      result.line_end.should                == 0
+      result.column_end.should              == 19
+      result.params.line_start.should       == 0
+      result.params.column_start.should     == 7    # returns 0 (still!)
+      result.params.line_end.should         == 0
+      result.params.column_end.should       == 19
+      result.params[0].line_start.should    == 0
+      result.params[0].column_start.should  == 7
+      result.params[0].line_end.should      == 0
+      result.params[0].column_end.should    == 5
+      result.params[1].line_start.should    == 0
+      result.params[1].column_start.should  == 12
+      result.params[1].line_end.should      == 0
+      result.params[1].column_end.should    == 19
+      
+    end
+    
+    specify 'ParseErrors should contain information about the location of the problem' do
+      
+      # error at beginning of string (unknown directive)
+      begin
+        @parser.parse('#sooper')
+      rescue Grammar::ParseError => e
+        exception = e
+      end
+      exception.line_start.should     == 0
+      exception.column_start.should   == 0
+      exception.line_end.should       == 0
+      exception.column_end.should     == 0
+      
+      # error on second line (unknown directive)
+      begin
+        @parser.parse("## a comment\n#sooper")
+      rescue Grammar::ParseError => e
+        exception = e
+      end
+      exception.line_start.should     == 0
+      exception.column_start.should   == 0
+      exception.line_end.should       == 1
+      exception.column_end.should     == 0
+      
+      # error at end of second line (missing closing bracket)
+      begin
+        @parser.parse("## a comment\n#super (1, 2")
+      rescue Grammar::ParseError => e
+        exception = e
+      end
+      exception.line_start.should     == 0
+      exception.column_start.should   == 0
+      exception.line_end.should       == 1
+      exception.column_end.should     == 12 # returns 0, which is almost right... but we want the rightmost coordinate, not the beginning of the busted directive
+      
+    end
+    
+    specify 'produced AST nodes should contain information about their location in the source file' do
+      
+    end
+    
   end
   
 end # module Walrus

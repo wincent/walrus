@@ -9,8 +9,7 @@ module Walrus
     # Make subclasses of this for us in Abstract Syntax Trees (ASTs).
     class Node
       
-      # In order to be useful parse results Node and its subclasses must work well with ParserState objects, and that means responding to the "to_s" and "omitted" messages. Whatever is returned by "omitted" must itself respond to "to_s".
-      attr_accessor :omitted # an accessor because ParserState and the Grammar "wrap" method may wish to write to it
+      include Walrus::Grammar::LocationTracking
       
       def to_s
         @string_value
@@ -36,16 +35,13 @@ module Walrus
           new_class.class_eval { attr_reader :lexeme }
           initialize_body = "def initialize(lexeme)\n"
           initialize_body << "@string_value = lexeme.to_s\n"
-          initialize_body << "@omitted = lexeme.omitted.to_s\n"
           initialize_body << "@lexeme = lexeme\n"
         else
           initialize_body = "def initialize(#{results.collect { |symbol| symbol.to_s}.join(', ')})\n"
           initialize_body << "@string_value = \"\"\n"
-          initialize_body << "@omitted = \"\"\n"
           for result in results
             initialize_body << "@#{result.to_s} = #{result.to_s}\n"
             initialize_body << "@string_value << #{result.to_s}.to_s\n"
-            initialize_body << "@omitted << #{result.to_s}.omitted.to_s\n"
           end
         end
         initialize_body << "end\n"

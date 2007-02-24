@@ -21,47 +21,37 @@ module Walrus
       
       def parse(string, options = {})
         raise ArgumentError if string.nil?
-        state             = ParserState.new(string)
-        augmented_options = options.clone
-        augmented_options[:location] = 0 unless augmented_options.has_key? :location
-        
-        catch :ZeroWidthParseSuccess do          # a zero-width match is grounds for immediate abort
-          while @max.nil? or state.count < @max   # try forever if max is nil; otherwise keep trying while match count < max
+        state                         = ParserState.new(string, options)
+        catch :ZeroWidthParseSuccess do             # a zero-width match is grounds for immediate abort
+          while @max.nil? or state.length < @max    # try forever if max is nil; otherwise keep trying while match count < max
             begin
-              starting_location = state.jlength  # remember current location within current ParserState instance
-              parsed = @parseable.memoizing_parse(state.remainder, augmented_options)
+              parsed = @parseable.memoizing_parse(state.remainder, state.options)
               state.parsed(parsed)
-              state.skipped(parsed.omitted.to_s)  # in case any sub-parslets skipped tokens along the way
-              augmented_options[:location] = augmented_options[:location] + (state.jlength - starting_location)
             rescue SkippedSubstringException => e
-              state.skipped(e.to_s)
-              augmented_options[:location] = augmented_options[:location] + (state.jlength - starting_location)
+              state.skipped(e)
             rescue ParseError => e # failed, will try to skip; save original error in case skipping fails
-              skipping_parslet = nil
-              if augmented_options.has_key?(:skipping_override) : skipping_parslet = augmented_options[:skipping_override]
-              elsif augmented_options.has_key?(:skipping)       : skipping_parslet = augmented_options[:skipping]
+              if options.has_key?(:skipping_override) : skipping_parslet = options[:skipping_override]
+              elsif options.has_key?(:skipping)       : skipping_parslet = options[:skipping]
+              else                                      skipping_parslet = nil
               end
-              if skipping_parslet
-                begin
-                  parsed = skipping_parslet.memoizing_parse(state.remainder, augmented_options) # guard against self references (possible infinite recursion) here?
-                rescue ParseError
-                  break # skipping didn't help either, raise original error
-                end
+              break if skipping_parslet.nil?
+              begin
+                parsed = skipping_parslet.memoizing_parse(state.remainder, state.options) # guard against self references (possible infinite recursion) here?
                 state.skipped(parsed)
-                state.skipped(parsed.omitted.to_s)
-                augmented_options[:location] = augmented_options[:location] + (state.jlength - starting_location)
-                redo # skipping succeeded, try to redo
+                redo                                  # skipping succeeded, try to redo
+              rescue ParseError
+                break                                 # skipping didn't help either, give up
               end
-              break # give up
             end
           end          
         end
         
         # now assess whether our tries met the requirements
-        if state.count == 0 and @min == 0 # success (special case)
+        if state.length == 0 and @min == 0 # success (special case)
           throw :ZeroWidthParseSuccess
-        elsif state.count < @min          # matches < min (failure)
-          raise ParseError.new('required %d matches but obtained %d while parsing "%s"' % [@min, state.count, string])
+        elsif state.length < @min          # matches < min (failure)
+          raise ParseError.new('required %d matches but obtained %d while parsing "%s"' % [@min, state.length, string],
+                               :line_end    => state.options[:line_end],    :column_end   => state.options[:column_end])
         else                              # success (general case)
           state.results                   # returns multiple matches as an array, single matches as a single object
         end

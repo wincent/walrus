@@ -24,7 +24,6 @@ module Walrus
     autoload(:MemoizingCache,               'walrus/grammar/memoizing_cache')
     autoload(:NotPredicate,                 'walrus/grammar/not_predicate')
     autoload(:Node,                         'walrus/grammar/node')
-    autoload(:OmissionData,                 'walrus/grammar/omission_data')
     autoload(:ParseError,                   'walrus/grammar/parse_error')
     autoload(:ParserState,                  'walrus/grammar/parser_state')
     autoload(:Parslet,                      'walrus/grammar/parslet')
@@ -42,6 +41,7 @@ module Walrus
     autoload(:SkippedSubstringException,    'walrus/grammar/skipped_substring_exception')
     autoload(:StringEnumerator,             'walrus/grammar/string_enumerator')
     autoload(:StringParslet,                'walrus/grammar/string_parslet')
+    autoload(:StringResult,                 'walrus/grammar/string_result')
     autoload(:SymbolParslet,                'walrus/grammar/symbol_parslet')
     
   end

@@ -41,20 +41,20 @@ module Walrus
     def parse(string, options = {})
       raise ArgumentError if string.nil?
       raise StandardError if @starting_symbol.nil?
-      options[:grammar]   = self
-      options[:rule_name] = @starting_symbol
-      options[:skipping]  = @skipping
-      options[:location]  = 0 # where we are in the input stream: only ParsletMerge, ParsletRepetion and ParsletSequence objects advance this index
-      options[:line]      = 0 # richer information than that provided in "location"
-      options[:column]    = 0 # richer information than that provided in "location"
-      options[:memoizer]  = MemoizingCache.new if @memoizing
+      options[:grammar]       = self
+      options[:rule_name]     = @starting_symbol
+      options[:skipping]      = @skipping
+      options[:line_start]    = 0 # "richer" information (more human-friendly) than that provided in "location"
+      options[:column_start]  = 0 # "richer" information (more human-friendly) than that provided in "location"
+      options[:memoizer]      = MemoizingCache.new if @memoizing
       
-      #catch :AndPredicateSuccess do     # not sure whether to let these go through to the caller
-      #catch :ZeroWidthParseSuccess do   # not sure whether to let these go through to the caller
+#      begin
         result              = @rules[@starting_symbol].memoizing_parse(string, options)
         self.wrap(result, @starting_symbol)
-      #end
-      #end
+#      rescue ParseError => e
+#        puts "top level parse error: " + e.inspect
+#        raise e
+#      end
     end
     
     # Defines a rule and stores it 
@@ -118,9 +118,9 @@ module Walrus
           params << ", result[#{i.to_s}]"
         end
         
-        # ParserState may have packed info into the "omitted" instance variable of "results", make sure our node has a copy of it
         node = node_class.class_eval('new(%s)' % params)
-        node.omitted = result.omitted
+        node.start    = result.start    # propagate the start information
+        node.end      = result.end      # and the end information
         node
         
       else

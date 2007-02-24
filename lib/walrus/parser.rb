@@ -147,16 +147,16 @@ module Walrus
       # http://www.antlr.org:8080/pipermail/antlr-interest/2005-September/013673.html
       rule            :here_document,                       lambda { |string, options|
         
-        # for the time-being, not sure if there is much benefit in calling memoizing_parse here (would have to track location)
-        state     = Grammar::ParserState.new(string)
-        parsed    = /<<(-?)([a-zA-Z0-9_]+)[ \t\v]*\n/.to_parseable.parse(state.remainder, options)
-        state.skipped(parsed.to_s)
+        # for the time-being, not sure if there is much benefit in calling memoizing_parse here
+        state     = Grammar::ParserState.new(string, options)
+        parsed    = /<<(-?)([a-zA-Z0-9_]+)[ \t\v]*\n/.to_parseable.parse(state.remainder, state.options)
+        state.skipped(parsed)
         marker    = parsed.match_data
         indenting = (marker[1] == '') ? false : true
         
-        if indenting  # whitespace allowed before end marker
+        if indenting                                                # whitespace allowed before end marker
           end_marker  = /^[ \t\v]*#{marker[2]}(\n|\z)/.to_parseable # will eat trailing newline
-        else          # no whitespace allowed before end marker
+        else                                                        # no whitespace allowed before end marker
           end_marker  = /^#{marker[2]}(\n|\z)/.to_parseable         # will eat trailing newline
         end
         
@@ -164,18 +164,21 @@ module Walrus
         
         while true do
           begin
-            skipped = end_marker.parse(state.remainder, options)
-            state.skipped(skipped.to_s)     # found end marker, skip it
+            skipped = end_marker.parse(state.remainder, state.options)
+            state.skipped(skipped)          # found end marker, skip it
             break                           # all done
           rescue Grammar::ParseError        # didn't find end marker yet, consume a line
-            parsed = line.parse(state.remainder, options)
-            state.parsed(parsed.to_s)
+            parsed = line.parse(state.remainder, state.options)
+            state.parsed(parsed)
           end
         end
         
-        result          = state.results.to_s  # caller will want a String, not an Array
-        result.omitted  = state.omitted       # make sure info about skipped material is included in return value
-        result
+        # caller will want a String, not an Array
+        results         = state.results
+        document        = Grammar::StringResult.new(results.to_s)
+        document.start  = results.start
+        document.end    = results.end
+        document
       }
       
       rule            :ruby_directive,                      '#ruby'.skip & ((:directive_end & /([^#]+|#(?!end)+)*/ & '#end'.skip & :directive_end) | :here_document)

@@ -17,25 +17,22 @@ module Walrus
       
       def parse(string, options = {})
         raise ArgumentError if string.nil?
-        column_offset, line_offset = [0, 0] # reset
         if (string =~ @expected_regexp)
           wrapper = MatchDataWrapper.new($~)
           match   = $~[0]
           
-          # count number of newlines in match
-          line_offset  = match.scan(/\r\n|\r|\n/).length
-          
-          # count characters on last line
-          last_newline = match.rindex(/\r|\n/)
-          if last_newline :   column_offset = match.length - last_newline - 1
-          else                column_offset = match.length
+          if (line_count = match.scan(/\r\n|\r|\n/).length) != 0      # count number of newlines in match
+            column_end    = match.jlength - match.rindex(/\r|\n/) - 1 # calculate characters on last line
+          else                                                        # no newlines in match
+            column_end    = match.jlength + (options[:column_start] || 0)
           end
           
-          wrapper.offset = [line_offset, column_offset]
+          wrapper.start = [options[:line_start], options[:column_start]]
+          wrapper.end   = [wrapper.line_start + line_count, column_end]
           wrapper
         else
-          raise ParseError.new('non-matching characters "%s" while parsing regular expression "%s"' % [string, @expected_regexp.inspect], 
-                               :line_offset => line_offset, :column_offset => column_offset)
+          raise ParseError.new('non-matching characters "%s" while parsing regular expression "%s"' % [string, @expected_regexp.inspect],
+                               :line_end    => (options[:line_start] || 0), :column_end    => (options[:column_start] || 0))
         end
       end
       

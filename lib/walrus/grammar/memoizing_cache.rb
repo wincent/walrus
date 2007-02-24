@@ -18,7 +18,7 @@ module Walrus
       end
       
       def initialize
-        # The results of parse operations are stored (memoized) in a cache, keyed on a unique identifier comprising the Parslet, ParsletCombination or Predicate used in the parse operation, the location of the operation, the rule name, and the skipping override (if any). The values may be:
+        # The results of parse operations are stored (memoized) in a cache, keyed on a unique identifier comprising the Parslet, ParsletCombination or Predicate used in the parse operation, the location of the operation (the line_start and column_start), and the skipping override (if any). The values may be:
         #
         #   - ParseErrors raised during parsing
         #   - SkippedSubstringExceptions raised during parsing
@@ -33,12 +33,12 @@ module Walrus
         @cache = Hash.new(NoValueForKey.instance)
       end
       
-      # The receiver checks whether there is already a stored result corresponding to that a unique identifier that specifies the "coordinates" of a parsing operation (location, parseable, rule name, skipping override). If found propogates the result directly to the caller rather than performing the parse method all over again. Here "propagation" means re-raising parse errors, re-throwing symbols, and returning object references. If not found, performs the parsing operation and stores the result in the cache before propagating it.
+      # The receiver checks whether there is already a stored result corresponding to that a unique identifier that specifies the "coordinates" of a parsing operation (location, parseable, skipping override). If found propogates the result directly to the caller rather than performing the parse method all over again. Here "propagation" means re-raising parse errors, re-throwing symbols, and returning object references. If not found, performs the parsing operation and stores the result in the cache before propagating it.
       def parse(string, options = {})
         raise ArgumentError if string.nil?
         
         # construct a unique identifier
-        identifier = [options[:parseable], options[:location]]#, options[:rule_name]]
+        identifier = [options[:parseable], options[:line_start], options[:column_start]]
         identifier << options[:skipping_override] if options.has_key? :skipping_override
         
         if (result = @cache[identifier]) != NoValueForKey.instance
@@ -46,22 +46,22 @@ module Walrus
           elsif result.kind_of? Exception : raise result
           else                              return result
           end
-        else # first time for this parseable/location/rule_name/skipping_override (etc) combination, capture result and propagate
+        else    # first time for this parseable/location/skipping_override (etc) combination, capture result and propagate
           catch :NotPredicateSuccess do
             catch :AndPredicateSuccess do
               catch :ZeroWidthParseSuccess do
                 begin
                   options[:ignore_memoizer] = true
-                  return @cache[identifier] = options[:parseable].memoizing_parse(string, options) # store and return
+                  return @cache[identifier] = options[:parseable].memoizing_parse(string, options)  # store and return
                 rescue Exception => e
-                  raise @cache[identifier] = e                                           # store and re-raise
+                  raise @cache[identifier] = e                                                      # store and re-raise
                 end
               end
-              throw @cache[identifier] = :ZeroWidthParseSuccess                          # store and re-throw
+              throw @cache[identifier] = :ZeroWidthParseSuccess                                     # store and re-throw
             end
-            throw @cache[identifier] = :AndPredicateSuccess                              # store and re-throw
+            throw @cache[identifier] = :AndPredicateSuccess                                         # store and re-throw
           end
-          throw @cache[identifier] = :NotPredicateSuccess                                # store and re-throw
+          throw @cache[identifier] = :NotPredicateSuccess                                           # store and re-throw
         end
       end
       

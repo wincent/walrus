@@ -75,48 +75,48 @@ module Walrus
         /foo/.to_parseable.should_not_eql 'foo'                 # totally different classes
       end
       
-      specify 'should accurately pack line and column offsets into whatever gets returned from "parse"' do
+      specify 'should accurately pack line and column ends into whatever gets returned from "parse"' do
         
         # single word
         parslet = /.+/m.to_parseable
         result = parslet.parse('hello')
-        result.line_offset.should == 0
-        result.column_offset.should == 5
+        result.line_end.should == 0
+        result.column_end.should == 5
         
         # single word with newline at end (UNIX style)
         result = parslet.parse("hello\n")
-        result.line_offset.should == 1
-        result.column_offset.should == 0
+        result.line_end.should == 1
+        result.column_end.should == 0
         
         # single word with newline at end (Classic Mac style)
         result = parslet.parse("hello\r")
-        result.line_offset.should == 1
-        result.column_offset.should == 0
+        result.line_end.should == 1
+        result.column_end.should == 0
         
         # single word with newline at end (Windows style)
         result = parslet.parse("hello\r\n")
-        result.line_offset.should == 1
-        result.column_offset.should == 0
+        result.line_end.should == 1
+        result.column_end.should == 0
         
         # two lines (UNIX style)
         result = parslet.parse("hello\nworld")
-        result.line_offset.should == 1
-        result.column_offset.should == 5
+        result.line_end.should == 1
+        result.column_end.should == 5
         
         # two lines (Classic Mac style)
         result = parslet.parse("hello\rworld")
-        result.line_offset.should == 1
-        result.column_offset.should == 5
+        result.line_end.should == 1
+        result.column_end.should == 5
         
         # two lines (Windows style)
         result = parslet.parse("hello\r\nworld")
-        result.line_offset.should == 1
-        result.column_offset.should == 5
+        result.line_end.should == 1
+        result.column_end.should == 5
         
       end
       
       # in the case of RegexpParslets, the "last successfully scanned position" is always 0, 0
-      specify 'line and column offset should reflect last succesfully scanned position prior to failure' do
+      specify 'line and column end should reflect last succesfully scanned position prior to failure' do
         
         # fail right at start
         parslet = /hello\r\nworld/.to_parseable
@@ -125,8 +125,8 @@ module Walrus
         rescue ParseError => e
           exception = e
         end
-        exception.line_offset.should == 0
-        exception.column_offset.should == 0
+        exception.line_end.should == 0
+        exception.column_end.should == 0
         
         # fail after 1 character
         begin
@@ -134,8 +134,8 @@ module Walrus
         rescue ParseError => e
           exception = e
         end
-        exception.line_offset.should == 0
-        exception.column_offset.should == 0
+        exception.line_end.should == 0
+        exception.column_end.should == 0
         
         # fail after end-of-line
         begin
@@ -143,8 +143,8 @@ module Walrus
         rescue ParseError => e
           exception = e
         end
-        exception.line_offset.should == 0
-        exception.column_offset.should == 0
+        exception.line_end.should == 0
+        exception.column_end.should == 0
         
       end
       

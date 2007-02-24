@@ -10,47 +10,35 @@ module Walrus
       
       def parse(string, options = {})
         raise ArgumentError if string.nil?
-        state             = ParserState.new(string)
-        last_caught       = nil # keep track of the last kind of throw to be caught
-        augmented_options = options.clone
-        augmented_options[:location] = 0 unless augmented_options.has_key? :location
+        state                         = ParserState.new(string, options)
+        last_caught                   = nil # keep track of the last kind of throw to be caught
         @components.each do |parseable|
           catch :ProcessNextComponent do
             catch :NotPredicateSuccess do
               catch :AndPredicateSuccess do
                 catch :ZeroWidthParseSuccess do
                   begin
-                    starting_location = state.jlength  # remember current location within current ParserState instance
-                    parsed = parseable.memoizing_parse(state.remainder, augmented_options)
-                    if parsed.respond_to? :each : parsed.each { |element| state.parsed(element) }
-                    else                          state.parsed(parsed)
+                    parsed = parseable.memoizing_parse(state.remainder, state.options)
+                    if parsed.respond_to? :each
+                      parsed.each { |element| state.parsed(element) }
+                    else
+                      state.parsed(parsed)
                     end
-                    state.skipped(parsed.omitted.to_s)  # in case any sub-parslets skipped tokens along the way
-                    augmented_options[:location] = augmented_options[:location] + (state.jlength - starting_location)
                   rescue SkippedSubstringException => e
-                    state.skipped(e.to_s)
-                    augmented_options[:location] = augmented_options[:location] + (state.jlength - starting_location)
-                  
-                  # TODO: possiby try inter-token parslets on failure here?
-                  # (have yet to find a failing spec that requires this; although uncommenting this code doesn't cause any specs to fail either)
-#                  rescue ParseError => e # failed, will try to skip; save original error in case skipping fails                    
-#                    skipping_parslet = nil
-#                    if augmented_options.has_key?(:skipping_override) : skipping_parslet = augmented_options[:skipping_override]
-#                    elsif augmented_options.has_key?(:skipping)       : skipping_parslet = augmented_options[:skipping]
-#                    end
-#                    if skipping_parslet
-#                      begin
-#                        parsed = skipping_parslet.memoizing_parse(state.remainder, augmented_options) # guard against self references (possible infinite recursion) here?
-#                      rescue ParseError
-#                        raise e # skipping didn't help either, raise original error
-#                      end
-#                      state.skipped(parsed)
-#                      state.skipped(parsed.omitted.to_s)
-#                      augmented_options[:location] = augmented_options[:location] + (state.jlength - starting_location)
-#                      redo # skipping succeeded, try to redo
-#                    end
-#                    raise e # no skipper defined, raise original error  
-                    
+                    state.skipped(e)
+                  # rescue ParseError => e # failed, will try to skip; save original error in case skipping fails                                        
+                  #   if options.has_key?(:skipping_override) : skipping_parslet = options[:skipping_override]
+                  #   elsif options.has_key?(:skipping)       : skipping_parslet = options[:skipping]
+                  #   else                                      skipping_parslet = nil
+                  #   end
+                  #   raise e if skipping_parslet.nil?        # no skipper defined, raise original error
+                  #   begin
+                  #     parsed = skipping_parslet.memoizing_parse(state.remainder, state.options) # guard against self references (possible infinite recursion) here?
+                  #     state.skipped(parsed)
+                  #     redo              # skipping succeeded, try to redo
+                  #   rescue ParseError
+                  #     raise e           # skipping didn't help either, raise original error
+                  #   end
                   end
                   last_caught = nil
                   throw :ProcessNextComponent # can't use "next" here because it will only break out of innermost "do"
@@ -65,13 +53,10 @@ module Walrus
           end
         end
         
-        if state.results.respond_to? :empty? and
-           state.results.omitted.respond_to? :empty? and
-           state.results.empty? and
-           state.results.omitted.empty?
+        if state.results.respond_to? :empty? and state.results.empty? and
          throw last_caught
         else
-         state.results
+          state.results
         end
         
       end

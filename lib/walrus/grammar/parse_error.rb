@@ -16,12 +16,16 @@ module Walrus
       # filename
       def initialize(message, info = {})
         super message
-        self.line_offset    = info[:line_offset]
-        self.column_offset  = info[:column_offset]
-        @rightmost          = info[:rightmost]           # (optional) rightmost exception that was thrown by a sub-parser while trying to parse
+        self.line_start     = info[:line_start]
+        self.column_start   = info[:column_start]
+        self.line_end       = info[:line_end]
+        self.column_end     = info[:column_end]
       end
       
-      # TODO: potentially offer a "rightmost" method that recursively checks to see what is the rightmost subparser error (or subsubsubparser error)
+      def inspect
+        # TODO also return filename if available
+        '#<%s: %s @line_end=%d, @column_end=%d>' % [ self.class.to_s, self.to_s, self.line_end, self.column_end ]
+      end
       
     end # class ParseError
     

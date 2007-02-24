@@ -19,7 +19,8 @@ module Walrus
         end
         
         # getting this far means that parsing succeeded (not what we wanted)
-        raise ParseError.new('predicate not satisfied ("%s" not allowed) while parsing "%s"' % [@parseable.to_s, string])
+        raise ParseError.new('predicate not satisfied ("%s" not allowed) while parsing "%s"' % [@parseable.to_s, string],
+                             :line_end => options[:line_start], :column_end => options[:column_start])
       end
       
     private

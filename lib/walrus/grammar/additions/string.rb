@@ -34,8 +34,6 @@ end # class String
 
 class String
   
-  include Walrus::Grammar::LocationTracking
-  include Walrus::Grammar::OmissionData
   include Walrus::Grammar::ParsletCombining   # Rationale: it's ok to add "&" and "|" methods to string because they don't exist yet (they're not overrides).
   
   # Returns a StringParslet based on the receiver

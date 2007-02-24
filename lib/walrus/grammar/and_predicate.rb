@@ -13,9 +13,9 @@ module Walrus
         catch :ZeroWidthParseSuccess do
           begin
             parsed = @parseable.memoizing_parse(string, options)
-          rescue ParseError => e
+          rescue ParseError
             raise ParseError.new('predicate not satisfied (expected "%s") while parsing "%s"' % [@parseable.to_s, string],
-                                 :rightmost => e)
+                                 :line_end => options[:line_start], :column_end => options[:column_start])
           end
         end
         

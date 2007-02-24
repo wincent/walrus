@@ -17,28 +17,28 @@ module Walrus
       
       def parse(string, options = {})
         raise ArgumentError if string.nil?
-        column_offset, line_offset = [0, 0]
-        chars = StringEnumerator.new(string)
-        parsed = ''
+        chars         = StringEnumerator.new(string)
+        parsed        = StringResult.new
+        parsed.start  = [options[:line_start], options[:column_start]]
+        parsed.end    = parsed.start
         expected_string.each_char do |expected_char|
           actual_char = chars.next
           if actual_char.nil?
             raise ParseError.new('unexpected end-of-string (expected "%s") while parsing "%s"' % [ expected_char, expected_string ],
-                                 :line_offset => line_offset, :column_offset => column_offset)
+                                 :line_end    => parsed.line_end,   :column_end   => parsed.column_end)
           elsif actual_char != expected_char
             raise ParseError.new('unexpected character "%s" (expected "%s") while parsing "%s"' % [ actual_char, expected_char, expected_string],
-                                 :line_offset => line_offset, :column_offset => column_offset)
+                                 :line_end    => parsed.line_end,   :column_end   => parsed.column_end)
           else
             if actual_char == "\r" or (actual_char == "\n" and chars.last != "\r")  # catches Mac, Windows and UNIX end-of-line markers
-              column_offset  =   0
-              line_offset    +=  1
-            elsif actual_char != "\n" # \n is ignored if it is preceded by an \r (already counted above)
-              column_offset  +=  1    # everything else gets counted
+              parsed.column_end = 0
+              parsed.line_end   = parsed.line_end + 1
+            elsif actual_char != "\n"                     # \n is ignored if it is preceded by an \r (already counted above)
+              parsed.column_end = parsed.column_end + 1   # everything else gets counted
             end
             parsed << actual_char
           end
         end
-        parsed.offset = [line_offset, column_offset]
         parsed
       end
       

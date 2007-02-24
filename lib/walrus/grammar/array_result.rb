@@ -5,12 +5,8 @@ require 'walrus'
 
 module Walrus
   class Grammar
-    
-    module OmissionData
+    class ArrayResult < Array
       
-      attr_accessor :omitted
-      
-    end # module OmissionData
-    
+    end # class ArrayResult
   end # class Grammar
 end # module Walrus
