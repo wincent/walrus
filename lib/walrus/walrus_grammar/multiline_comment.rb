@@ -10,7 +10,7 @@ module Walrus
       
       # Multiline comments may containing nested Comments/Multiline comments or normal text, so must compile recursively.
       # TODO: anchor comments that appear immediately before #def and #block directives to their corresponding methods (for the timebeing should note in the documentation that if you want your comments to appear adjacent to the blocks which follow them then you must put your comments inside the blocks)
-      def compile
+      def compile(options = {})
         compiled = ''
         if @content.respond_to? :each
           @content.each do |item|

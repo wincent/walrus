@@ -8,7 +8,7 @@ module Walrus
     
     class EscapeSequence
       
-      def compile
+      def compile(options = {})
         "accumulate(%s) \# EscapeSequence\n" % @lexeme.to_s.dump
       end
       

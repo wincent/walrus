@@ -17,16 +17,19 @@ module Walrus
       end
       
       # Returns a string containing the compiled (Ruby) version of receiver.
-      def compile
+      # If options[:slurping] is true, instructs the receiver to strip the leading carriage return/line feed from the @lexeme prior to emitting the compiled output.
+      def compile(options = {})
+        lexeme = options[:slurping] ? @lexeme.to_s.sub(/\A(\r\n|\r|\n)/, '') : @lexeme.to_s
+        
         if @@use_pack # avoid having to escape characters or sequences that would otherwise have a special meaning in Ruby.
           compiled = 'accumulate([ '
-          @lexeme.to_s.unpack('U*').each { |number| compiled << '%d, ' % number } 
-          compiled.sub!(/, \z/, ' ')   # trailing comma is harmless, but suppress it anyway for aesthetics
+          lexeme.unpack('U*').each { |number| compiled << '%d, ' % number } 
+          compiled.sub!(/, \z/, ' ')          # trailing comma is harmless, but suppress it anyway for aesthetics
           compiled << "].pack('U*')) # RawText (packed)\n"
-        else          # try for human readable output
+        else                                  # try for human readable output
           compiled  = []
           first     = true
-          @lexeme.to_s.to_source_string.each do |line|
+          lexeme.to_source_string.each do |line|
             newline = ''
             if line =~ /(\r\n|\r|\n)\z/       # check for literal newline at end of line
               line.chomp!                     # get rid of it

@@ -8,7 +8,7 @@ module Walrus
     
     class Comment
       
-      def compile
+      def compile(options = {})
         '# Comment:' + @lexeme.to_s + "\n"
       end
       

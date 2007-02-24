@@ -28,6 +28,7 @@ module Walrus
       # calling #import or #extends more than once in a given template raises a CompileError
       import_directive  = nil
       extends_directive = nil
+      options           = {}
       
       # begin tree walk
       tree.each do |element|
@@ -36,7 +37,7 @@ module Walrus
           # how to handle nesting here: if a two element array is returned, expect it to be [outside, inside] (nil is ok)
           # otherwise, just assume it is for the inside?
           
-          element.compile.each { |line| outside_body  << OUTSIDE_INDENT + line } 
+          element.compile(options).each { |line| outside_body  << OUTSIDE_INDENT + line } 
           if element.kind_of? WalrusGrammar::BlockDirective    # special case of block: defines a block and includes its output in the template_body
             template_body << BODY_INDENT    + "accumulate($#{element.identifier})\n"
           end
@@ -50,9 +51,16 @@ module Walrus
           import_directive = element.class_name
 #        elsif element.kind_of? WalrusGrammar::RawText           # special case: don't split RawText into lines because it may already include literal newlines
 #          template_body << BODY_INDENT + element.compile
+        elsif  element.kind_of? WalrusGrammar::Comment and element.column_start == 0  # special case if comment is only thing on input line
+          template_body << BODY_INDENT + element.compile(options)
+          options[:slurping] = true
+          next
         else                                                    # everything else gets added to the template_body
-          element.compile.each { |line| template_body << BODY_INDENT + line } # indent by 6 spaces
+          element.compile(options).each { |line| template_body << BODY_INDENT + line } # indent by 6 spaces
         end
+        
+        options = {}
+        
       end
       
       superclass_name = import_directive || extends_directive || 'Document'
