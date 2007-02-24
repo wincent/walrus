@@ -49,8 +49,6 @@ module Walrus
           raise CompileError.new('#import may be used only once per template') unless import_directive.nil?
           raise CompileError.new('illegal #import (#extends already used in this template)') unless extends_directive.nil?
           import_directive = element.class_name
-#        elsif element.kind_of? WalrusGrammar::RawText           # special case: don't split RawText into lines because it may already include literal newlines
-#          template_body << BODY_INDENT + element.compile
         elsif  element.kind_of? WalrusGrammar::Comment and element.column_start == 0  # special case if comment is only thing on input line
           template_body << BODY_INDENT + element.compile(options)
           options[:slurping] = true

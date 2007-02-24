@@ -19,7 +19,7 @@ module Walrus
       Dir[File.join(File.dirname(__FILE__), '**/*.tmpl')].collect { |template| Pathname.new(template).realpath }
     end
   
-    # Given the path of an input template returns the path of the file containing the expected output for the template.
+    # Given the path of an input template returns the path of the file containing the expected output for the template.
     def expected_path(template)
       raise ArgumentError.new("template must not be nil") if template.nil?
       expected = template.sub(/\.tmpl$/i, ".expected")
