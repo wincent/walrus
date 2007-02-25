@@ -31,7 +31,7 @@ module Walrus
       result = nil
       begin
         compiled = self.compiled_text
-        result = eval(compiled)
+        result = instance_eval(compiled)
       rescue Exception => exception
         source = @origin ? @origin : @base_text
         #raise Exception.exception(' %s (%s: %s)' % [ exception.message, source, compiled ])

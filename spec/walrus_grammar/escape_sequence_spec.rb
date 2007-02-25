@@ -2,7 +2,7 @@
 # $Id$
 
 require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
-require 'walrus/parser'
+require 'walrus/parser' # ensure that WalrusGrammar is defined before continuing
 
 module Walrus
   class WalrusGrammar
@@ -53,19 +53,19 @@ module Walrus
         
         # single $
         sequence = @parser.compile('\\$', :class_name => :EscapeSequenceSpecAlpha)
-        eval(sequence).should == '$'
+        self.class.class_eval(sequence).should == '$'
         
         # single #
         sequence = @parser.compile('\\#', :class_name => :EscapeSequenceSpecBeta)
-        eval(sequence).should == '#'
+        self.class.class_eval(sequence).should == '#'
         
         # single \
         sequence = @parser.compile('\\\\', :class_name => :EscapeSequenceSpecDelta)
-        eval(sequence).should == '\\'
+        self.class.class_eval(sequence).should == '\\'
         
         # multiple escape markers
         sequence = @parser.compile('\\\\\\#\\$', :class_name => :EscapeSequenceSpecGamma)
-        eval(sequence).should == '\\#$'
+        self.class.class_eval(sequence).should == '\\#$'
         
       end
       

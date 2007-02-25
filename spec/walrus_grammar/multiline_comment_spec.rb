@@ -2,7 +2,7 @@
 # $Id$
 
 require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
-require 'walrus/parser'
+require 'walrus/parser' # ensure that WalrusGrammar is defined before continuing
 
 module Walrus
   
@@ -11,7 +11,7 @@ module Walrus
     context 'compiling a comment instance' do
       
       specify 'comments should produce no meaningful output' do
-        eval(MultilineComment.new(" hello\n   world ").compile).should == nil
+        self.class.class_eval(MultilineComment.new(" hello\n   world ").compile).should == nil
       end
       
     end
@@ -26,19 +26,19 @@ module Walrus
         
         # simple multiline comment
         comment = @parser.compile("#* hello\n   world *#", :class_name => :MultilineCommentSpecAlpha)
-        eval(comment).should == ''
+        self.class.class_eval(comment).should == ''
         
         # nested singleline comment
         comment = @parser.compile("#* hello ## <-- first line\n   world *#", :class_name => :MultilineCommentSpecBeta)
-        eval(comment).should == ''
+        self.class.class_eval(comment).should == ''
         
         # nested multiline comment
         comment = @parser.compile("#* hello ## <-- first line\n   world #* <-- second line *# *#", :class_name => :MultilineCommentSpecDelta)
-        eval(comment).should == ''
+        self.class.class_eval(comment).should == ''
         
         # multiple comments
         comment = @parser.compile("#* hello *##* world *#", :class_name => :MultilineCommentSpecGamma)
-        eval(comment).should == ''
+        self.class.class_eval(comment).should == ''
         
       end
       

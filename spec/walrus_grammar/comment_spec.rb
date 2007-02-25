@@ -2,7 +2,7 @@
 # $Id$
 
 require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
-require 'walrus/parser'
+require 'walrus/parser' # ensure that WalrusGrammar is defined before continuing
 
 module Walrus
   class WalrusGrammar
@@ -23,7 +23,7 @@ module Walrus
       
       specify 'should produce no output' do
         comment = @parser.compile('## hello world', :class_name => :CommentSpec)
-        eval(comment).should == ''
+        self.class.class_eval(comment).should == ''
       end
       
     end

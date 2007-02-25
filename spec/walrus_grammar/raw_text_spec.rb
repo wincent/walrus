@@ -2,7 +2,7 @@
 # $Id$
 
 require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
-require 'walrus/parser'
+require 'walrus/parser' # ensure that WalrusGrammar is defined before continuing
 
 module Walrus
   class WalrusGrammar
@@ -38,15 +38,15 @@ module Walrus
         
         # simple example
         raw_text = @parser.compile('hello world', :class_name => :RawTextSpecAlpha)
-        eval(raw_text).should == 'hello world'
+        self.class.class_eval(raw_text).should == 'hello world'
         
         # containing single quotes
         raw_text = @parser.compile("hello 'world'", :class_name => :RawTextSpecBeta)
-        eval(raw_text).should == "hello 'world'"
+        self.class.class_eval(raw_text).should == "hello 'world'"
         
         # containing a newline
         raw_text = @parser.compile("hello\nworld", :class_name => :RawTextSpecDelta)
-        eval(raw_text).should == "hello\nworld"
+        self.class.class_eval(raw_text).should == "hello\nworld"
         
       end
       

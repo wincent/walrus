@@ -74,7 +74,7 @@ module Walrus
 
 require '#{superclass_implementation}'
 
-module WalrusX # change this to "Walrus" and watch everything go wrong...
+module Walrus
   
   class WalrusGrammar
     
