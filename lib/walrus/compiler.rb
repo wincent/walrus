@@ -6,18 +6,20 @@ require 'walrus'
 module Walrus
   class Compiler
     
-    BODY_INDENT     = ' ' * 6
-    OUTSIDE_INDENT  = ' ' * 4
+    BODY_INDENT     = ' ' * 8
+    OUTSIDE_INDENT  = ' ' * 6
     
     # Walks the Abstract Syntax Tree, tree, that represents a parsed Walrus template.
     # Returns a String that defines a Document subclass corresponding to the compiled version of the tree.
-    def compile(tree, class_name = 'DocumentSubclass')
+    def compile(tree, options = {})
+      
+      class_name = (options[:class_name] || 'DocumentSubclass').to_s
       
       # everything that produces output (placeholders, rawtext etc) is implicitly included in the "template_body" block
       # there are somethings which explicitly occur outside of the "template_body" block: #def blocks for example.
       
       template_body = [] # will accumulate items for body, and joins them at the end of processing
-      outside_body = [] # will accumulate items for outside of body, and joins them at the end of processing
+      outside_body  = [] # will accumulate items for outside of body, and joins them at the end of processing
       
       # make sure that tree responds to each (could also just add "each" method to Node)
       tree = [tree] unless tree.respond_to? :each
@@ -72,23 +74,27 @@ module Walrus
 
 require '#{superclass_implementation}'
 
-module Walrus
+module WalrusX # change this to "Walrus" and watch everything go wrong...
   
-  class #{class_name} < #{superclass_name}
+  class WalrusGrammar
     
-    def template_body
+    class #{class_name} < #{superclass_name}
       
+      def template_body
+        
 #{template_body.join}
-    end
-    
+      end
+      
 #{outside_body.join}    
-    if __FILE__ == $0   # when run from the command line the default action is to call 'run'
-      self.new.run
-    else                # in other cases, evaluate 'fill' (if run inside an eval, will return filled content)
-      self.new.fill
-    end
+      if __FILE__ == $0   # when run from the command line the default action is to call 'run'
+        self.new.run
+      else                # in other cases, evaluate 'fill' (if run inside an eval, will return filled content)
+        self.new.fill
+      end
+      
+    end # #{class_name}
     
-  end # #{class_name}
+  end # WalrusGrammar
   
 end # Walrus
 

@@ -31,21 +31,21 @@ module Walrus
     context 'producing a Document containing RawText' do
       
       setup do
-        @parser = Parser.new()
+        @parser = Parser.new
       end
       
       specify 'should be able to round trip' do
         
         # simple example
-        raw_text = @parser.compile('hello world')
+        raw_text = @parser.compile('hello world', :class_name => :RawTextSpecAlpha)
         eval(raw_text).should == 'hello world'
         
         # containing single quotes
-        raw_text = @parser.compile("hello 'world'")
+        raw_text = @parser.compile("hello 'world'", :class_name => :RawTextSpecBeta)
         eval(raw_text).should == "hello 'world'"
         
         # containing a newline
-        raw_text = @parser.compile("hello\nworld")
+        raw_text = @parser.compile("hello\nworld", :class_name => :RawTextSpecDelta)
         eval(raw_text).should == "hello\nworld"
         
       end

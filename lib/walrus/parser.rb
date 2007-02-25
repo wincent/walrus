@@ -11,9 +11,13 @@ module Walrus
       @@grammar.parse(string)
     end
     
-    def compile(string)
+    def compile(string, options = {})
       @@compiler ||= Compiler.new
-      @@compiler.compile(parse(string))
+      parsed = []
+      catch :AndPredicateSuccess do # catch here because an empty file will throw
+        parsed = parse string
+      end
+      @@compiler.compile parsed, options
     end
     
     @@grammar ||= Grammar.subclass('WalrusGrammar') do

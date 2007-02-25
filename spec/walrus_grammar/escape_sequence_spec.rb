@@ -46,25 +46,25 @@ module Walrus
     context 'producing a Document containing an EscapeSequence' do
       
       setup do
-        @parser = Parser.new()
+        @parser = Parser.new
       end
       
       specify 'should be able to round trip' do
         
         # single $
-        sequence = @parser.compile('\\$')
+        sequence = @parser.compile('\\$', :class_name => :EscapeSequenceSpecAlpha)
         eval(sequence).should == '$'
         
         # single #
-        sequence = @parser.compile('\\#')
+        sequence = @parser.compile('\\#', :class_name => :EscapeSequenceSpecBeta)
         eval(sequence).should == '#'
         
         # single \
-        sequence = @parser.compile('\\\\')
+        sequence = @parser.compile('\\\\', :class_name => :EscapeSequenceSpecDelta)
         eval(sequence).should == '\\'
         
         # multiple escape markers
-        sequence = @parser.compile('\\\\\\#\\$')
+        sequence = @parser.compile('\\\\\\#\\$', :class_name => :EscapeSequenceSpecGamma)
         eval(sequence).should == '\\#$'
         
       end

@@ -21,9 +21,9 @@ module Walrus
           wrapper = MatchDataWrapper.new($~)
           match   = $~[0]
           
-          if (line_count = match.scan(/\r\n|\r|\n/).length) != 0      # count number of newlines in match
-            column_end    = match.jlength - match.rindex(/\r|\n/) - 1 # calculate characters on last line
-          else                                                        # no newlines in match
+          if (line_count = match.scan(/\r\n|\r|\n/).length) != 0        # count number of newlines in match
+            column_end    = match.jlength - match.jrindex(/\r|\n/) - 1  # calculate characters on last line
+          else                                                          # no newlines in match
             column_end    = match.jlength + (options[:column_start] || 0)
           end
           

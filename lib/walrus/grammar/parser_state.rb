@@ -83,7 +83,7 @@ module Walrus
           input = StringResult.new(input)
           input.start = [previous_line_end, previous_column_end]
           if (line_count  = input.scan(/\r\n|\r|\n/).length) != 0       # count number of newlines in receiver
-            column_end    = input.jlength - input.rindex(/\r|\n/) - 1   # calculate characters on last line
+            column_end    = input.jlength - input.jrindex(/\r|\n/) - 1  # calculate characters on last line
           else                                                          # no newlines in match
             column_end    = input.jlength + previous_column_end
           end
@@ -109,7 +109,14 @@ module Walrus
         line_delta              = @options[:line_end] - previous_line_end
         if line_delta > 0                                               # have consumed newline(s)
           line_delta.times do                                           # remove them from remainder
-            newline_location    = @remainder.index /\r\n|\r|\n/         # find the location of the next newline
+            newline_location    = @remainder.jindex /\r\n|\r|\n/        # find the location of the next newline
+            
+            # bizarre $~ magic going on here that I don't understand
+            # the original index method sets $~ but my jindex doesn't (and can't seem to force it to either)
+            
+            # totally inefficient hack            
+            @remainder.index /\r\n|\r|\n/
+            
             newline_location    += $~[0].length                         # add the actual characters used to indicate the newline
             @remainder          = @remainder[newline_location..-1]      # strip everything up to and including the newline
           end

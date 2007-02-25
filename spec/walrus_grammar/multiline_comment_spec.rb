@@ -19,25 +19,25 @@ module Walrus
     context 'producing a Document containing Comment' do
       
       setup do
-        @parser = Parser.new()
+        @parser = Parser.new
       end
       
       specify 'should produce no output' do
         
         # simple multiline comment
-        comment = @parser.compile("#* hello\n   world *#")
+        comment = @parser.compile("#* hello\n   world *#", :class_name => :MultilineCommentSpecAlpha)
         eval(comment).should == ''
         
         # nested singleline comment
-        comment = @parser.compile("#* hello ## <-- first line\n   world *#")
+        comment = @parser.compile("#* hello ## <-- first line\n   world *#", :class_name => :MultilineCommentSpecBeta)
         eval(comment).should == ''
         
         # nested multiline comment
-        comment = @parser.compile("#* hello ## <-- first line\n   world #* <-- second line *# *#")
+        comment = @parser.compile("#* hello ## <-- first line\n   world #* <-- second line *# *#", :class_name => :MultilineCommentSpecDelta)
         eval(comment).should == ''
         
         # multiple comments
-        comment = @parser.compile("#* hello *##* world *#")
+        comment = @parser.compile("#* hello *##* world *#", :class_name => :MultilineCommentSpecGamma)
         eval(comment).should == ''
         
       end

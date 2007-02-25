@@ -18,11 +18,11 @@ module Walrus
     context 'producing a Document containing Comment' do
       
       setup do
-        @parser = Parser.new()
+        @parser = Parser.new
       end
       
       specify 'should produce no output' do
-        comment = @parser.compile('## hello world')
+        comment = @parser.compile('## hello world', :class_name => :CommentSpec)
         eval(comment).should == ''
       end
       

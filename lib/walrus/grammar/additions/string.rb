@@ -13,6 +13,7 @@ class String
   
   alias old_range []
   
+  # multi-byte friendly [] implementation
   def [](range, other = Walrus::NoParameterMarker.instance)
     if other == Walrus::NoParameterMarker.instance
       if range.kind_of? Range
@@ -25,11 +26,47 @@ class String
     end
   end
   
+  # multi-byte friendly rindex implementation
+  def jrindex(search, other = Walrus::NoParameterMarker.instance) 
+    
+    # first let original implementation do the work
+    if other == Walrus::NoParameterMarker.instance
+      idx = rindex search
+    else
+      idx = rindex search, other
+    end
+    
+    # idx is now a number of bytes so must convert to character count    
+    index_to_jindex(idx)
+    
+  end
+  
+  # multi-byte friendly index implementation
+  def jindex(search, other = Walrus::NoParameterMarker.instance)
+    
+    # first let original implementation do the work
+    if other == Walrus::NoParameterMarker.instance
+      idx = index search
+    else
+      idx = index search, other
+    end
+    
+    # idx is now a number of bytes so must convert to character count
+    index_to_jindex(idx)
+    
+  end
+  
   # Returns a character-level enumerator for the receiver.
   def enumerator
     Walrus::Grammar::StringEnumerator.new(self)
   end
-
+  
+private
+  
+  def index_to_jindex(idx)
+    idx ? unpack('C*')[0...idx].pack('C*').jlength : idx
+  end
+  
 end # class String
 
 class String
