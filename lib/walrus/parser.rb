@@ -282,6 +282,7 @@ module Walrus
       require 'walrus/walrus_grammar/multiline_comment'
       require 'walrus/walrus_grammar/raw_directive'
       require 'walrus/walrus_grammar/raw_text'
+      require 'walrus/walrus_grammar/silent_directive'
       require 'walrus/walrus_grammar/single_quoted_string_literal'
       
     end
