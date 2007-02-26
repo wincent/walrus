@@ -11,13 +11,14 @@ module Walrus
   module SpecHelper
     
     # will append the local libs directory to search path if not already present
-    parent = Pathname.new(File.join(File.dirname(__FILE__), '..', 'lib')).realpath
+    parent      = Pathname.new(File.join(File.dirname(__FILE__), '..', 'lib')).realpath
+    extensions  = Pathname.new(File.join(parent, '..', 'ext')).realpath
     
     # normalize all paths ("rescue" because "realpath" will raise if lstat(2) fails for the path: non-existent paths, relative paths etc)
     normalized = $:.collect { |path| Pathname.new(path).realpath rescue path }
     
-    # only add the parent directory if it does not appear to be present already
-    $:.push(parent) if not normalized.include?(parent)
+    # only add the directories if they do not appear to be present already
+    [parent, extensions].each { |path| $:.push(path) unless normalized.include?(path) }    
     
   end # module SpecHelper
 end # module Walrus

@@ -3,7 +3,7 @@
 
 require 'walrus'
 
-require 'walrus/grammar/additions/jindex' # multibyte-friendly implementations of String#index and String#rindex
+require 'jindex' # multibyte-friendly implementations of String#index and String#rindex
 
 # Additions to String class for Unicode support.
 class String

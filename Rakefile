@@ -53,6 +53,6 @@ task :make => [:jindex]
 
 desc 'Build jindex extension'
 task :jindex do |t|
-  system %{cd lib/walrus/grammar/additions/; ruby ./extconf.rb; make; cd -}
+  system %{cd ext/jindex && ruby ./extconf.rb && make && cp jindex.bundle ../ && cd -}
 end
 
