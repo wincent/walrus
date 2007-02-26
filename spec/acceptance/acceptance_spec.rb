@@ -17,7 +17,7 @@ module Walrus
         @template_paths = Dir[File.join(File.dirname(__FILE__), '**/*.tmpl')].collect { |template| Pathname.new(template).realpath }
       
         # corresponding array of expected output files
-        @expected_output_paths = @template_paths.collect { |path| path.sub(/\.tmpl\z/i, ".expected") }
+        @expected_output_paths = @template_paths.collect { |path| path.to_s.sub(/\.tmpl\z/i, ".expected") }
       
         # class names based on template filename (less ".tmpl" extension)
         @class_names = @template_paths.collect { |path| Pathname.new(path).basename.to_s.gsub(/\.tmpl\z/i, '').to_class_name } 
