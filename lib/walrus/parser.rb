@@ -276,14 +276,13 @@ module Walrus
       
       # only after defining the grammar is it safe to extend the classes dynamically created during the grammar definition
       require 'walrus/walrus_grammar/comment'
-      require 'walrus/walrus_grammar/double_quoted_string_literal'
       require 'walrus/walrus_grammar/echo_directive'
       require 'walrus/walrus_grammar/escape_sequence'
       require 'walrus/walrus_grammar/multiline_comment'
       require 'walrus/walrus_grammar/raw_directive'
       require 'walrus/walrus_grammar/raw_text'
       require 'walrus/walrus_grammar/silent_directive'
-      require 'walrus/walrus_grammar/single_quoted_string_literal'
+      require 'walrus/walrus_grammar/string_literal'
       
     end
     
