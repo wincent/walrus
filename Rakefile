@@ -48,4 +48,11 @@ Spec::Rake::SpecTask.new('specdoc') do |t|
   t.out         = 'specdoc.rd'
 end
 
+desc 'Build C extensions'
+task :make => [:jindex]
+
+desc 'Build jindex extension'
+task :jindex do |t|
+  system %{cd lib/walrus/grammar/additions/; ruby ./extconf.rb; make; cd -}
+end
 

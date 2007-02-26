@@ -110,13 +110,6 @@ module Walrus
         if line_delta > 0                                               # have consumed newline(s)
           line_delta.times do                                           # remove them from remainder
             newline_location    = @remainder.jindex /\r\n|\r|\n/        # find the location of the next newline
-            
-            # bizarre $~ magic going on here that I don't understand
-            # the original index method sets $~ but my jindex doesn't (and can't seem to force it to either)
-            
-            # totally inefficient hack            
-            @remainder.index /\r\n|\r|\n/
-            
             newline_location    += $~[0].length                         # add the actual characters used to indicate the newline
             @remainder          = @remainder[newline_location..-1]      # strip everything up to and including the newline
           end
