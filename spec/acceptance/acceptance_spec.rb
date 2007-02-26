@@ -35,6 +35,13 @@ module Walrus
         @template_paths.each_with_index do |template, index|
           actual_output           = self.class.class_eval(@parser.compile(IO.read(template), :class_name => @class_names[index]))
           expected_output         = IO.read(@expected_output_paths[index])
+          if actual_output != expected_output
+            printf actual_output
+            require 'walrus/diff'
+            puts "diff >>"
+            puts Diff.diff(actual_output, Pathname.new(@expected_output_paths[index])).inspect
+            puts "end"
+          end
           actual_output.should == expected_output
         end
       

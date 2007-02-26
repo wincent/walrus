@@ -98,7 +98,8 @@ module Walrus
       
       # "Directive tags can be closed explicitly with #, or implicitly with the end of the line"
       # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/language.directives.closures.html
-      # Note that "skipping" the end_of_input here is harmless as it isn't actually consumed
+      # This means that to follow a directive by a comment on the same line you must explicitly close the directive first (otherwise the grammar would be ambiguous).
+      # Note that "skipping" the end_of_input here is harmless as it isn't actually consumed.
       rule            :directive_end,                       ( /#/ | :newline | :end_of_input ).skip
       
       rule            :block_directive,                     '#block'.skip & :identifier & :def_parameter_list.optional([]) & :directive_end &
@@ -159,9 +160,9 @@ module Walrus
         indenting = (marker[1] == '') ? false : true
         
         if indenting                                                # whitespace allowed before end marker
-          end_marker  = /^[ \t\v]*#{marker[2]}(\n|\z)/.to_parseable # will eat trailing newline
+          end_marker  = /^[ \t\v]*#{marker[2]}[ \t\v]*(\n|\z)/.to_parseable # will eat trailing newline
         else                                                        # no whitespace allowed before end marker
-          end_marker  = /^#{marker[2]}(\n|\z)/.to_parseable         # will eat trailing newline
+          end_marker  = /^#{marker[2]}[ \t\v]*(\n|\z)/.to_parseable         # will eat trailing newline
         end
         
         line = /^.*\n/.to_parseable # for gobbling a line
@@ -277,6 +278,7 @@ module Walrus
       require 'walrus/walrus_grammar/comment'
       require 'walrus/walrus_grammar/escape_sequence'
       require 'walrus/walrus_grammar/multiline_comment'
+      require 'walrus/walrus_grammar/raw_directive'
       require 'walrus/walrus_grammar/raw_text'
       
     end

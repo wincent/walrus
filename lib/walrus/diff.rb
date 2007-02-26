@@ -56,7 +56,7 @@ class Diff
   end
   
   # Actually runs diff(1) with the supplied arguments (pathnames). One but not both of the arguments may be "-" to indicate the standard input.
-  def diff(left, right)
+  def self.diff(left, right)
     raise ArgumentError.new('left may not be ni') unless left
     raise ArgumentError.new('right may not be nil') unless right
     raise ArgumentError.new('only one parameter may be "-"') if left == '-' and right == '-'
