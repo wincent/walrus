@@ -39,6 +39,7 @@ module Walrus
             parsed << actual_char
           end
         end
+        parsed.source_text = parsed.to_s.clone
         parsed
       end
       

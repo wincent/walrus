@@ -43,9 +43,11 @@ module Walrus
       rule            :raw_text,                            /[^\$\\#]+/
       production      :raw_text.build(:node)
       
+      node            :literal
+      
       rule            :string_literal,                      :single_quoted_string_literal | :double_quoted_string_literal
       skipping        :string_literal, nil
-      node            :string_literal
+      node            :string_literal, :literal
       
       rule            :single_quoted_string_literal,        "'".skip & :single_quoted_string_content.optional & "'".skip
       production      :single_quoted_string_literal.build(:string_literal)
@@ -54,14 +56,15 @@ module Walrus
       production      :double_quoted_string_literal.build(:string_literal)
       rule            :double_quoted_string_content,        /(\\(?!").|\\"|[^"\\]+)+/
       
-      rule            :numeric_literal,                     /\d+\.\d+|\d(?!\.)/
-      production      :numeric_literal.build(:node)
+      # TODO: support 1_000_000 syntax for numeric_literals
+      rule            :numeric_literal,                     /\d+\.\d+|\d+(?!\.)/
+      production      :numeric_literal.build(:literal)
       rule            :identifier,                          /[a-z_][a-zA-Z0-9_]*/
       production      :identifier.build(:node)
       rule            :constant,                            /[A-Z][a-zA-Z0-9_]*/
       production      :constant.build(:node)
       rule            :symbol_literal,                      /:[a-zA-Z_][a-zA-Z0-9_]*/
-      production      :symbol_literal.build(:node)
+      production      :symbol_literal.build(:literal)
       
       rule            :escape_sequence,                     '\\'.skip & /[\$\\#]/
       production      :escape_sequence.build(:node)
@@ -278,11 +281,11 @@ module Walrus
       require 'walrus/walrus_grammar/comment'
       require 'walrus/walrus_grammar/echo_directive'
       require 'walrus/walrus_grammar/escape_sequence'
+      require 'walrus/walrus_grammar/literal'
       require 'walrus/walrus_grammar/multiline_comment'
       require 'walrus/walrus_grammar/raw_directive'
       require 'walrus/walrus_grammar/raw_text'
       require 'walrus/walrus_grammar/silent_directive'
-      require 'walrus/walrus_grammar/string_literal'
       
     end
     

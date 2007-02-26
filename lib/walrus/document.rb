@@ -55,7 +55,7 @@ module Walrus
         @accumulators.pop           # replace temporary nil accumulator
         @accumulators.push("")      # with proper string accumulator
       end
-      @accumulators.last << string
+      @accumulators.last << string.to_s
     end
     
     # Fills (executes) the template body of the receiver and returns the result.

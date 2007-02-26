@@ -27,8 +27,9 @@ module Walrus
             column_end    = match.jlength + (options[:column_start] || 0)
           end
           
-          wrapper.start = [options[:line_start], options[:column_start]]
-          wrapper.end   = [wrapper.line_start + line_count, column_end]
+          wrapper.start       = [options[:line_start], options[:column_start]]
+          wrapper.end         = [wrapper.line_start + line_count, column_end]
+          wrapper.source_text = match.to_s.clone
           wrapper
         else
           raise ParseError.new('non-matching characters "%s" while parsing regular expression "%s"' % [string, @expected_regexp.inspect],
