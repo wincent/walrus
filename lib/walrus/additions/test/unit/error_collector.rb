@@ -49,7 +49,6 @@ module Test
         backtrace = error.backtrace
         backtrace.shift # raise shouldn't appear in the backtrace
         if @is_collecting
-          # not exactly sure why 5, 2 works... other values don't
           backtrace.slice!(5, 2) # remove collecting_errors and corresponding block
           send(method, error.message, backtrace)
         else
