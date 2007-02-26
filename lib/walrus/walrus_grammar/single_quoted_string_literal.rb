@@ -6,13 +6,13 @@ require 'walrus/parser.rb' # make sure that RawText class has been defined prior
 module Walrus
   class WalrusGrammar
     
-    class EscapeSequence
+    class SingleQuotedStringLiteral
       
       def compile(options = {})
-        "accumulate(%s) \# EscapeSequence\n" % @lexeme.to_s.dump
+        "'" + @lexeme.to_s + "'"
       end
       
-    end
+    end # class SingleQuotedStringLiteral
     
   end # class WalrusGrammar
 end # Walrus

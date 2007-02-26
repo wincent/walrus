@@ -1,7 +1,7 @@
 # Copyright 2007 Wincent Colaiuta
 # $Id$
 
-#require 'walrus/parser.rb' # make sure that RawText class has been defined prior to extending it
+require 'walrus/parser.rb' # make sure that RawText class has been defined prior to extending it
 
 module Walrus
   class WalrusGrammar

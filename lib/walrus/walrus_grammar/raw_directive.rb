@@ -6,16 +6,13 @@ require 'walrus/parser.rb' # make sure that RawText class has been defined prior
 module Walrus
   class WalrusGrammar
     
-    class RawText
+    class RawDirective
       
       # Returns a string containing the compiled (Ruby) version of receiver.
-      # If options[:slurping] is true, instructs the receiver to strip the leading carriage return/line feed from the @lexeme prior to emitting the compiled output.
       def compile(options = {})
-        lexeme = options[:slurping] ? @lexeme.to_s.sub(/\A(\r\n|\r|\n)/, '') : @lexeme.to_s
-        
-        compiled  = ''
+        compiled  = []
         first     = true
-        lexeme.to_source_string.each do |line|
+        @content.to_s.to_source_string.each do |line|
           newline = ''
           if line =~ /(\r\n|\r|\n)\z/       # check for literal newline at end of line
             line.chomp!                     # get rid of it
@@ -23,17 +20,17 @@ module Walrus
           end
           
           if first
-            compiled << "accumulate('%s'%s) # RawText\n" % [ line, newline ]
+            compiled << "accumulate('%s'%s) # RawDirective\n" % [ line, newline ]
             first = false
           else
-            compiled << "accumulate('%s'%s) # RawText (continued)\n" % [ line, newline ]
+            compiled << "accumulate('%s'%s) # RawDirective (continued)\n" % [ line, newline ]
           end
           
         end
-        compiled
+        compiled.join
       end
       
-    end # class RawText
+    end # class RawDirective
     
   end # class WalrusGrammar
 end # Walrus
