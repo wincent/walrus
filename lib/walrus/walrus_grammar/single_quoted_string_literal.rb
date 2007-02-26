@@ -9,7 +9,7 @@ module Walrus
     class SingleQuotedStringLiteral
       
       def compile(options = {})
-        "'" + @lexeme.to_s + "'"
+        @lexeme.source_text
       end
       
     end # class SingleQuotedStringLiteral

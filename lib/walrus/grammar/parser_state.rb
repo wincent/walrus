@@ -20,6 +20,7 @@ module Walrus
         self.base_string        = string
         @results                = ArrayResult.new                     # for accumulating results
         @remainder              = @base_string.clone
+        @scanned                = ''
         @options                = options.clone
         @options[:line_start]   = 0 if @options[:line_start].nil?
         @options[:column_start] = 0 if @options[:column_start].nil?
@@ -57,8 +58,9 @@ module Walrus
         else
           results = @results
         end        
-        results.start   = [@original_line_start, @original_column_start]
-        results.end     = [@options[:line_end], @options[:column_end]]
+        results.start         = [@original_line_start, @original_column_start]
+        results.end           = [@options[:line_end], @options[:column_end]]
+        results.source_text = @scanned.clone
         results
       end
       
@@ -111,12 +113,15 @@ module Walrus
           line_delta.times do                                           # remove them from remainder
             newline_location    = @remainder.jindex /\r\n|\r|\n/        # find the location of the next newline
             newline_location    += $~[0].length                         # add the actual characters used to indicate the newline
+            @scanned            << @remainder[0...newline_location]     # record scanned text
             @remainder          = @remainder[newline_location..-1]      # strip everything up to and including the newline
           end
+          @scanned              << @remainder[0...@options[:column_end]]
           @remainder            = @remainder[@options[:column_end]..-1] # delete up to the current column
         else                                                            # no newlines consumed
           column_delta          = @options[:column_end] - previous_column_end
           if column_delta > 0                                           # there was movement within currentline
+            @scanned            << @remainder[0...column_delta]
             @remainder          = @remainder[column_delta..-1]          # delete up to the current column
           end
         end

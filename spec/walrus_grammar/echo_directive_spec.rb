@@ -20,9 +20,10 @@ module Walrus
     context 'compiling an EchoDirective instance' do
       
       specify 'should be able to round trip' do
-        @accumulator  = EchoDirectiveAccumulator.new
-        @raw          = EchoDirective.new(SingleQuotedStringLiteral.new('hello world'))
-        @accumulator.instance_eval(@raw.compile)
+        string              = StringResult.new('hello world')
+        string.source_text  = "'hello world'"
+        @accumulator        = EchoDirectiveAccumulator.new
+        @accumulator.instance_eval(EchoDirective.new(SingleQuotedStringLiteral.new(string)).compile)
         @accumulator.content.should == 'hello world'
       end
       

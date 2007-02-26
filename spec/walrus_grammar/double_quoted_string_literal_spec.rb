@@ -10,7 +10,9 @@ module Walrus
     context 'compiling a double-quoted string literal instance' do
       
       specify 'should produce a string literal' do
-        compiled = DoubleQuotedStringLiteral.new('hello world').compile
+        string = StringResult.new('hello world')                  # construct the string result the same way the parser does
+        string.source_text = '"hello world"'                      # the original source text includes the quotes
+        compiled = DoubleQuotedStringLiteral.new(string).compile  # but the inner lexeme is just the contents
         compiled.should == '"hello world"'
         eval(compiled).should == 'hello world'
       end

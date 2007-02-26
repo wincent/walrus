@@ -118,9 +118,10 @@ module Walrus
           params << ", result[#{i.to_s}]"
         end
         
-        node = node_class.class_eval('new(%s)' % params)
-        node.start    = result.start    # propagate the start information
-        node.end      = result.end      # and the end information
+        node                = node_class.class_eval('new(%s)' % params)
+        node.start          = result.start        # propagate the start information
+        node.end            = result.end          # and the end information
+        node.source_text    = result.source_text  # and the original source text
         node
         
       else

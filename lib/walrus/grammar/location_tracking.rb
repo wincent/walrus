@@ -9,6 +9,14 @@ module Walrus
     # Methods for embedding location information in objects returned (or exceptions raised) from parse methods.
     module LocationTracking
       
+      attr_reader :source_text
+      
+      def source_text=(string)
+        @source_text = string.to_s.clone
+      rescue NoMethodError
+        @source_text = string.to_s
+      end
+      
       # Sets @column_start to col.
       # Sets @column_start to 0 if passed nil (for ease of use, users of classes that mix-in this module don't have to worry about special casing nil values).
       def column_start=(col)

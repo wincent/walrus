@@ -9,7 +9,7 @@ module Walrus
     class DoubleQuotedStringLiteral
       
       def compile(options = {})
-        '"' + @lexeme.to_s + '"'
+        @lexeme.source_text
       end
       
     end # class DoubleQuotedStringLiteral
