@@ -980,15 +980,17 @@ HERE_DOCUMENT')
       result.should_be_kind_of WalrusGrammar::RawDirective
       result.content.should == ''
       
+      # whitespace after end marker
+      result = @parser.parse('#raw <<HERE_DOCUMENT
+#end
+HERE_DOCUMENT     ')
+      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.content.should == "#end\n"
+      
       # invalid here document (whitespace before end marker)
       lambda { @parser.parse('#raw <<HERE_DOCUMENT
 #end
     HERE_DOCUMENT') }.should_raise Grammar::ParseError
-      
-      # invalid here document (whitespace after end marker)
-      lambda { @parser.parse('#raw <<HERE_DOCUMENT
-#end
-HERE_DOCUMENT     ') }.should_raise Grammar::ParseError
       
       # invalid here document (non-matching end marker)
       lambda { @parser.parse('#raw <<HERE_DOCUMENT
@@ -1060,15 +1062,17 @@ HERE_DOCUMENT')
       result.should_be_kind_of WalrusGrammar::RubyDirective
       result.content.should == ''
       
+      # whitespace after end marker
+      result = @parser.parse('#ruby <<HERE_DOCUMENT
+#end
+HERE_DOCUMENT     ')
+      result.should_be_kind_of WalrusGrammar::RubyDirective
+      result.content.should == "#end\n"
+      
       # invalid here document (whitespace before end marker)
       lambda { @parser.parse('#ruby <<HERE_DOCUMENT
 #end
     HERE_DOCUMENT') }.should_raise Grammar::ParseError
-      
-      # invalid here document (whitespace after end marker)
-      lambda { @parser.parse('#ruby <<HERE_DOCUMENT
-#end
-HERE_DOCUMENT     ') }.should_raise Grammar::ParseError
       
       # invalid here document (non-matching end marker)
       lambda { @parser.parse('#ruby <<HERE_DOCUMENT
