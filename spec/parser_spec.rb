@@ -1256,6 +1256,13 @@ THERE_DOCUMENT') }.should_raise Grammar::ParseError
       # note that the params include their enclosing quote marks even thouh those are technically skipped also
       # so basically it is a complex issue: how do we indicate to the parser where we want our boundaries to fall?
       # it is problematic because sometimes we want skipped content to be included and sometimes not
+      #
+      # The answer: 
+      #
+      # Skipping parslets should be handled in two ways:
+      # 1. Those which are explicitly skipped should be included in the bounds calculations (for example "#super" is explicitly skipped and should be considered when determining the bounds of the directive)
+      # 2. Those which are implicitly skipped (intertoken parslets, for example) should not be included (for example, the whitespace etc around and between the parameters should not be included in determining the bounds of the parameters)
+      # Note that the quotes in each parameter are explicitly skipped and so should be included.
       
     end
     
