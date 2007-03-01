@@ -48,6 +48,15 @@ module Walrus
         update_and_return_remainder_for_string(substring)
       end
       
+      # The skipped method is used to inform the receiver of a successful parsing event where the parsed substring should be consumed but not included in the accumulated results and furthermore the parse event should not effect the overall bounds of the parse result. In reality this means that the method is only ever called upon the successful use of a automatic intertoken "skipping" parslet. By definition this method should only be called for intertoken skipping otherwise incorrect results will be produced.
+      def auto_skipped(substring)
+        raise ArgumentError if substring.nil?
+        a, b, c, d = @options[:line_start], @options[:column_start], @options[:line_end], @options[:column_end] # save
+        remainder = update_and_return_remainder_for_string(substring)
+        @options[:line_start], @options[:column_start], @options[:line_end], @options[:column_end] = a, b, c, d # restore
+        remainder
+      end
+      
       # Returns the results accumulated so far.
       # Returns an empty array if no results have been accumulated.
       # Returns a single object if only one result has been accumulated.
@@ -60,7 +69,7 @@ module Walrus
         end        
         results.start         = [@original_line_start, @original_column_start]
         results.end           = [@options[:line_end], @options[:column_end]]
-        results.source_text = @scanned.clone
+        results.source_text   = @scanned.clone
         results
       end
       
@@ -76,7 +85,6 @@ module Walrus
     private
       
       def update_and_return_remainder_for_string(input, store = false)
-        
         previous_line_end       = @options[:line_end]                                           # remember old end point
         previous_column_end     = @options[:column_end]                                         # remember old end point
         

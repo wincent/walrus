@@ -236,8 +236,15 @@ module Walrus
       rule            :ruby_expression,                     :unary_expression | :assignment_expression | :addition_expression
       node            :ruby_expression
       
-      rule            :literal_expression,                  :string_literal | :numeric_literal | :array_literal | :hash_literal | :identifier | :constant | :symbol_literal
+      rule            :literal_expression,                  :string_literal     |
+                                                            :numeric_literal    |
+                                                            :array_literal      |
+                                                            :hash_literal       |
+                                                            :lvalue             |
+                                                            :symbol_literal
       rule            :unary_expression,                    :literal_expression | :message_expression
+      
+      rule            :lvalue,                              :class_variable | :instance_variable | :identifier | :constant
       
       rule            :array_literal,                       '['.skip & ( :ruby_expression >> (','.skip & :ruby_expression ).zero_or_more ).optional & ']'.skip
       production      :array_literal.build(:ruby_expression, :elements)
@@ -248,7 +255,7 @@ module Walrus
       rule            :hash_assignment,                     :unary_expression & '=>'.skip & (:unary_expression | :addition_expression)
       production      :hash_assignment.build(:ruby_expression, :lvalue, :expression)
       
-      rule            :assignment_expression,               :identifier & '='.skip & (:addition_expression | :unary_expression)
+      rule            :assignment_expression,               :lvalue & '='.skip & (:addition_expression | :unary_expression)
       production      :assignment_expression.build(:ruby_expression, :lvalue, :expression)
       
       rule            :addition_expression,                 :unary_expression & '+'.skip & (:addition_expression | :unary_expression)
@@ -269,6 +276,14 @@ module Walrus
       rule            :method_parameter,                    :ruby_expression
       rule            :method_parameter_list_without_parentheses, :method_parameter >> ( ','.skip & :method_parameter ).zero_or_more
       
+      rule            :class_variable,                      '@@'.skip & :identifier
+      skipping        :class_variable, nil
+      production      :class_variable.build(:ruby_expression)
+      
+      rule            :instance_variable,                   '@'.skip & :identifier
+      skipping        :instance_variable, nil
+      production      :instance_variable.build(:ruby_expression)
+      
       # TODO: regexp literal expression
       
       # Ruby + allowing placeholders for unary expressions
@@ -278,9 +293,11 @@ module Walrus
       rule            :extended_unary_expression,           :placeholder | :unary_expression
       
       # only after defining the grammar is it safe to extend the classes dynamically created during the grammar definition
+      require 'walrus/walrus_grammar/assignment_expression'
       require 'walrus/walrus_grammar/comment'
       require 'walrus/walrus_grammar/echo_directive'
       require 'walrus/walrus_grammar/escape_sequence'
+      require 'walrus/walrus_grammar/instance_variable'
       require 'walrus/walrus_grammar/literal'
       require 'walrus/walrus_grammar/multiline_comment'
       require 'walrus/walrus_grammar/raw_directive'
