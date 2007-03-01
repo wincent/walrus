@@ -15,21 +15,21 @@ module Walrus
     end
   
     def set_value(key, value)
-      @internal_hash[key] = value
+      @internal_hash[key.to_sym] = value
     end
   
     def get_value(key)
-      @internal_hash[key]
+      @internal_hash[key.to_sym]
     end
   
     def remove_value(key)
-      @internal_hash.delete(key)
+      @internal_hash.delete(key.to_sym)
     end
   
     # Expects a placeholder symbol or String.
     # The parameters are optional.
     def lookup_and_accumulate_placeholder(placeholder, *params)
-      output = self.lookup_and_return_placeholder(placeholder, *params)
+      output = lookup_and_return_placeholder(placeholder, *params)
       @accumulators.last << output if output
     end
   
@@ -37,7 +37,7 @@ module Walrus
       # if exists a method responding to placeholder, call it
       if self.respond_to? placeholder
         @accumulators << nil                            # push new accumulator onto the stack
-        output = self.send(placeholder.to_sym, *params) # call method
+        output = send(placeholder.to_sym, *params)      # call method
         accumulated = @accumulators.pop                 # pop last accumulator from the stack
         if accumulated
           return accumulated
@@ -45,7 +45,7 @@ module Walrus
           return output
         end
       else  # otherwise, try looking it up in the values hash
-        return self.get_value(placeholder)
+        return get_value(placeholder)
       end
     end
   

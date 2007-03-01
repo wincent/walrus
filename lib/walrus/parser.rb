@@ -192,8 +192,9 @@ module Walrus
       rule            :ruby_directive,                      '#ruby'.skip & ((:directive_end & /([^#]+|#(?!end)+)*/ & '#end'.skip & :directive_end) | :here_document)
       production      :ruby_directive.build(:directive, :content)
       
-      rule            :set_directive,                       '#set'.skip & :assignment_expression & :directive_end
-      production      :set_directive.build(:directive, :assignment)
+      # Unlike a normal Ruby assignement expression, the lvalue of a "#set" directive is an identifier preceded by a dollar sign.
+      rule            :set_directive,                       '#set'.skip & /\$(?![ \r\n\t\v])/.skip & :placeholder_name & '='.skip & (:addition_expression | :unary_expression) & :directive_end
+      production      :set_directive.build(:directive, :placeholder, :expression)
       
       # "#silent is the opposite of #echo. It executes an expression but discards the output."
       # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.silent.html
@@ -226,8 +227,13 @@ module Walrus
       
       # placeholders may be in long form (${foo}) or short form ($foo)
       rule            :placeholder,                         :long_placeholder | :short_placeholder
-      rule            :long_placeholder,                    '$'.skip & '{'.skip & :placeholder_name & :placeholder_parameters.optional & '}'.skip
-      rule            :short_placeholder,                   '$'.skip & :placeholder_name & :placeholder_parameters.optional
+      
+      # No whitespace allowed between the "$" and the opening "{"
+      rule            :long_placeholder,                    '${'.skip & :placeholder_name & :placeholder_parameters.optional & '}'.skip
+      
+      # No whitespace allowed between the "$" and the placeholder_name
+      rule            :short_placeholder,                   /\$(?![ \r\n\t\v])/.skip & :placeholder_name & :placeholder_parameters.optional
+      
       rule            :placeholder_name,                    :identifier
       rule            :placeholder_parameters,              '('.skip & (:placeholder_parameter >> (','.skip & :placeholder_parameter).zero_or_more).optional & ')'.skip
       rule            :placeholder_parameter,               :placeholder | :ruby_expression
@@ -302,6 +308,7 @@ module Walrus
       require 'walrus/walrus_grammar/multiline_comment'
       require 'walrus/walrus_grammar/raw_directive'
       require 'walrus/walrus_grammar/raw_text'
+      require 'walrus/walrus_grammar/set_directive'
       require 'walrus/walrus_grammar/silent_directive'
       
     end

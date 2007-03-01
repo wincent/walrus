@@ -1084,10 +1084,32 @@ THERE_DOCUMENT') }.should_raise Grammar::ParseError
     specify 'should be able to parse the "set" directive' do
       
       # assign a string literal 
-      result = @parser.parse('#set foo = "bar"')
+      result = @parser.parse('#set $foo = "bar"')
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SetDirective)
+      result.placeholder.to_s.should == 'foo'
+      result.expression.should be_kind_of(WalrusGrammar::DoubleQuotedStringLiteral)
+      result.expression.lexeme.should == 'bar'
       
       # assign a local variable
-      result = @parser.parse('#set foo = bar')
+      result = @parser.parse('#set $foo = bar')
+      result.should be_kind_of(WalrusGrammar::SetDirective)
+      result.placeholder.to_s.should == 'foo'
+      result.expression.should be_kind_of(WalrusGrammar::Identifier)
+      result.expression.lexeme.should == 'bar'
+      
+      # no whitespace allowed between "$" and placeholder name
+      lambda { @parser.parse('#set $ foo = bar') }.should raise_error(Grammar::ParseError)
+      
+      # "long form" not allowed in #set directives
+      lambda { @parser.parse('#set ${foo} = bar') }.should raise_error(Grammar::ParseError)
+      
+      # explicitly close directive
+      result = @parser.parse('#set $foo = "bar"#')
+      result.should be_kind_of(WalrusGrammar::SetDirective)
+      result.placeholder.to_s.should == 'foo'
+      result.expression.should be_kind_of(WalrusGrammar::DoubleQuotedStringLiteral)
+      result.expression.lexeme.should == 'bar'
       
     end
     
