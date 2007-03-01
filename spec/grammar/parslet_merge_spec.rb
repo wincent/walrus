@@ -18,7 +18,7 @@ module Walrus
         parseable2 = 'bar'.to_parseable
         p1 = ParsletMerge.new(parseable1, parseable2)
         p2 = ParsletSequence.new(parseable1, parseable2)
-        p1.hash.should_not_equal p2.hash
+        p1.hash.should_not == p2.hash
         p1.should_not_eql p2
       end
       

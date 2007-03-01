@@ -19,12 +19,12 @@ module Walrus
       end
       
       specify 'hashes should (ideally) be different if initialized with different parseables' do
-        ParsletChoice.new(@p1, @p2).hash.should_not_equal ParsletChoice.new('baz'.to_parseable, 'abc'.to_parseable).hash.should
+        ParsletChoice.new(@p1, @p2).hash.should_not == ParsletChoice.new('baz'.to_parseable, 'abc'.to_parseable).hash
         ParsletChoice.new(@p1, @p2).should_not_eql ParsletChoice.new('baz'.to_parseable, 'abc'.to_parseable)
       end
       
       specify 'hashes should be different compared to other similar classes even if initialized with the same parseables' do
-        ParsletChoice.new(@p1, @p2).hash.should_not_equal ParsletSequence.new(@p1, @p2).hash
+        ParsletChoice.new(@p1, @p2).hash.should_not == ParsletSequence.new(@p1, @p2).hash
         ParsletChoice.new(@p1, @p2).should_not_eql ParsletSequence.new(@p1, @p2)
       end
       

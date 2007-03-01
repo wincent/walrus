@@ -31,9 +31,9 @@ module Walrus
         p2 = AndPredicate.new(parseable)
         p3 = NotPredicate.new(parseable)
         
-        p1.hash.should_not_equal p2.hash
-        p2.hash.should_not_equal p3.hash
-        p3.hash.should_not_equal p1.hash
+        p1.hash.should_not == p2.hash
+        p2.hash.should_not == p3.hash
+        p3.hash.should_not == p1.hash
         
         p1.should_not_eql p2
         p2.should_not_eql p3
