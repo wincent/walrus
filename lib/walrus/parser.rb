@@ -308,6 +308,7 @@ module Walrus
       require 'walrus/walrus_grammar/multiline_comment'
       require 'walrus/walrus_grammar/raw_directive'
       require 'walrus/walrus_grammar/raw_text'
+      require 'walrus/walrus_grammar/ruby_directive'
       require 'walrus/walrus_grammar/set_directive'
       require 'walrus/walrus_grammar/silent_directive'
       

@@ -48,14 +48,20 @@ module Walrus
         return get_value(placeholder)
       end
     end
-  
-    def accumulate(string)
-      return if string.nil?
+    
+    # Supports two calling methods:
+    #   - if passed a string it will be appended to the accumulator.
+    #   - if not passed a string but given a block will evaluate the block and append the (string) result to the accumulator.
+    def accumulate(string = nil)
       if (@accumulators.last.nil?)  # accumulator will be nil if hasn't been used yet
         @accumulators.pop           # replace temporary nil accumulator
         @accumulators.push("")      # with proper string accumulator
       end
-      @accumulators.last << string.to_s
+      if block_given?
+        @accumulators.last << yield.to_s
+      elsif not string.nil?
+        @accumulators.last << string.to_s
+      end
     end
     
     # Fills (executes) the template body of the receiver and returns the result.

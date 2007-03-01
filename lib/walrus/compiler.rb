@@ -59,6 +59,8 @@ module Walrus
           element.compile(options).each { |line| template_body << BODY_INDENT + line } # indent by 6 spaces
         end
         
+        # NOTE: I am currently indenting even the code that comes inside #ruby blocks, may need to consider special casing it
+        
         options = {}
         
       end
