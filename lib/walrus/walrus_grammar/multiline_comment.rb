@@ -17,12 +17,26 @@ module Walrus
             if item.kind_of? Comment
               compiled << '# (nested) ' + item.compile 
             else
-              compiled << '# MultilineComment:' + item.to_s + "\n"
+              first = true
+              item.to_s.each do |line|
+                if first
+                  first = false
+                  compiled << '# MultilineComment:' + line.to_s.chomp + "\n"
+                else
+                  compiled << '# MultilineComment (continued):' + line.to_s.chomp + "\n"
+                end
+              end
             end
           end
         else # no nesting, just raw text, but still must check for multiple lines
+          first = true
           @content.to_s.each do |line|
-            compiled << '# MultilineComment:' + line.to_s + "\n"
+            if first
+              first = false
+              compiled << '# MultilineComment:' + line.to_s.chomp + "\n"
+            else
+              compiled << '# MultilineComment (continued):' + line.to_s.chomp + "\n"
+            end
           end
         end
         compiled
