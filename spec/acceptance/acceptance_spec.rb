@@ -29,7 +29,6 @@ module Walrus
       
       @template_paths.each_with_index do |template, index|
         compiled        = @parser.compile(IO.read(template), :class_name => @class_names[index])
-        puts compiled
         actual_output   = self.class.class_eval(compiled)
         expected_output = IO.read(@expected_output_paths[index])
         specify "actual output should match expected output bypassing 'walrus' commandline tool (source file: #{template})" do
