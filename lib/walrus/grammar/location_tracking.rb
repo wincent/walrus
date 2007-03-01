@@ -13,18 +13,12 @@ module Walrus
       
       def source_text=(string)
         @source_text = string.to_s.clone
-      rescue NoMethodError
-        @source_text = string.to_s
       end
       
       # Sets @column_start to col.
       # Sets @column_start to 0 if passed nil (for ease of use, users of classes that mix-in this module don't have to worry about special casing nil values).
       def column_start=(column_start)
-        @column_start = column_start.to_i.clone
-      rescue TypeError
         @column_start = column_start.to_i
-      rescue NoMethodError
-        @column_start = 0
       end
       
       # Returns 0 if @column_start is nil (for ease of use, users of classes that mix-in this module don't have to worry about special casing nil values).
@@ -35,11 +29,7 @@ module Walrus
       # Sets @line_start to line.
       # Sets @line_start to 0 if passed nil (for ease of use, users of classes that mix-in this module don't have to worry about special casing nil values).
       def line_start=(line_start)
-        @line_start = line_start.to_i.clone
-      rescue TypeError
         @line_start = line_start.to_i
-      rescue NoMethodError
-        @line_start = 0
       end
       
       # Returns 0 if @line_start is nil (for ease of use, users of classes that mix-in this module don't have to worry about special casing nil values).
@@ -61,11 +51,7 @@ module Walrus
       end
       
       def line_end=(line_end)
-        @line_end = line_end.to_i.clone
-      rescue TypeError
         @line_end = line_end.to_i
-      rescue NoMethodError
-        @line_end = 0
       end
       
       def line_end
@@ -73,11 +59,7 @@ module Walrus
       end
       
       def column_end=(column_end)
-        @column_end = column_end.to_i.clone
-      rescue TypeError
         @column_end = column_end.to_i
-      rescue NoMethodError
-        @column_end = 0
       end
       
       def column_end
