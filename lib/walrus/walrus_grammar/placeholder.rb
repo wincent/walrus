@@ -10,6 +10,10 @@ module Walrus
       
       def compile(options = {})
         # basic implementation to begin with (no parameters)
+        "lookup_and_accumulate_placeholder(#{@name.to_s.to_sym.inspect})\n"
+        
+        # special case when placeholder is not used as part of literal text; return the value rather than accumulating
+        
       end
       
     end # class Placeholder

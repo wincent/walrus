@@ -227,12 +227,15 @@ module Walrus
       
       # placeholders may be in long form (${foo}) or short form ($foo)
       rule            :placeholder,                         :long_placeholder | :short_placeholder
+      node            :placeholder
       
       # No whitespace allowed between the "$" and the opening "{"
-      rule            :long_placeholder,                    '${'.skip & :placeholder_name & :placeholder_parameters.optional & '}'.skip
+      rule            :long_placeholder,                    '${'.skip & :placeholder_name & :placeholder_parameters.optional([]) & '}'.skip
+      production      :long_placeholder.build(:placeholder, :name, :params)
       
       # No whitespace allowed between the "$" and the placeholder_name
-      rule            :short_placeholder,                   /\$(?![ \r\n\t\v])/.skip & :placeholder_name & :placeholder_parameters.optional
+      rule            :short_placeholder,                   /\$(?![ \r\n\t\v])/.skip & :placeholder_name & :placeholder_parameters.optional([])
+      production      :short_placeholder.build(:placeholder, :name, :params)
       
       rule            :placeholder_name,                    :identifier
       rule            :placeholder_parameters,              '('.skip & (:placeholder_parameter >> (','.skip & :placeholder_parameter).zero_or_more).optional & ')'.skip
@@ -308,6 +311,7 @@ module Walrus
       require 'walrus/walrus_grammar/instance_variable'
       require 'walrus/walrus_grammar/literal'
       require 'walrus/walrus_grammar/multiline_comment'
+      require 'walrus/walrus_grammar/placeholder'
       require 'walrus/walrus_grammar/raw_directive'
       require 'walrus/walrus_grammar/raw_text'
       require 'walrus/walrus_grammar/ruby_directive'
