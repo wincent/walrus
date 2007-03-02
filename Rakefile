@@ -49,10 +49,15 @@ Spec::Rake::SpecTask.new('specdoc') do |t|
 end
 
 desc 'Build C extensions'
-task :make => [:jindex]
+task :make => [:jindex, :mkdtemp]
 
 desc 'Build jindex extension'
 task :jindex do |t|
   system %{cd ext/jindex && ruby ./extconf.rb && make && cp jindex.bundle ../ && cd -}
+end
+
+desc 'Build mkdtemp extension'
+task :mkdtemp do |t|
+  system %{cd ext/mkdtemp && ruby ./extconf.rb && make && cp mkdtemp.bundle ../ && cd -}
 end
 
