@@ -1,0 +1,13 @@
+## This example shows some alternative ways of causing #def content to appear in the output
+## (by default #def content is not automatically injected into the output)
+#def block1
+This is block 1. It will be injected using the \#silent directive.
+#end
+#def block2
+This is block 2. It will be injected using the \#ruby directive.
+#end
+#silent block1### no need to call "accumulate" here because the block already does that.
+#ruby
+# no need to call "accumulate" here because the block already does that.
+block2
+#end

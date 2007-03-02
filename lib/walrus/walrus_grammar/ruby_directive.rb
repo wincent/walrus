@@ -10,11 +10,11 @@ module Walrus
       
       # TODO: could make a #rubyecho method that did an "accumulate do" instead of instance_eval
       def compile(options = {})
-        <<-ENDDOC
-instance_eval do # Ruby directive
-#{@content}
-end
-        ENDDOC
+        # possible problem here is that the compiler will indent each line for us, possibly breaking here docs etc
+        # seeing as it is going to be indented anyway, I add some additional indenting here for pretty printing purposes
+        compiled = "instance_eval do # Ruby directive\n"
+        @content.to_s.each { |line| compiled << '  ' + line }
+        compiled << "end\n"
       end
       
     end # class RawDirective

@@ -1,0 +1,3 @@
+This is block 1. It will be injected using the #silent directive.
+
+This is block 2. It will be injected using the #ruby directive.

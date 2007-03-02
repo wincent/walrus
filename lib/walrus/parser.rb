@@ -60,9 +60,9 @@ module Walrus
       rule            :numeric_literal,                     /\d+\.\d+|\d+(?!\.)/
       production      :numeric_literal.build(:literal)
       rule            :identifier,                          /[a-z_][a-zA-Z0-9_]*/
-      production      :identifier.build(:node)
+      production      :identifier.build(:literal)
       rule            :constant,                            /[A-Z][a-zA-Z0-9_]*/
-      production      :constant.build(:node)
+      production      :constant.build(:literal)
       rule            :symbol_literal,                      /:[a-zA-Z_][a-zA-Z0-9_]*/
       production      :symbol_literal.build(:literal)
       
