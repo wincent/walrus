@@ -15,20 +15,18 @@
 # 
 
 require 'getoptlong'
-
-# http://rubyforge.org/tracker/?func=detail&atid=1698&aid=5563&group_id=426
-require 'rdoc/ri/ri_paths'
+require 'rdoc/ri/ri_paths' # temporary workaround; see: http://rubyforge.org/tracker/?func=detail&atid=1698&aid=5563&group_id=426
 require 'rdoc/usage'
 
-opts = Getoptlong.new(
-  ['--compile',         '-c', Getoptlong::NO_ARGUMENT ],
-  ['--fill',            '-f', Getoptlong::NO_ARGUMENT ],
-  ['--input-file',      '-i', Getoptlong::REQUIRED_ARGUMENT ],
-  ['--output-file',     '-o', Getoptlong::REQUIRED_ARGUMENT ],
-  ['--output-extension',      Getoptlong::REQUIRED_ARGUMENT ],
-  ['--debug',           '-d', Getoptlong::NO_ARGUMENT ],
-  ['--help',            '-h', Getoptlong::NO_ARGUMENT ],
-  ['--version',         '-v', Getoptlong::NO_ARGUMENT ]
+opts = GetoptLong.new(
+  ['--compile',         '-c', GetoptLong::NO_ARGUMENT ],
+  ['--fill',            '-f', GetoptLong::NO_ARGUMENT ],
+  ['--input-file',      '-i', GetoptLong::REQUIRED_ARGUMENT ],
+  ['--output-file',     '-o', GetoptLong::REQUIRED_ARGUMENT ],
+  ['--output-extension',      GetoptLong::REQUIRED_ARGUMENT ],
+  ['--debug',           '-d', GetoptLong::NO_ARGUMENT ],
+  ['--help',            '-h', GetoptLong::NO_ARGUMENT ],
+  ['--version',         '-v', GetoptLong::NO_ARGUMENT ]
 )
 
 
