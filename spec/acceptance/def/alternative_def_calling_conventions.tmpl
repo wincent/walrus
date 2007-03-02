@@ -6,8 +6,13 @@ This is block 1. It will be injected using the \#silent directive.
 #def block2
 This is block 2. It will be injected using the \#ruby directive.
 #end
-#silent block1### no need to call "accumulate" here because the block already does that.
+#def block3
+This is block 3. It will be referenced using a placeholder.
+#end
+## no need to call "accumulate" here because the block already does that.
+#silent block1
 #ruby
 # no need to call "accumulate" here because the block already does that.
 block2
 #end
+$block3
