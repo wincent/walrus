@@ -1,0 +1,4 @@
+By default, text which appears in a template is considered to be part of the "template_body" block.
+In the Document superclass from which all compiled templates ultimately inherit, the "template_body"
+block is empty (it emits nothing). So, if I call #super from within the top-level of this template
+it will have no effect on the output.

@@ -313,7 +313,8 @@ module Walrus
       require 'walrus/walrus_grammar/ruby_directive'
       require 'walrus/walrus_grammar/set_directive'
       require 'walrus/walrus_grammar/silent_directive'
-      
+      require 'walrus/walrus_grammar/super_directive'
+            
     end
     
   end # class Parser
