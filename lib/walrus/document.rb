@@ -30,14 +30,14 @@ module Walrus
     # The parameters are optional.
     def lookup_and_accumulate_placeholder(placeholder, *params)
       output = lookup_and_return_placeholder(placeholder, *params)
-      @accumulators.last << output if output
+      accumulate(output) if output
     end
   
     def lookup_and_return_placeholder(placeholder, *params)
       # if exists a method responding to placeholder, call it
       if self.respond_to? placeholder
         @accumulators << nil                            # push new accumulator onto the stack
-        output = send(placeholder.to_sym, *params)      # call method
+        output = send(placeholder, *params)             # call method
         accumulated = @accumulators.pop                 # pop last accumulator from the stack
         if accumulated
           return accumulated

@@ -34,15 +34,10 @@ module Walrus
       
       # begin tree walk
       tree.each do |element|
-        if element.kind_of? WalrusGrammar::DefDirective         # merely defines a block, doesn't output it
-          
-          # how to handle nesting here: if a two element array is returned, expect it to be [outside, inside] (nil is ok)
-          # otherwise, just assume it is for the inside?
-          
-          element.compile(options).each { |line| outside_body  << OUTSIDE_INDENT + line } 
-          if element.kind_of? WalrusGrammar::BlockDirective    # special case of block: defines a block and includes its output in the template_body
-            template_body << BODY_INDENT    + "accumulate($#{element.identifier})\n"
-          end
+        if element.kind_of? WalrusGrammar::DefDirective         # special case: def (and block) directives may return two items
+          inner, outer = element.compile(options)
+          outer.each { |line| outside_body << OUTSIDE_INDENT + line } if outer
+          inner.each { |line| template_body << BODY_INDENT + line } if inner
         elsif element.kind_of? WalrusGrammar::ExtendsDirective  # defines superclass and automatically invoke #super (super) at the head of the template_body
           raise CompileError.new('#extends may be used only once per template') unless extends_directive.nil?
           raise CompileError.new('illegal #extends (#import already used in this template)') unless import_directive.nil?

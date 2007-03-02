@@ -300,7 +300,9 @@ module Walrus
       
       # only after defining the grammar is it safe to extend the classes dynamically created during the grammar definition
       require 'walrus/walrus_grammar/assignment_expression'
+      require 'walrus/walrus_grammar/block_directive'
       require 'walrus/walrus_grammar/comment'
+      require 'walrus/walrus_grammar/def_directive'
       require 'walrus/walrus_grammar/echo_directive'
       require 'walrus/walrus_grammar/escape_sequence'
       require 'walrus/walrus_grammar/instance_variable'
