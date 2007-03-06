@@ -23,6 +23,7 @@ module Walrus
       @options.recurse            = false
       @options.backup             = true
       @options.debug              = false
+      @options.dry                = false
       @options.verbose            = false
       
       @command  = nil # "compile", "fill" (saves to disk), "run" (prints to standard out)
@@ -67,6 +68,10 @@ module Walrus
           @options.backup = opt
         end
         
+        o.on('-t', '--test', 'Performs a "dry" (test) run', 'default: off') do |opt|
+          @options.dry = opt
+        end
+        
         o.on_tail('-d', '--debug', 'Print debugging information to standard error', 'default: off') do |opt|
           @options.debug = opt
         end
@@ -108,12 +113,11 @@ module Walrus
         when 'fill'
           log "Filling #{input}."
           compile_if_needed(input)
-          output = `#{compiled_source_path_for_input(input).realpath}`
-          write_string_to_path(output, filled_output_path_for_input(input))
+          write_string_to_path(get_output(input), filled_output_path_for_input(input))
         when 'run'
           log "Running #{input}."
           compile_if_needed(input)
-          printf('%s',`#{compiled_source_path_for_input(input).realpath}`)
+          printf('%s', get_output(input))
           $stdout.flush
         else
           raise ArgumentError.new("unrecognized command '#{@command}'")
@@ -174,8 +178,20 @@ module Walrus
       
     end
     
+    def get_output(input)
+      if @options.dry
+        "(no output: dry run)\n"
+      else
+        `#{compiled_source_path_for_input(input).realpath}`
+      end
+    end
+    
     def write_string_to_path(string, path)
-      log "Writing #{path}."      
+      if @options.dry
+        log "Would write #{path} (dry run)."
+        return
+      end
+      log "Writing #{path}."
       File.open(path, "a+") do |f|
         if not File.zero? path and @options.backup
           log "Making backup of existing file at #{path}."
