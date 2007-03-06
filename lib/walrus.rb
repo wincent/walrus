@@ -13,6 +13,7 @@ module Walrus
   autoload(:Grammar,                      'walrus/grammar')
   autoload(:Parser,                       'walrus/parser')
   autoload(:NoParameterMarker,            'walrus/no_parameter_marker')
+  autoload(:Template,                     'walrus/template')
   
   class Grammar
     

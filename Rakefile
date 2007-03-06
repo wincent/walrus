@@ -1,3 +1,5 @@
+# $Id$
+
 require 'rake'
 require 'rubygems'
 require 'spec/rake/spectask'
@@ -9,20 +11,6 @@ desc 'Install'
 task :install do
   raise 'Not yet implemented'
 end
-
-Rake::TestTask.new do |t|
-  t.test_files  = FileList['tests/tests.rb']
-  t.verbose     = true
-  t.warning     = true
-end
-
-# Alternate test-running task
-#Rake::TestTask.new do |t|
-#  t.test_files  =   FileList['tests/**/*_test.rb']
-#  t.verbose     =   true
-#  t.warning     =   true
-#  t.libs        <<  'lib'
-#end
 
 desc 'Run specs with coverage'
 Spec::Rake::SpecTask.new('coverage') do |t|

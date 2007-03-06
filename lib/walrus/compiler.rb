@@ -8,12 +8,13 @@ module Walrus
     
     BODY_INDENT     = ' ' * 8
     OUTSIDE_INDENT  = ' ' * 6
+    DEFAULT_CLASS   = 'DocumentSubclass'
     
     # Walks the Abstract Syntax Tree, tree, that represents a parsed Walrus template.
     # Returns a String that defines a Document subclass corresponding to the compiled version of the tree.
     def compile(tree, options = {})
       
-      class_name = (options[:class_name] || 'DocumentSubclass').to_s
+      class_name = (options[:class_name] || DEFAULT_CLASS).to_s
       
       # everything that produces output (placeholders, rawtext etc) is implicitly included in the "template_body" block
       # there are somethings which explicitly occur outside of the "template_body" block: #def blocks for example.

@@ -1,33 +1,39 @@
 #!/usr/bin/env ruby
+# Copyright 2007 Wincent Colaiuta
+# $Id: diff.rb 89 2007-02-26 15:35:56Z wincent $
 
-#
-# = Synopsis
-# 
-# walrus: command-line front-end for the Walrus templating system
-# 
-# = Usage
-#
-#   --debug, -d: print debug information to the standard error during processing
-#   --help, -h: show help
-#   
-#   --version, -v: show version information
-# 
-# 
+module Walrus
+  
+  EXIT_LOAD_ERROR     = 1
+  EXIT_ARGUMENT_ERROR = 2
+  EXIT_OTHER_ERROR    = 3
+  
+  begin
+    require 'walrus/runner'
+  rescue LoadError => e
+    $stderr.puts <<-HERE
+Error: load error (#{e})
 
-require 'getoptlong'
-require 'rdoc/ri/ri_paths' # temporary workaround; see: http://rubyforge.org/tracker/?func=detail&atid=1698&aid=5563&group_id=426
-require 'rdoc/usage'
+If you are trying to run Walrus but have not yet installed it, it may be that
+Ruby cannot find the Walrus files. You can help Ruby to find the Walrus "lib"
+and "ext" directories by adding them to the RUBYLIB environment variable. For
+example, you could do the following if you are using the Bash shell, ideally
+substituting absolute paths for "lib" and "ext":
 
-opts = GetoptLong.new(
-  ['--compile',         '-c', GetoptLong::NO_ARGUMENT ],
-  ['--fill',            '-f', GetoptLong::NO_ARGUMENT ],
-  ['--input-file',      '-i', GetoptLong::REQUIRED_ARGUMENT ],
-  ['--output-file',     '-o', GetoptLong::REQUIRED_ARGUMENT ],
-  ['--output-extension',      GetoptLong::REQUIRED_ARGUMENT ],
-  ['--debug',           '-d', GetoptLong::NO_ARGUMENT ],
-  ['--help',            '-h', GetoptLong::NO_ARGUMENT ],
-  ['--version',         '-v', GetoptLong::NO_ARGUMENT ]
-)
+  export RUBYLIB="${RUBYLIB}:lib:ext"
 
-
-RDoc::usage
+    HERE
+    exit EXIT_LOAD_ERROR
+  end
+  
+  begin  
+    Runner.new.run
+  rescue Runner::ArgumentError => e
+    $stderr.puts "Error: #{e}", "For usage information type: #{$0} --help"
+    exit EXIT_ARGUMENT_ERROR
+  rescue Runner::Error => e
+    $stderr.puts "Error: #{e}"
+    exit EXIT_OTHER_ERROR
+  end
+  
+end # module Walrus
