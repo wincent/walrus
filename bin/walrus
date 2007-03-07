@@ -12,7 +12,7 @@ module Walrus
     require 'walrus/runner'
   rescue LoadError => e
     $stderr.puts <<-HERE
-Error: load error (#{e})
+Error: load error (#{e.to_s})
 
 If you are trying to run Walrus but have not yet installed it, it may be that
 Ruby cannot find the Walrus files. You can help Ruby to find the Walrus "lib"
@@ -29,10 +29,10 @@ substituting absolute paths for "lib" and "ext":
   begin  
     Runner.new.run
   rescue Runner::ArgumentError => e
-    $stderr.puts "Error: #{e}", "For usage information type: #{$0} --help"
+    $stderr.puts "Error: #{e.to_s}", "For usage information type: #{$0} --help"
     exit EXIT_ARGUMENT_ERROR
   rescue Runner::Error => e
-    $stderr.puts "Error: #{e}"
+    $stderr.puts "Error: #{e.to_s}"
     exit EXIT_OTHER_ERROR
   end
   

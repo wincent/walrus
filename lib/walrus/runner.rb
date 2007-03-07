@@ -18,11 +18,13 @@ module Walrus
     def initialize
       
       @options = OpenStruct.new
+      @options.output_dir         = nil
       @options.input_extension    = 'tmpl'
       @options.output_extension   = 'html'
       @options.recurse            = false
       @options.backup             = true
       @options.debug              = false
+      @options.halt               = false
       @options.dry                = false
       @options.verbose            = false
       
@@ -48,15 +50,15 @@ module Walrus
         o.separator '          run     -- runs compiled templates, printing output to standard output'
         o.separator ''
         
-        o.on('-o', '--output-dir', 'Output directory', 'defaults to same directory as input file') do |opt|
-          @options.output_dir = opt
+        o.on('-o', '--output-dir DIR', 'Output directory (must already exist)', 'defaults to same directory as input file') do |opt|
+          @options.output_dir = Pathname.new(opt)
         end
         
-        o.on('-i', '--input-extension', 'Extension for input file(s)', 'default: tmpl') do |opt|
+        o.on('-i', '--input-extension EXT', 'Extension for input file(s)', 'default: tmpl') do |opt|
           @options.input_extension = opt
         end
         
-        o.on('-e', '--output-extension', 'Extension for output file(s) (when filling)', 'default: html') do |opt|
+        o.on('-e', '--output-extension EXT', 'Extension for output file(s) (when filling)', 'default: html') do |opt|
           @options.output_extension = opt
         end
         
@@ -64,25 +66,31 @@ module Walrus
           @options.recurse = opts
         end
         
-        o.on('-b', '--[no-]backup', 'Make backups before overwriting', 'default: backup') do |opt|
+        o.on('-b', '--[no-]backup', 'Make backups before overwriting', 'default: on') do |opt|
           @options.backup = opt
+        end
+        
+        o.on('--halt', 'Halts on encountering an error (even a non-fatal error)', 'default: off') do |opt|
+          @options.halt = opt
         end
         
         o.on('-t', '--test', 'Performs a "dry" (test) run', 'default: off') do |opt|
           @options.dry = opt
         end
         
-        o.on_tail('-d', '--debug', 'Print debugging information to standard error', 'default: off') do |opt|
+        o.on('-d', '--debug', 'Print debugging information to standard error', 'default: off') do |opt|
           @options.debug = opt
         end
+        
+        o.on('-v', '--verbose', 'Run verbosely', 'default: off') do |opt|
+          @options.verbose = opt
+        end
+        
+        o.separator ''
         
         o.on_tail('-h', '--help', 'Show this message') do
           $stderr.puts o
           exit
-        end
-        
-        o.on_tail('-v', '--verbose', 'Run verbosely', 'default: off') do |opt|
-          @options.verbose = opt
         end
         
         o.on_tail('--version', 'Show version') do
@@ -92,7 +100,12 @@ module Walrus
         
       end
       
-      parser.parse!
+      begin
+        parser.parse!
+      rescue OptionParser::InvalidOption => e
+        raise ArgumentError.new(e)
+      end
+      
       parser.order! do |item|
         if @command.nil? :  @command = item               # get command first ("compile", "fill" or "run")
         else                @inputs << Pathname.new(item) # all others (and there must be at least one) are file or directory names
@@ -127,8 +140,7 @@ module Walrus
     end
     
     # Expects an array of Pathname objects.
-    # Any file inputs are passed through the "sanitize_input" method.
-    # If an input is a directory then its contents are also checked: file inputs are passed through the "sanitize_input" method, and directory inputs are themselves recursively expanded if the "recurse" option is set to true.
+    # Directory inputs are themselves recursively expanded if the "recurse" option is set to true; otherwise only their top-level entries are expanded.
     # Returns an expanded array of Pathname objects.
     def expand(inputs)
       expanded = []
@@ -163,16 +175,16 @@ module Walrus
         begin
           template = Template.new(template_source_path)
         rescue Exception => e
-          raise Error.new("failed to read input template '#{template_source_path}' (#{e.to_s})")
+          handle_error("failed to read input template '#{template_source_path}' (#{e.to_s})")
         end
         
         begin
           compiled = template.compile
         rescue Grammar::ParseError => e
-          raise Error.new("failed to compile input template '#{template_source_path}' (#{e.to_s})")
+          handle_error("failed to compile input template '#{template_source_path}' (#{e.to_s})")
         end
         
-        write_string_to_path(compiled, compiled_path)
+        write_string_to_path(compiled, compiled_path, true)
         
       end
       
@@ -186,21 +198,36 @@ module Walrus
       end
     end
     
-    def write_string_to_path(string, path)
+    def write_string_to_path(string, path, executable = false)
+      
+      if @options.output_dir
+        if path.absolute?
+          path = @options.output_dir + path.to_s.sub(/\A\//, '')
+        else
+          path = @options.output_dir + path
+        end
+      end
+      
       if @options.dry
         log "Would write #{path} (dry run)."
         return
       end
+      
       log "Writing #{path}."
-      File.open(path, "a+") do |f|
-        if not File.zero? path and @options.backup
-          log "Making backup of existing file at #{path}."
-          dir, base = path.split
-          FileUtils.cp path, dir + "#{base.to_s}.bak"
+      begin
+        File.open(path, "a+") do |f|
+          if not File.zero? path and @options.backup
+            log "Making backup of existing file at #{path}."
+            dir, base = path.split
+            FileUtils.cp path, dir + "#{base.to_s}.bak"
+          end
+          f.flock File::LOCK_EX
+          f.truncate 0
+          f.write string
+          f.chmod 0744 if executable
         end
-        f.flock File::LOCK_EX
-        f.truncate 0
-        f.write string
+      rescue SystemCallError => e
+        handle_error(e)
       end
     end
     
@@ -248,15 +275,24 @@ module Walrus
     
   private
     
-    # Writes to standard error if @options.verbose is true.
+    # Writes "message" to standard error if user supplied the "--verbose" switch.
     def log(message)
       if @options.verbose
         $stderr.puts message
       end
     end
     
+    # If the user supplied the "--halt" switch raises an Runner::Error exception based on "message". Otherwise merely prints "message" to the standard error.
+    def handle_error(message)
+      if @options.halt
+        raise Error.new(message)
+      else
+        $stderr.puts message
+      end
+    end
+    
+    
   end # class Runner
   
 end # module Walrus
-
 
