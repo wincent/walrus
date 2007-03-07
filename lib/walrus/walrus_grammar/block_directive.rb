@@ -12,7 +12,7 @@ module Walrus
       def compile(options = {})
         inner, outer = super
         inner = '' if inner.nil?
-        inner << "  lookup_and_accumulate_placeholder(#{@identifier.to_s.to_sym.inspect})\n"
+        inner << "lookup_and_accumulate_placeholder(#{@identifier.to_s.to_sym.inspect})\n"
         [inner, outer]
       end
       

@@ -4,6 +4,7 @@
 # $Id$
 
 require 'walrus'
+require 'pathname'
 
 module Walrus
   
@@ -13,26 +14,26 @@ module Walrus
     def initialize
       @internal_hash = {}
     end
-  
+    
     def set_value(key, value)
       @internal_hash[key.to_sym] = value
     end
-  
+    
     def get_value(key)
       @internal_hash[key.to_sym]
     end
-  
+    
     def remove_value(key)
       @internal_hash.delete(key.to_sym)
     end
-  
+    
     # Expects a placeholder symbol or String.
     # The parameters are optional.
     def lookup_and_accumulate_placeholder(placeholder, *params)
       output = lookup_and_return_placeholder(placeholder, *params)
       accumulate(output) if output
     end
-  
+    
     def lookup_and_return_placeholder(placeholder, *params)
       # if exists a method responding to placeholder, call it
       if self.respond_to? placeholder
@@ -85,6 +86,27 @@ module Walrus
       self.new.run      # When run from the command line the default action is to call "run".
     else
       self.new.fill     # in other cases, evaluate 'fill' (if run inside an eval, will return filled content)
+    end
+    
+    def self.require(file, fallback)
+      begin
+        Kernel::require file
+      rescue LoadError => e
+        candidate = Pathname.new(fallback).dirname.realpath                             # try adding directory of current file into load path
+        if $:.any? { |path| Pathname.new(path).realpath == candidate rescue false }     # already in load path!
+          raise e # re-raise original error
+        else
+          begin
+            $:.push(candidate)                                                          # make only a temporary change to the load path
+            status = Kernel::require file                                               # remember return status
+          rescue LoadError
+            raise e                                                                     # re-raise original error
+          ensure
+            $:.pop                                                                      # put load path back the way it was
+            status                                                                      # return 'require' status
+          end  
+        end
+      end
     end
     
   end # class Document

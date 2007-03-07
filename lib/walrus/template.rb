@@ -34,7 +34,7 @@ module Walrus
     # Parses template, returning compiled input (suitable for writing to disk).
     def compile
       @parser   ||= Parser.new
-      @compiled ||= @parser.compile(@base_text, class_name)
+      @compiled ||= @parser.compile(@base_text, :class_name => class_name)
     end
     
     # Returns the compiled text of the receiver

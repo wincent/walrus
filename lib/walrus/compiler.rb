@@ -15,7 +15,6 @@ module Walrus
     def compile(tree, options = {})
       
       class_name = (options[:class_name] || DEFAULT_CLASS).to_s
-      
       # everything that produces output (placeholders, rawtext etc) is implicitly included in the "template_body" block
       # there are somethings which explicitly occur outside of the "template_body" block: #def blocks for example.
       
@@ -42,11 +41,11 @@ module Walrus
         elsif element.kind_of? WalrusGrammar::ExtendsDirective  # defines superclass and automatically invoke #super (super) at the head of the template_body
           raise CompileError.new('#extends may be used only once per template') unless extends_directive.nil?
           raise CompileError.new('illegal #extends (#import already used in this template)') unless import_directive.nil?
-          extends_directive = element.class_name
+          extends_directive = element.class_name.to_s
         elsif element.kind_of? WalrusGrammar::ImportDirective   # defines superclass with no automatic invocation of #super on the template_body
           raise CompileError.new('#import may be used only once per template') unless import_directive.nil?
           raise CompileError.new('illegal #import (#extends already used in this template)') unless extends_directive.nil?
-          import_directive = element.class_name
+          import_directive = element.class_name.to_s
         elsif  element.kind_of? WalrusGrammar::Comment and element.column_start == 0  # special case if comment is only thing on input line
           template_body << BODY_INDENT + element.compile(options)
           options[:slurping] = true
@@ -61,16 +60,23 @@ module Walrus
         
       end
       
+      if extends_directive
+        template_body.unshift BODY_INDENT + "super # (invoked automatically due to Extends directive)\n"
+      end
+      
       superclass_name = import_directive || extends_directive || 'Document'
-      if superclass_name != 'Document'  :   superclass_implementation = superclass_name.to_require_name
-      else                                  superclass_implementation = 'walrus/document'
+      if superclass_name != 'Document'
+        superclass_implementation = superclass_name.to_require_name
+        require_line = "require 'walrus/document'\nWalrus::Document::require '#{superclass_implementation}', __FILE__"
+      else
+        require_line = "require 'walrus/document'"
       end
       
       <<-RETURN
-#!/usr/bin/env ruby
-# Generated #{Time.new.to_s} by Walrus version #{VERSION}
+\#!/usr/bin/env ruby
+\# Generated #{Time.new.to_s} by Walrus version #{VERSION}
 
-require '#{superclass_implementation}'
+#{require_line}
 
 module Walrus
   
@@ -90,11 +96,11 @@ module Walrus
         self.new.fill
       end
       
-    end # #{class_name}
+    end \# #{class_name}
     
-  end # WalrusGrammar
+  end \# WalrusGrammar
   
-end # Walrus
+end \# Walrus
 
       RETURN
       

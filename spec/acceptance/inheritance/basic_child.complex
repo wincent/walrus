@@ -1,0 +1,4 @@
+#extends BasicParent
+#block footer
+This is the overridden footer.
+#end

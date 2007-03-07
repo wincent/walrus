@@ -175,9 +175,7 @@ module Walrus
     def compile(input, force = true)
       template_source_path  = template_source_path_for_input(input)
       compiled_path         = compiled_source_path_for_input(input)
-      
       if force or not compiled_path.exist?
-        
         begin
           template = Template.new(template_source_path)
         rescue Exception => e
