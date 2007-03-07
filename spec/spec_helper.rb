@@ -12,9 +12,10 @@ module Walrus
     
     if not const_defined? "LIBDIR"
       # will append the local "lib" and "ext" directories to search path if not already present
-      LIBDIR  = Pathname.new(File.join(File.dirname(__FILE__), '..', 'lib')).realpath
-      EXTDIR  = Pathname.new(File.join(LIBDIR, '..', 'ext')).realpath
-      
+      base    = File.join(File.dirname(__FILE__), '..')
+      LIBDIR  = Pathname.new(File.join(base, 'lib')).realpath
+      EXTDIR  = Pathname.new(File.join(base, 'ext')).realpath
+      TOOL    = Pathname.new(File.join(base, 'bin', 'walrus')).realpath
       # normalize all paths in the load path (use "rescue" because "realpath" will raise if lstat(2) fails for the path: non-existent paths, relative paths etc)
       normalized = $:.collect { |path| Pathname.new(path).realpath rescue path }
       

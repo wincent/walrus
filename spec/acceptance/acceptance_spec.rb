@@ -16,8 +16,9 @@ module Walrus
       # construct an array of absolute paths indicating the location of all testable templates.
       @template_paths = Dir[File.join(File.dirname(__FILE__), '**/*.tmpl')].collect { |template| Pathname.new(template).realpath }
       
-      # make temporary output dir for storing compiled templates
-      tmpdir = Pathname.new(Dir.mkdtemp('/tmp/walrus.acceptance.XXXXXX'))
+      # make temporary output dirs for storing compiled templates
+      manually_compiled_templates = Pathname.new(Dir.mkdtemp('/tmp/walrus.acceptance.XXXXXX'))
+      walrus_compiled_templates   = Pathname.new(Dir.mkdtemp('/tmp/walrus.acceptance.XXXXXX'))
       
       @parser = Parser.new
       
@@ -33,14 +34,20 @@ module Walrus
         end
         
         specify "actual output should match expected output running compiled file in subshell (source file: #{path})" do
-          target_path = tmpdir.join(path.basename(path.extname).to_s + '.rb')
+          target_path = manually_compiled_templates.join(path.basename(path.extname).to_s + '.rb')
           File.open(target_path, 'w+') { |file| file.puts compiled }
           actual_output = `ruby -I#{Walrus::SpecHelper::LIBDIR} -I#{Walrus::SpecHelper::EXTDIR} #{target_path}`
           actual_output.should == expected_output
         end
         
         specify "actual output should match expected output using 'walrus' commandline tool (source file: #{path})" do
-          
+          # use "env" to set up environment?
+          `#{Walrus::SpecHelper::TOOL} fill --output-dir '#{walrus_compiled_templates}' '#{path}'`
+          dir, base = path.split
+          dir   = dir.to_s.sub(/\A\//, '') if dir.absolute?
+          base  = base.basename(base.extname).to_s + '.html'
+          actual_output = IO.read(walrus_compiled_templates + dir + base)
+          actual_output.should == expected_output
         end
         
       end

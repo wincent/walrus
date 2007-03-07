@@ -119,10 +119,10 @@ module Walrus
       expand(@inputs).each do |input|
         case @command
         when 'compile'
-          log "Compiling #{input}."
+          log "Compiling '#{input}'."
           compile(input)
         when 'fill'
-          log "Filling #{input}."
+          log "Filling '#{input}'."
           compile_if_needed(input)
           begin
             write_string_to_path(get_output(input), filled_output_path_for_input(input))
@@ -130,7 +130,7 @@ module Walrus
             handle_error(e)
           end
         when 'run'
-          log "Running #{input}."
+          log "Running '#{input}'."
           compile_if_needed(input)
           begin
             printf('%s', get_output(input))
@@ -208,34 +208,48 @@ module Walrus
     
     def write_string_to_path(string, path, executable = false)
       
+      if @options.dry
+        log "Would write '#{path}' (dry run)."
+      else
+        
+        unless path.dirname.exist?
+          begin
+            log "Creating directory '#{path.dirname}'."
+            FileUtils.mkdir_p path.dirname
+          rescue SystemCallError => e
+            handle_error(e)
+            return
+          end
+        end
+        
+        log "Writing '#{path}'."
+        begin
+          File.open(path, "a+") do |f|
+            if not File.zero? path and @options.backup
+              log "Making backup of existing file at '#{path}'."
+              dir, base = path.split
+              FileUtils.cp path, dir + "#{base.to_s}.bak"
+            end
+            f.flock File::LOCK_EX
+            f.truncate 0
+            f.write string
+            f.chmod 0744 if executable
+          end
+        rescue SystemCallError => e
+          handle_error(e)
+        end
+      end
+    end
+    
+    def adjusted_output_path(path)
       if @options.output_dir
         if path.absolute?
           path = @options.output_dir + path.to_s.sub(/\A\//, '')
         else
           path = @options.output_dir + path
         end
-      end
-      
-      if @options.dry
-        log "Would write #{path} (dry run)."
-        return
-      end
-      
-      log "Writing #{path}."
-      begin
-        File.open(path, "a+") do |f|
-          if not File.zero? path and @options.backup
-            log "Making backup of existing file at #{path}."
-            dir, base = path.split
-            FileUtils.cp path, dir + "#{base.to_s}.bak"
-          end
-          f.flock File::LOCK_EX
-          f.truncate 0
-          f.write string
-          f.chmod 0744 if executable
-        end
-      rescue SystemCallError => e
-        handle_error(e)
+      else
+        path
       end
     end
     
@@ -259,7 +273,7 @@ module Walrus
       
       # add rb as an extension
       dir, base = input.split
-      dir + "#{base.to_s}.rb"
+      adjusted_output_path(dir + "#{base.to_s}.rb")
       
     end
     
@@ -274,9 +288,9 @@ module Walrus
       # add output extension if appropriate
       if @options.output_extension.length > 0
         dir, base = input.split
-        dir + "#{base.to_s}.#{@options.output_extension}"
+        adjusted_output_path(dir + "#{base.to_s}.#{@options.output_extension}")
       else
-        input
+        adjusted_output_path(input)
       end
       
     end
