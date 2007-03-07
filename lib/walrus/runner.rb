@@ -41,7 +41,7 @@ module Walrus
         o.separator '  \\   ~-----~   /   Copyright 2007 Wincent Colaiuta'
         o.separator '   \\ / /   \\ \\ /'
         o.separator '    / /-----\\ \\'
-        o.separator '   |_/       \_|'
+        o.separator '   |_/       \\_|'
         o.separator ''
         o.separator 'Commands: compile -- compile templates to Ruby code'
         o.separator '          fill    -- runs compiled templates, writing output to disk'
