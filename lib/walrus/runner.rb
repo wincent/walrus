@@ -34,16 +34,14 @@ module Walrus
         
         o.banner  = "Usage: #{o.program_name} command input-file(s)-or-directory/ies [options]"
         o.separator ''
-        #   _____________
-        #  /             \
-        # /     o   o     \
-        # |       b       |
-        #  \   ~-----~   /
-        #   \ / /   \ \ /
-        #    / /-----\ \
-        #   |_/       \_|        
-        o.separator "#{o.program_name} - command-line front-end for the Walrus templating system"
-        o.separator 'Copyright 2007 Wincent Colaiuta'
+        o.separator '   _____________'
+        o.separator '  /             \\'
+        o.separator " /     o   o     \\  #{o.program_name}"
+        o.separator ' |       b       |  Command-line front-end for the Walrus templating system'
+        o.separator '  \\   ~-----~   /   Copyright 2007 Wincent Colaiuta'
+        o.separator '   \\ / /   \\ \\ /'
+        o.separator '    / /-----\\ \\'
+        o.separator '   |_/       \_|'
         o.separator ''
         o.separator 'Commands: compile -- compile templates to Ruby code'
         o.separator '          fill    -- runs compiled templates, writing output to disk'
