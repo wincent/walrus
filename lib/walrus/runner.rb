@@ -176,12 +176,14 @@ module Walrus
           template = Template.new(template_source_path)
         rescue Exception => e
           handle_error("failed to read input template '#{template_source_path}' (#{e.to_s})")
+          return
         end
         
         begin
           compiled = template.compile
         rescue Grammar::ParseError => e
           handle_error("failed to compile input template '#{template_source_path}' (#{e.to_s})")
+          return
         end
         
         write_string_to_path(compiled, compiled_path, true)
