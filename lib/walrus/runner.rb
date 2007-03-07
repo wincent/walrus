@@ -126,12 +126,20 @@ module Walrus
         when 'fill'
           log "Filling #{input}."
           compile_if_needed(input)
-          write_string_to_path(get_output(input), filled_output_path_for_input(input))
+          begin
+            write_string_to_path(get_output(input), filled_output_path_for_input(input))
+          rescue Exception => e
+            handle_error(e)
+          end
         when 'run'
           log "Running #{input}."
           compile_if_needed(input)
-          printf('%s', get_output(input))
-          $stdout.flush
+          begin
+            printf('%s', get_output(input))
+            $stdout.flush
+          rescue Exception => e
+            handle_error(e)
+          end
         else
           raise ArgumentError.new("unrecognized command '#{@command}'")
         end
