@@ -6,6 +6,14 @@ $Id$
 #include <ruby.h>
 #include <errno.h>
 
+/*
+
+call-seq:
+    Dir.mkdtemp([string])   -> String or nil
+
+This method securely creates temporary directories. It is a wrapper for the mkdtemp() function in the standard C library. It takes an optional String parameter as a template describing the desired form of the directory name; if no template is supplied then "/tmp/temp.XXXXXX" is used as a default.
+
+*/
 static VALUE walrus_dir_mkdtemp_m(int argc, VALUE *argv, VALUE self)
 {
     VALUE template;

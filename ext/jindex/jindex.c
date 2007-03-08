@@ -36,11 +36,31 @@ static VALUE walrus_str_index_common(ID func, int argc, VALUE *argv, VALUE str)
     return jindex;
 }
 
+/*
+
+call-seq:
+    str.jindex(substring [, offset])    -> Fixnum or nil
+    str.jindex(fixnum [, offset])       -> Fixnum or nil
+    str.jindex(regexp [, offset])       -> Fixnum or nil
+
+Multibyte-friendly equivalent of the String#index method. If $KCODE is appropriately set will return an accurate index based on character count rather than byte counts.
+
+*/
 static VALUE walrus_str_jindex_m(int argc, VALUE *argv, VALUE str)
 {
     return walrus_str_index_common(rb_intern("index"), argc, argv, str);
 }
 
+/*
+
+call-seq:
+    str.jrindex(substring [, offset])   -> Fixnum or nil
+    str.jrindex(fixnum [, offset])      -> Fixnum or nil
+    str.jrindex(regexp [, offset])      -> Fixnum or nil
+
+Multibyte-friendly equivalent of the String#rindex method. If $KCODE is appropriately set will return an accurate index based on character count rather than byte counts.
+
+*/
 static VALUE walrus_str_jrindex_m(int argc, VALUE *argv, VALUE str)
 {
     return walrus_str_index_common(rb_intern("rindex"), argc, argv, str);
