@@ -5,8 +5,6 @@ require 'rubygems'
 require 'spec/rake/spectask'
 require 'spec/rake/verify_rcov'
 
-require 'rake/testtask'
-
 desc 'Install'
 task :install do
   raise 'Not yet implemented'
@@ -49,3 +47,23 @@ task :mkdtemp do |t|
   system %{cd ext/mkdtemp && ruby ./extconf.rb && make && cp mkdtemp.bundle ../ && cd -}
 end
 
+Gem::manage_gems
+require 'rake/gempackagetask'
+SPEC = Gem::Specification.new do |s|
+  s.name          = 'Walrus'
+  s.version       = '0.1'
+  s.author        = 'Wincent Colaiuta'
+  s.email         = 'win@wincent.com'
+  s.homepage      = 'http://walrus.wincent.com/'
+  s.platform      = Gem::Platform::RUBY
+  s.summary       = 'Object-oriented templating system'
+  s.require_paths = ['lib', 'ext']
+  s.autorequire   = 'walrus'
+  s.has_rdoc      = true
+  s.files         = FileList['{bin,ext,docs,lib,spec}/**/*'].to_a
+  s.extensions    = ['ext/jindex/extconf.rb', 'ext/mkdtemp/extconf.rb']
+end
+
+Rake::GemPackageTask.new(SPEC) do |t|
+  t.need_tar      = true
+end
