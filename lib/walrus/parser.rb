@@ -121,11 +121,10 @@ module Walrus
       rule            :echo_directive,                      '#echo'.skip & :ruby_expression_list & :directive_end
       production      :echo_directive.build(:directive, :expression)
       
-      rule            :extends_directive,                   '#extends'.skip & :constant & :directive_end
-      production      :extends_directive.build(:directive, :class_name)
-      
-      rule            :import_directive,                    '#import'.skip & :constant & :directive_end
-      production      :import_directive.build(:directive, :class_name)
+      rule            :extends_directive,                   '#extends'.skip & :string_literal & :directive_end
+      rule            :import_directive,                    '#import'.skip & :string_literal & :directive_end
+      production      :import_directive.build(:directive, :class_name)          # superclass (ImportDirective) must be created
+      production      :extends_directive.build(:import_directive, :class_name)  # before the subclass (ExtendsDirective)
       
       rule            :include_directive,                   '#include'.skip & :string_literal & :directive_end
       production      :include_directive.build(:directive, :file_name)
@@ -308,6 +307,7 @@ module Walrus
       require 'walrus/walrus_grammar/def_directive'
       require 'walrus/walrus_grammar/echo_directive'
       require 'walrus/walrus_grammar/escape_sequence'
+      require 'walrus/walrus_grammar/import_directive'
       require 'walrus/walrus_grammar/instance_variable'
       require 'walrus/walrus_grammar/literal'
       require 'walrus/walrus_grammar/multiline_comment'

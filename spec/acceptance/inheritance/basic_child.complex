@@ -1,4 +1,4 @@
-#extends BasicParent
+#extends 'basic_parent'
 #def footer
 This is the overridden footer. Note that in the overridden version of the footer
 I'm using a \#def block rather than a \#block like in the parent template. The

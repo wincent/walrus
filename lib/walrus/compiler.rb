@@ -2,6 +2,7 @@
 # $Id$
 
 require 'walrus'
+require 'pathname'
 
 module Walrus
   class Compiler
@@ -34,19 +35,19 @@ module Walrus
       
       # begin tree walk
       tree.each do |element|
-        if element.kind_of? WalrusGrammar::DefDirective         # special case: def (and block) directives may return two items
+        if element.kind_of? WalrusGrammar::DefDirective             # special case: def (and block) directives may return two items
           inner, outer = element.compile(options)
           outer.each { |line| outside_body << OUTSIDE_INDENT + line } if outer
           inner.each { |line| template_body << BODY_INDENT + line } if inner
-        elsif element.kind_of? WalrusGrammar::ExtendsDirective  # defines superclass and automatically invoke #super (super) at the head of the template_body
+        elsif element.instance_of? WalrusGrammar::ExtendsDirective  # defines superclass and automatically invoke #super (super) at the head of the template_body
           raise CompileError.new('#extends may be used only once per template') unless extends_directive.nil?
           raise CompileError.new('illegal #extends (#import already used in this template)') unless import_directive.nil?
-          extends_directive = element.class_name.to_s
-        elsif element.kind_of? WalrusGrammar::ImportDirective   # defines superclass with no automatic invocation of #super on the template_body
+          extends_directive = element.compile(options)
+        elsif element.instance_of? WalrusGrammar::ImportDirective   # defines superclass with no automatic invocation of #super on the template_body
           raise CompileError.new('#import may be used only once per template') unless import_directive.nil?
           raise CompileError.new('illegal #import (#extends already used in this template)') unless extends_directive.nil?
-          import_directive = element.class_name.to_s
-        elsif  element.kind_of? WalrusGrammar::Comment and element.column_start == 0  # special case if comment is only thing on input line
+          import_directive = element.compile(options)
+        elsif element.kind_of? WalrusGrammar::Comment and element.column_start == 0  # special case if comment is only thing on input line
           template_body << BODY_INDENT + element.compile(options)
           options[:slurping] = true
           next
@@ -60,16 +61,16 @@ module Walrus
         
       end
       
-      if extends_directive
+      if import_directive
+        superclass_name = import_directive.class_name
+        require_line    = "require 'walrus/document'\n" + import_directive.require_line
+      elsif extends_directive
+        superclass_name = extends_directive.class_name
+        require_line    = "require 'walrus/document'\n" + extends_directive.require_line
         template_body.unshift BODY_INDENT + "super # (invoked automatically due to Extends directive)\n"
-      end
-      
-      superclass_name = import_directive || extends_directive || 'Document'
-      if superclass_name != 'Document'
-        superclass_implementation = superclass_name.to_require_name
-        require_line = "require 'walrus/document'\nWalrus::Document::require '#{superclass_implementation}', __FILE__"
       else
-        require_line = "require 'walrus/document'"
+        superclass_name = 'Document'
+        require_line    = "require 'walrus/document'"
       end
       
       <<-RETURN

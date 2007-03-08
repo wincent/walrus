@@ -88,31 +88,6 @@ module Walrus
       self.new.fill     # in other cases, evaluate 'fill' (if run inside an eval, will return filled content)
     end
     
-    def self.require(file, fallback)
-      begin
-        Kernel::require file
-      rescue LoadError => e
-        
-        # possible alternative way of getting candidate (on need to pass __FILE__ to fallback)
-        # candidate = e.backtrace.map { |frame| Pathname.new(frame.split(':').first).dirname }.uniq[1].realpath
-        
-        candidate = Pathname.new(fallback).dirname.realpath                             # try adding directory of current file into load path
-        if $:.any? { |path| Pathname.new(path).realpath == candidate rescue false }     # already in load path!
-          raise e # re-raise original error
-        else
-          begin
-            $:.push(candidate)                                                          # make only a temporary change to the load path
-            status = Kernel::require file                                               # remember return status
-          rescue LoadError
-            raise e                                                                     # re-raise original error
-          ensure
-            $:.pop                                                                      # put load path back the way it was
-            status                                                                      # return 'require' status
-          end  
-        end
-      end
-    end
-    
   end # class Document
 end # module Walrus
 

@@ -1,4 +1,4 @@
-#import BasicParent
+#import 'basic_parent'
 This time we use an \#import directive rather than an \#extends.
 
 This means that we have access to all of the methods defined in the parent,
