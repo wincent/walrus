@@ -1,6 +1,8 @@
+# Copyright 2007 Wincent Colaiuta
 # $Id$
 
 require 'rake'
+require 'rake/gempackagetask'
 require 'rubygems'
 require 'spec/rake/spectask'
 require 'spec/rake/verify_rcov'
@@ -47,21 +49,27 @@ task :mkdtemp do |t|
   system %{cd ext/mkdtemp && ruby ./extconf.rb && make && cp mkdtemp.bundle ../ && cd -}
 end
 
-Gem::manage_gems
-require 'rake/gempackagetask'
 SPEC = Gem::Specification.new do |s|
-  s.name          = 'Walrus'
+  s.name          = 'walrus'
   s.version       = '0.1'
   s.author        = 'Wincent Colaiuta'
   s.email         = 'win@wincent.com'
   s.homepage      = 'http://walrus.wincent.com/'
   s.platform      = Gem::Platform::RUBY
   s.summary       = 'Object-oriented templating system'
+  s.description   = <<-ENDDESC
+    Walrus is an object-oriented templating system inspired by and similar to
+    the Cheetah Python-powered template engine. It includes a Parser
+    Expression Grammar (PEG) parser generator capable of generating an
+    integrated lexer, "packrat" parser, and Abstract Syntax Tree (AST)
+    builder.
+  ENDDESC
   s.require_paths = ['lib', 'ext']
   s.autorequire   = 'walrus'
   s.has_rdoc      = true
-  s.files         = FileList['{bin,ext,docs,lib,spec}/**/*'].to_a
+  s.files         = FileList['{bin,lib,spec}/**/*', 'ext/**/*.rb', 'ext/**/*.c'].to_a # TODO: add 'docs' subdirectory, 'README.txt' when they're done
   s.extensions    = ['ext/jindex/extconf.rb', 'ext/mkdtemp/extconf.rb']
+  s.executables   = ['walrus']
 end
 
 Rake::GemPackageTask.new(SPEC) do |t|
