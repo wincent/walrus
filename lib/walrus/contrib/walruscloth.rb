@@ -18,8 +18,9 @@ gem 'RedCloth', '= 3.0.4'; require 'redcloth'
 # Usage
 # =====
 #
+#   require 'walrus/contrib/walruscloth'
 #   WalrusCloth.new("` hello\n` world").to_html # note the space between the backtick and the list item content
-#   => "<ul>\n\t<li>hello</li>\n\t\t<li>world</li>\n\t</ul>"
+#   # => "<ul>\n\t<li>hello</li>\n\t\t<li>world</li>\n\t</ul>"
 #
 # Limitations
 # ===========
