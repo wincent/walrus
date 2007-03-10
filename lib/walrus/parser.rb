@@ -269,7 +269,15 @@ module Walrus
       rule            :addition_expression,                 :unary_expression & '+'.skip & (:addition_expression | :unary_expression)
       production      :addition_expression.build(:ruby_expression, :left, :right)
       
-      rule            :message_expression,                  :literal_expression & '.'.skip & :method_expression
+      # this definition is right-recursive and that yields a right-associative expression (not what we want)
+      #rule            :message_expression,                  :literal_expression & '.'.skip & (:message_expression | :method_expression)
+      # written as a left-recursive definition we'd get:
+      #rule            :message_expression,                  (:message_expression & '.'.skip & :method_expression) |
+      #                                                      (:literal_expression & '.'.skip & :method_expression)
+      # but left-recursion is not legal in a PEG so must manually refactor
+      # see page 69 of Ford's thesis for an idea of how these could be automatically re-written as left-recursive expressions
+      rule            :message_expression,                  :literal_expression & :message_expression_suffix
+      rule            :message_expression_suffix,           ('.'.skip & :method_expression & :message_expression_suffix) | ('.'.skip & :method_expression)
       production      :message_expression.build(:ruby_expression, :target, :message)
       
       rule            :method_expression,                   :method_with_parentheses | :method_without_parentheses

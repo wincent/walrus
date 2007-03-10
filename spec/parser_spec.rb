@@ -598,6 +598,36 @@ module Walrus
       result.expression.message.params[1].should_be_kind_of WalrusGrammar::Identifier
       result.expression.message.params[1].lexeme.should == 'baz'
       
+      # chained method invocation
+      result = @parser.parse('#silent foo.bar.baz')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::MessageExpression
+      result.expression.target.should_be_kind_of WalrusGrammar::Identifier
+      result.expression.target.lexeme.should == 'foo'
+      
+      # TODO: fix associativity in the above example:
+      # it is currently right-associative:  foo.(bar.baz)
+      # but is should be left-associative:  (foo.bar).baz
+      # I suspect the same problem is most likely true for the addition expression below
+      # (technically parsed as left associative, addition is associative anyway so it doesn't matter)
+      
+      # chained method invocation with arguments
+      result = @parser.parse('#silent foo.bar(1).baz')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::MessageExpression
+      
+      result = @parser.parse('#silent foo.bar.baz(2)')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::MessageExpression
+            
+      result = @parser.parse('#silent foo.bar(1).baz(2)')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::MessageExpression
+      
       # nested arrays
       result = @parser.parse('#silent [1, 2, [foo, bar]]')
       result.should_be_kind_of WalrusGrammar::Directive
