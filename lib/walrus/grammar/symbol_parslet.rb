@@ -37,7 +37,11 @@ module Walrus
       def to_s
         'rule: ' + @symbol.to_s
       end
-            
+      
+      def ==(other)
+        eql?(other)
+      end
+      
       def eql?(other)
         other.instance_of? SymbolParslet and other.symbol == @symbol
       end

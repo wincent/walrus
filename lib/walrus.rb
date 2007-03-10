@@ -20,6 +20,7 @@ module Walrus
     autoload(:AndPredicate,                 'walrus/grammar/and_predicate')
     autoload(:ArrayResult,                  'walrus/grammar/array_result')
     autoload(:ContinuationWrapperException, 'walrus/grammar/continuation_wrapper_exception')
+    autoload(:LeftRecursionException,       'walrus/grammar/left_recursion_exception')
     autoload(:LocationTracking,             'walrus/grammar/location_tracking')
     autoload(:MatchDataWrapper,             'walrus/grammar/match_data_wrapper')
     autoload(:Memoizing,                    'walrus/grammar/memoizing')

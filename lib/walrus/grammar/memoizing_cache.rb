@@ -52,6 +52,17 @@ module Walrus
               catch :ZeroWidthParseSuccess do
                 begin
                   options[:ignore_memoizer] = true
+                  
+                  # short-circuit left recursion here rather than infinite looping
+                  if options[:parseable].kind_of? SymbolParslet
+                    if @current_symbol_parslet == options[:parseable]
+                      raise LeftRecursionException
+                    end
+                    @current_symbol_parslet = options[:parseable]
+                  else
+                    @current_symbol_parslet = nil
+                  end
+                  
                   return @cache[identifier] = options[:parseable].memoizing_parse(string, options)  # store and return
                 rescue Exception => e
                   raise @cache[identifier] = e                                                      # store and re-raise

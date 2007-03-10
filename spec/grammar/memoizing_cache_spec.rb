@@ -44,5 +44,19 @@ module Walrus
       
     end
     
+    context 'working with left-recursive rules' do
+      
+      specify 'self-referencing rules should go into an infinite loop' do
+        
+        grammar = Grammar.subclass('InfiniteLoop') do
+          starting_symbol :a
+          rule            :a, :a # a bone-headed rule
+        end
+        lambda { grammar.parse('anything')}.should raise_error(LeftRecursionException)
+        
+      end
+      
+    end
+    
   end # class Grammar
 end # module Walrus
