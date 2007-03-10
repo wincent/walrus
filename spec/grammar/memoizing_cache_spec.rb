@@ -46,13 +46,27 @@ module Walrus
     
     context 'working with left-recursive rules' do
       
-      specify 'self-referencing rules should go into an infinite loop' do
-        
+      specify 'circular rules should cause a short-circuit' do
         grammar = Grammar.subclass('InfiniteLoop') do
           starting_symbol :a
           rule            :a, :a # a bone-headed rule
         end
-        lambda { grammar.parse('anything')}.should raise_error(LeftRecursionException)
+        lambda { grammar.parse('anything') }.should raise_error(LeftRecursionException)
+      end
+      
+      specify 'shortcuiting should not be fatal if a valid alternative is present' do
+        grammar = Grammar.subclass('AlmostInfinite') do
+          starting_symbol :a
+          rule            :a, :a | :b # slightly less bone-headed
+          rule            :b, 'foo'
+        end
+        grammar.parse('foo').should == 'foo'
+      end
+      
+      specify 'should retry after short-circuiting if valid continuation point' do
+        
+        
+        
         
       end
       

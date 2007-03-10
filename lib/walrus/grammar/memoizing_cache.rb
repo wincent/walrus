@@ -55,12 +55,12 @@ module Walrus
                   
                   # short-circuit left recursion here rather than infinite looping
                   if options[:parseable].kind_of? SymbolParslet
-                    if @current_symbol_parslet == options[:parseable]
+                    if @last_seen_symbol_parslet          == options[:parseable] and
+                       @last_seen_symbol_parslet_location == [options[:line_start], options[:column_start]]
                       raise LeftRecursionException
                     end
-                    @current_symbol_parslet = options[:parseable]
-                  else
-                    @current_symbol_parslet = nil
+                    @last_seen_symbol_parslet             = options[:parseable]
+                    @last_seen_symbol_parslet_location    = [options[:line_start], options[:column_start]]
                   end
                   
                   return @cache[identifier] = options[:parseable].memoizing_parse(string, options)  # store and return
