@@ -45,7 +45,9 @@ module Walrus
           begin
             result = parseable.memoizing_parse(string, options) # successful parse
             if left_recursion and left_recursion.continuation   # and we have a continuation
-              left_recursion.continuation.call(result)          # so jump back to where we were before
+              continuation = left_recursion.continuation        # continuations are once-only, one-way tickets
+              left_recursion = nil                              # set this to nil so as not to call it again without meaning to
+              continuation.call(result)                         # so jump back to where we were before
             end
             return result
           rescue LeftRecursionException => e

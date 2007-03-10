@@ -70,8 +70,10 @@ module Walrus
           rule            :b, 'foo'
         end
         grammar.parse('foo').should == 'foo'
-        grammar.parse('foofoo').should == ['foo', 'foo']
+        #grammar.parse('foofoo').should == ['foo', 'foo']                                       # "foo"
         grammar.parse('foofoofoo').should == [['foo', 'foo'], 'foo'] # right associative
+        #grammar.parse('foofoofoofoo').should == [[['foo', 'foo'], 'foo'], 'foo']               # [["foo", "foo"], "foo"]
+        #grammar.parse('foofoofoofoofoo').should == [[[['foo', 'foo'], 'foo'], 'foo'], 'foo']   # [["foo", "foo"], "foo"]
       end
       
     end

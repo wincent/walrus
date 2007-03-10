@@ -47,30 +47,29 @@ module Walrus
         raise ArgumentError if string.nil?
         state                         = ParserState.new(string, options)
         last_caught                   = nil # keep track of the last kind of throw to be caught
+        puts "about to start sequence, will try to parse '#{string}"
         @components.each do |parseable|
+          puts "trying component #{parseable.to_s}, remainder is #{state.remainder}"
           catch :ProcessNextComponent do
             catch :NotPredicateSuccess do
               catch :AndPredicateSuccess do
                 catch :ZeroWidthParseSuccess do
                   begin
                     parsed = parseable.memoizing_parse(state.remainder, state.options)
+                    puts "parsed #{parsed.to_s}"
                     state.parsed(parsed)
                   rescue SkippedSubstringException => e
                     state.skipped(e)
                   rescue LeftRecursionException => e
+                    puts "caught left recursion, current component is " + parseable.to_s
                     continuation  = nil
                     value         = callcc { |c| continuation = c }         
                     if value == continuation                    # first time that we're here
                       e.continuation = continuation             # pack continuation into exception
                       raise e                                   # and propagate
                     else
-                      result = value
-                      
-                      
-                      raise "Not yet implemented"
-                      
-                      
-                      
+                      puts "alternative worked (parsed '#{value.to_s}')"
+                      state.parsed(value)
                     end
                   rescue ParseError => e # failed, will try to skip; save original error in case skipping fails                                        
                     if options.has_key?(:skipping_override) : skipping_parslet = options[:skipping_override]
@@ -87,6 +86,7 @@ module Walrus
                     end
                   end
                   last_caught = nil
+                  puts "done with #{parseable.to_s}, will try next component"
                   throw :ProcessNextComponent   # can't use "next" here because it would only break out of innermost "do" rather than continuing the iteration
                 end
                 last_caught = :ZeroWidthParseSuccess
