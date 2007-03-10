@@ -43,14 +43,17 @@ module Walrus
         left_recursion  = nil # will also track any left recursion that we detect
         @alternatives.each do |parseable|
           begin
-            return parseable.memoizing_parse(string, options)
+            result = parseable.memoizing_parse(string, options) # successful parse
+            if left_recursion and left_recursion.continuation   # and we have a continuation
+              left_recursion.continuation.call(result)          # so jump back to where we were before
+            end
+            return result
           rescue LeftRecursionException => e
             left_recursion = e
           rescue ParseError => e
             if error.nil?   :   error = e
             else                error = e unless error.rightmost?(e)
             end
-            next
           end
         end
         raise ParseError.new('no valid alternatives while parsing "%s" (%s)' % [string, error.to_s],

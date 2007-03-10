@@ -57,6 +57,21 @@ module Walrus
                     state.parsed(parsed)
                   rescue SkippedSubstringException => e
                     state.skipped(e)
+                  rescue LeftRecursionException => e
+                    continuation  = nil
+                    value         = callcc { |c| continuation = c }         
+                    if value == continuation                    # first time that we're here
+                      e.continuation = continuation             # pack continuation into exception
+                      raise e                                   # and propagate
+                    else
+                      result = value
+                      
+                      
+                      raise "Not yet implemented"
+                      
+                      
+                      
+                    end
                   rescue ParseError => e # failed, will try to skip; save original error in case skipping fails                                        
                     if options.has_key?(:skipping_override) : skipping_parslet = options[:skipping_override]
                     elsif options.has_key?(:skipping)       : skipping_parslet = options[:skipping]

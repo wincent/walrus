@@ -64,10 +64,14 @@ module Walrus
       end
       
       specify 'should retry after short-circuiting if valid continuation point' do
-        
-        
-        
-        
+        grammar = Grammar.subclass('MuchMoreRealisticExample') do
+          starting_symbol :a
+          rule            :a, :a & :b | :b
+          rule            :b, 'foo'
+        end
+        grammar.parse('foo').should == 'foo'
+        grammar.parse('foofoo').should == ['foo', 'foo']
+        grammar.parse('foofoofoo').should == [['foo', 'foo'], 'foo'] # right associative
       end
       
     end

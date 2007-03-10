@@ -8,12 +8,12 @@ module Walrus
     
     class LeftRecursionException < Exception
       
-      # attr_reader :continuation
-      # 
-      # def initialize(continuation = nil)
-      #   super self.class.to_s
-      #   @continuation = continuation
-      # end
+      attr_accessor :continuation
+       
+      def initialize(continuation = nil)
+        super self.class.to_s
+        @continuation = continuation
+      end
       
     end # class LeftRecursionException
     
