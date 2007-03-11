@@ -47,7 +47,7 @@ module Walrus
       options[:line_start]    = 0 # "richer" information (more human-friendly) than that provided in "location"
       options[:column_start]  = 0 # "richer" information (more human-friendly) than that provided in "location"
       options[:memoizer]      = MemoizingCache.new if @memoizing
-      result                  = @rules[@starting_symbol].memoizing_parse(string, options)
+      result                  = @starting_symbol.to_parseable.memoizing_parse(string, options)
       self.wrap(result, @starting_symbol)
     end
     

@@ -240,12 +240,12 @@ module Walrus
         
         # simple tests
         grammar.parse('()').children.should == []
-        grammar.parse('(content)').children.should == 'content'
+        grammar.parse('(content)').children.to_s.should == 'content'
         
         # nested test: two expressions at the first level, one of them nested
         results = grammar.parse('(content (and more content))')
         results.children[0].should == 'content '
-        results.children[1].children.should == 'and more content'
+        results.children[1].children.to_s.should == 'and more content'
         
         # nested test: three expressions at first level, two of them nested
         results = grammar.parse('(content (and more content)(and more))')#.should == ['content ', 'and more content', 'and more']        

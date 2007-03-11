@@ -55,10 +55,7 @@ module Walrus
                   
                   # short-circuit left recursion here rather than infinite looping
                   if options[:parseable].kind_of? SymbolParslet
-                    if @last_seen_symbol_parslet          == options[:parseable] and
-                       @last_seen_symbol_parslet_location == [options[:line_start], options[:column_start]]
-                      raise LeftRecursionException
-                    end
+                    check_left_recursion(options[:parseable], options)
                     @last_seen_symbol_parslet             = options[:parseable]
                     @last_seen_symbol_parslet_location    = [options[:line_start], options[:column_start]]
                   end
@@ -73,6 +70,14 @@ module Walrus
             throw @cache[identifier] = :AndPredicateSuccess                                         # store and re-throw
           end
           throw @cache[identifier] = :NotPredicateSuccess                                           # store and re-throw
+        end
+      end
+      
+      def check_left_recursion(parseable, options = {})
+        if parseable.kind_of? SymbolParslet and
+           @last_seen_symbol_parslet == parseable and
+           @last_seen_symbol_parslet_location == [options[:line_start], options[:column_start]]
+          raise LeftRecursionException
         end
       end
       

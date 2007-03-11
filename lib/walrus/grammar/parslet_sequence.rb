@@ -43,34 +43,54 @@ module Walrus
         append(next_parslet)
       end
       
+      SKIP_FIRST  = true
+      NO_SKIP     = false
+      
       def parse(string, options = {})
+        parse_common(NO_SKIP, string, options)
+      end
+      
+      def parse_remainder(string, options = {})
+        parse_common(SKIP_FIRST, string, options)
+      end
+      
+      def parse_common(skip_first, string, options = {})
         raise ArgumentError if string.nil?
         state                         = ParserState.new(string, options)
-        last_caught                   = nil # keep track of the last kind of throw to be caught
-        puts "about to start sequence, will try to parse '#{string}"
-        @components.each do |parseable|
-          puts "trying component #{parseable.to_s}, remainder is #{state.remainder}"
+        last_caught                   = nil   # keep track of the last kind of throw to be caught
+        left_recursion                = false # keep track of whether left recursion was detected
+        
+        @components.each_with_index do |parseable, index|
+          
+          if index == 0 # for first component only
+            if skip_first
+              next
+            end
+            begin
+              check_left_recursion(parseable, options)
+            rescue LeftRecursionException => e
+              left_recursion = true
+              continuation  = nil
+              value         = callcc { |c| continuation = c }         
+              if value == continuation                    # first time that we're here
+                e.continuation = continuation             # pack continuation into exception
+                raise e                                   # and propagate
+              else
+                state.parsed(value)
+                next
+              end
+            end
+          end
+          
           catch :ProcessNextComponent do
             catch :NotPredicateSuccess do
               catch :AndPredicateSuccess do
                 catch :ZeroWidthParseSuccess do
                   begin
                     parsed = parseable.memoizing_parse(state.remainder, state.options)
-                    puts "parsed #{parsed.to_s}"
                     state.parsed(parsed)
                   rescue SkippedSubstringException => e
                     state.skipped(e)
-                  rescue LeftRecursionException => e
-                    puts "caught left recursion, current component is " + parseable.to_s
-                    continuation  = nil
-                    value         = callcc { |c| continuation = c }         
-                    if value == continuation                    # first time that we're here
-                      e.continuation = continuation             # pack continuation into exception
-                      raise e                                   # and propagate
-                    else
-                      puts "alternative worked (parsed '#{value.to_s}')"
-                      state.parsed(value)
-                    end
                   rescue ParseError => e # failed, will try to skip; save original error in case skipping fails                                        
                     if options.has_key?(:skipping_override) : skipping_parslet = options[:skipping_override]
                     elsif options.has_key?(:skipping)       : skipping_parslet = options[:skipping]
@@ -86,7 +106,6 @@ module Walrus
                     end
                   end
                   last_caught = nil
-                  puts "done with #{parseable.to_s}, will try next component"
                   throw :ProcessNextComponent   # can't use "next" here because it would only break out of innermost "do" rather than continuing the iteration
                 end
                 last_caught = :ZeroWidthParseSuccess
@@ -99,11 +118,48 @@ module Walrus
           end
         end
         
-        if state.results.respond_to? :empty? and state.results.empty? and last_caught
+        if left_recursion
+          results = recurse(state)
+        else
+          results = state.results
+        end
+        
+        if skip_first
+          return results
+        end
+        
+        if results.respond_to? :empty? and results.empty? and last_caught
           throw last_caught
         else
-          state.results
+          results
         end
+        
+      end
+      
+      # Left-recursion helper
+      def recurse(state)
+        if state.remainder == ''
+          return state.results
+        end
+        
+        grammar   = state.options[:grammar]
+        rule_name = state.options[:rule_name]
+        results   = grammar.wrap(state.results, rule_name)
+        
+        new_state = ParserState.new(state.remainder, state.options)
+        
+        last_successful_result = nil
+        while state.remainder != ''
+          begin
+            new_results = parse_remainder(new_state.remainder, new_state.options)
+            new_state.parsed(new_results)
+            last_successful_result = ArrayResult[last_successful_result || results, new_results]
+          rescue ParseError
+            break
+          end
+        end
+        
+        return last_successful_result || state.results
         
       end
       

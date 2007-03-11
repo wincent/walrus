@@ -64,16 +64,20 @@ module Walrus
       end
       
       specify 'should retry after short-circuiting if valid continuation point' do
+        
         grammar = Grammar.subclass('MuchMoreRealisticExample') do
           starting_symbol :a
           rule            :a, :a & :b | :b
           rule            :b, 'foo'
         end
+        
+        # note the right associativity
         grammar.parse('foo').should == 'foo'
-        #grammar.parse('foofoo').should == ['foo', 'foo']                                       # "foo"
-        grammar.parse('foofoofoo').should == [['foo', 'foo'], 'foo'] # right associative
-        #grammar.parse('foofoofoofoo').should == [[['foo', 'foo'], 'foo'], 'foo']               # [["foo", "foo"], "foo"]
-        #grammar.parse('foofoofoofoofoo').should == [[[['foo', 'foo'], 'foo'], 'foo'], 'foo']   # [["foo", "foo"], "foo"]
+        grammar.parse('foofoo').should == ['foo', 'foo']
+        grammar.parse('foofoofoo').should == [['foo', 'foo'], 'foo']                              # ["foo", ["foo", "foo"]]
+        grammar.parse('foofoofoofoo').should == [[['foo', 'foo'], 'foo'], 'foo']                # ["foo", ["foo", ["foo", "foo"]]]
+        grammar.parse('foofoofoofoofoo').should == [[[['foo', 'foo'], 'foo'], 'foo'], 'foo']    # ["foo", ["foo", ["foo", ["foo", "foo"]]]]
+        
       end
       
     end

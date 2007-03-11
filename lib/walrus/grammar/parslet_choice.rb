@@ -52,6 +52,22 @@ module Walrus
             return result
           rescue LeftRecursionException => e
             left_recursion = e
+            
+            # TODO:
+            # it's not enough to just catch this kind of exception and remember the last one
+            # may need to accumulate these in an array
+            # consider the example rule:
+            #   :a, :a & :b | :a & :c | :a & :d | :b
+            # the first option will raise a LeftRecursionException
+            # the next option will raise for the same reason
+            # the third likewise
+            # finally we get to the fourth option, the first which might succeed
+            # at that point we should have three continuations
+            # we should try the first, falling back to the second and third if necessary
+            # on successfully retrying, need to start all over again and try all the options again, just in case further recursion is possible
+            # so it is quite complicated
+            # the question is, is it more complicated than the other ways of getting right-associativity into Walrus-generated parsers?
+            
           rescue ParseError => e
             if error.nil?   :   error = e
             else                error = e unless error.rightmost?(e)

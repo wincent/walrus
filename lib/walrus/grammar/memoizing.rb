@@ -23,6 +23,12 @@ module Walrus
         
       end
       
+      # Can only check for left recursion if memoizing is turned on (the help of the memoizer is needed).
+      def check_left_recursion(parseable, options = {})
+        return unless options.has_key?(:memoizer)
+        options[:memoizer].check_left_recursion(parseable, options)
+      end
+      
     end # module Memoizing
     
   end # class Grammar
