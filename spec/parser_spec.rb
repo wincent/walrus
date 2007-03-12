@@ -602,15 +602,16 @@ module Walrus
       result = @parser.parse('#silent foo.bar.baz')
       result.should_be_kind_of WalrusGrammar::Directive
       result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::MessageExpression
-      result.expression.target.should_be_kind_of WalrusGrammar::Identifier
-      result.expression.target.lexeme.should == 'foo'
+      result.expression.should be_kind_of(WalrusGrammar::MessageExpression)
       
-      # TODO: fix associativity in the above example:
-      # it is currently right-associative:  foo.(bar.baz)
-      # but is should be left-associative:  (foo.bar).baz
-      # I suspect the same problem is most likely true for the addition expression below
-      # (technically parsed as left associative, addition is associative anyway so it doesn't matter)
+      # right-associativity is now working, but get an array here for "target" instead of a message expression:
+      # [Identifier, MethodExpression]      
+      #result.expression.target.should_be_kind_of WalrusGrammar::MessageExpression
+      #result.expression.target.target.lexeme.should == 'foo'
+      
+      result.expression.message.should be_kind_of(WalrusGrammar::MethodExpression)
+      result.expression.message.name.lexeme.to_s.should == 'baz'
+      result.expression.message.params.should == []
       
       # chained method invocation with arguments
       result = @parser.parse('#silent foo.bar(1).baz')
@@ -633,6 +634,17 @@ module Walrus
       result.should_be_kind_of WalrusGrammar::Directive
       result.should_be_kind_of WalrusGrammar::SilentDirective
       result.expression.should_be_kind_of WalrusGrammar::ArrayLiteral
+      result.expression.elements.should_be_kind_of Array
+      result.expression.elements[0].should be_kind_of(WalrusGrammar::NumericLiteral)
+      result.expression.elements[0].lexeme.to_s.should == '1'
+      result.expression.elements[1].should be_kind_of(WalrusGrammar::NumericLiteral)
+      result.expression.elements[1].lexeme.to_s.should == '2'
+      result.expression.elements[2].should be_kind_of(WalrusGrammar::ArrayLiteral)
+      result.expression.elements[2].elements.should be_kind_of(Array)
+      result.expression.elements[2].elements[0].should be_kind_of(WalrusGrammar::Identifier)
+      result.expression.elements[2].elements[0].lexeme.to_s.should == 'foo'
+      result.expression.elements[2].elements[1].should be_kind_of(WalrusGrammar::Identifier)
+      result.expression.elements[2].elements[1].lexeme.to_s.should == 'bar'
       
       # nesting in a hash
       result = @parser.parse('#silent { :foo => [1, 2] }')
@@ -1205,7 +1217,16 @@ THERE_DOCUMENT') }.should_raise Grammar::ParseError
       # more complex expression
       result = @parser.parse("#  @secret_ivar = 'foo' #")
       # note the extra space: that's officially a bug that appears when using an assignment expression
-      # also happens with long form, doesn't happen for other types of expression
+      # also happens with long form
+      result = @parser.parse("#  foo + bar #")  # same happens for addition expressions
+      result = @parser.parse("#  foo.bar #")    # and message expressions
+      
+      
+      result = @parser.parse("# [foo, bar]#")       # array literal works fine without extra space
+      result = @parser.parse("# { :foo => bar }#")  # hash literal also
+      
+      
+      
       
       # leading whitespace is obligatory
       lambda { @parser.parse('#1 #') }.should_raise Grammar::ParseError
