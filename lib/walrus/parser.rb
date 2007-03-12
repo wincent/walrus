@@ -299,7 +299,7 @@ module Walrus
       rule            :hash_literal,                        '{'.skip & ( :hash_assignment >> (','.skip & :hash_assignment ).zero_or_more ).optional & '}'.skip
       production      :hash_literal.build(:ruby_expression, :pairs)
       
-      rule            :hash_assignment,                     :unary_expression & '=>'.skip & (:unary_expression | :addition_expression)
+      rule            :hash_assignment,                     :unary_expression & '=>'.skip & (:addition_expression | :unary_expression)
       production      :hash_assignment.build(:ruby_expression, :lvalue, :expression)
       
       rule            :assignment_expression,               :lvalue & '='.skip & (:addition_expression | :unary_expression)
