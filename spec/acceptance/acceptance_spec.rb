@@ -25,7 +25,12 @@ module Walrus
       template_paths.each do |path|
         
         template        = Template.new(path)
-        compiled        = template.compile
+        compiled        = nil
+        specify 'template should compile (source file: #{path})' do
+          compiled      = template.compile
+        end
+        next if compiled.nil? # compiled will be nil if the compilation spec failed
+        
         expected_output = IO.read(path.to_s.sub(/\.tmpl\z/i, ".expected"))
         
         specify "actual output should match expected output evaluating dynamically (source file: #{path})" do

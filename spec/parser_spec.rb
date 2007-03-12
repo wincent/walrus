@@ -911,6 +911,30 @@ world
       
     end
     
+    specify 'should be able to parse "echo" directive, short notation' do
+      
+      # single expression
+      result = @parser.parse('#= 1 #')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::EchoDirective
+      result.expression.should_be_kind_of WalrusGrammar::NumericLiteral
+      result.expression.lexeme.should == '1'
+      
+      # expression list
+      result = @parser.parse('#= foo; bar #')
+      result.should_be_kind_of WalrusGrammar::EchoDirective
+      result.expression.should_be_kind_of Array
+      result.expression[0].should_be_kind_of WalrusGrammar::Identifier
+      result.expression[0].lexeme.should == 'foo'
+      result.expression[1].should_be_kind_of WalrusGrammar::Identifier
+      result.expression[1].lexeme.should == 'bar'
+      
+      # explicit end marker is required
+      lambda { @parser.parse('#= 1') }.should_raise Grammar::ParseError
+      lambda { @parser.parse('#= foo; bar') }.should_raise Grammar::ParseError
+      
+    end
+    
     specify 'should be able to parse the "raw" directive' do
       
       # shortest example possible
@@ -1157,6 +1181,39 @@ THERE_DOCUMENT') }.should_raise Grammar::ParseError
       result.expression[0].lexeme.should == 'foo'
       result.expression[1].should_be_kind_of WalrusGrammar::Identifier
       result.expression[1].lexeme.should == 'bar'
+      
+    end
+    
+    specify 'should be able to parse "silent" directive, short notation' do
+      
+      # single expression
+      result = @parser.parse('# 1 #')
+      result.should_be_kind_of WalrusGrammar::Directive
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of WalrusGrammar::NumericLiteral
+      result.expression.lexeme.should == '1'
+      
+      # expression list
+      result = @parser.parse('# foo; bar #')
+      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.expression.should_be_kind_of Array
+      result.expression[0].should_be_kind_of WalrusGrammar::Identifier
+      result.expression[0].lexeme.should == 'foo'
+      result.expression[1].should_be_kind_of WalrusGrammar::Identifier
+      result.expression[1].lexeme.should == 'bar'
+      
+      # more complex expression
+      result = @parser.parse("#  @secret_ivar = 'foo' #")
+      # note the extra space: that's officially a bug that appears when using an assignment expression
+      # also happens with long form, doesn't happen for other types of expression
+      
+      # leading whitespace is obligatory
+      lambda { @parser.parse('#1 #') }.should_raise Grammar::ParseError
+      lambda { @parser.parse('#foo; bar #') }.should_raise Grammar::ParseError
+      
+      # explicit end marker is required
+      lambda { @parser.parse('# 1') }.should_raise Grammar::ParseError
+      lambda { @parser.parse('# foo; bar') }.should_raise Grammar::ParseError
       
     end
     

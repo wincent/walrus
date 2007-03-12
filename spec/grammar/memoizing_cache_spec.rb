@@ -44,6 +44,7 @@ module Walrus
       
     end
     
+    # left-recursion is enabled by code in the memoizer and elsewhere; keep the specs here for want of a better place
     context 'working with left-recursive rules' do
       
       specify 'circular rules should cause a short-circuit' do
@@ -74,9 +75,29 @@ module Walrus
         # note the right associativity
         grammar.parse('foo').should == 'foo'
         grammar.parse('foofoo').should == ['foo', 'foo']
-        grammar.parse('foofoofoo').should == [['foo', 'foo'], 'foo']                              # ["foo", ["foo", "foo"]]
-        grammar.parse('foofoofoofoo').should == [[['foo', 'foo'], 'foo'], 'foo']                # ["foo", ["foo", ["foo", "foo"]]]
-        grammar.parse('foofoofoofoofoo').should == [[[['foo', 'foo'], 'foo'], 'foo'], 'foo']    # ["foo", ["foo", ["foo", ["foo", "foo"]]]]
+        grammar.parse('foofoofoo').should == [['foo', 'foo'], 'foo']
+        grammar.parse('foofoofoofoo').should == [[['foo', 'foo'], 'foo'], 'foo']
+        grammar.parse('foofoofoofoofoo').should == [[[['foo', 'foo'], 'foo'], 'foo'], 'foo']
+        
+      end
+      
+      specify 'right associativity should work when building AST nodes' do
+        
+        grammar = Grammar.subclass('RightAssociativeAdditionExample') do
+          starting_symbol :addition_expression
+          rule            :term, /\d+/
+          rule            :addition_expression, :addition_expression & '+'.skip & :term | :term
+          production      :addition_expression.build(:node, :left, :right)
+          
+          # TODO: syntax for expressing alternate production?
+          
+        end
+        
+        
+        
+        
+        
+        
         
       end
       

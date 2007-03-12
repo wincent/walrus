@@ -69,7 +69,6 @@ module Walrus
       rule            :escape_sequence,                     '\\'.skip & /[\$\\#]/
       production      :escape_sequence.build(:node)
       
-      # Would be nice to make it that if a comment is the only thing on a line then it consumes its trailing newline as well; but this would require us to look behind where we are in the input (because /^##/ will always succeed wherever /##/ succeeds, and it doesn't handle the more complex cases, like where a comment is preceeded by a directive); this is therfore a task for the compiler, not the parser.
       rule            :comment,                             '##'.skip & /.*$/
       production      :comment.build(:node)
       
@@ -78,20 +77,26 @@ module Walrus
       skipping        :multiline_comment, nil
       production      :multiline_comment.build(:comment, :content)
       
-      # human-language version of the regex: "any run of characters other than # or *, any # not followed by another # or a *, or any * not followed by a #"
-      rule            :comment_content,                     (:comment & :newline.skip) | :multiline_comment | /([^*#]+|#(?!#|\*)|\*(?!#))+/
+      rule            :comment_content,                     (:comment & :newline.skip)  | 
+                                                            :multiline_comment          |
+                                                            /(                # three possibilities:
+                                                              [^*#]+      |   # 1. any run of characters other than # or *
+                                                              \#(?!\#|\*) |   # 2. any # not followed by another # or a *
+                                                              \*(?!\#)        # 3. any * not followed by a #
+                                                             )+               # match the three possibilities repeatedly
+                                                            /x
       
-      rule            :directive,                           :block_directive    |
-                                                            :def_directive      |
-                                                            :echo_directive     |
-                                                            :extends_directive  |
-                                                            :import_directive   |
-                                                            :include_directive  |
-                                                            :raw_directive      |
-                                                            :ruby_directive     |
-                                                            :set_directive      |
-                                                            :silent_directive   |
-                                                            :slurp_directive    |
+      rule            :directive,                           :block_directive        |
+                                                            :def_directive          |
+                                                            :echo_directive         |
+                                                            :extends_directive      |
+                                                            :import_directive       |
+                                                            :include_directive      |
+                                                            :raw_directive          |
+                                                            :ruby_directive         |
+                                                            :set_directive          |
+                                                            :silent_directive       |
+                                                            :slurp_directive        |
                                                             :super_directive
       
       node            :directive
@@ -118,7 +123,23 @@ module Walrus
       
       # "The #echo directive is used to echo the output from expressions that can't be written as simple $placeholders."
       # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.echo.html
-      rule            :echo_directive,                      '#echo'.skip & :ruby_expression_list & :directive_end
+      #
+      # Convenient alternative short syntax for the #echo directive, similar to ERB (http://www.ruby-doc.org/stdlib/libdoc/erb/rdoc/):
+      #
+      #   #= expression(s) #
+      #
+      # Is a shortcut equivalent to:
+      #
+      #   #echo expression(s) #
+      #
+      # This is similar to the ERB syntax, but even more concise:
+      #
+      #   <%= expression(s) =>
+      #
+      # See also the #silent directive, which also has a shortcut syntax.
+      #
+      rule            :echo_directive,                      '#echo'.skip & :ruby_expression_list & :directive_end | # long form
+                                                            '#='.skip & :ruby_expression_list & '#'.skip            # short form
       production      :echo_directive.build(:directive, :expression)
       
       rule            :extends_directive,                   '#extends'.skip & :string_literal & :directive_end
@@ -197,7 +218,25 @@ module Walrus
       
       # "#silent is the opposite of #echo. It executes an expression but discards the output."
       # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.silent.html
-      rule            :silent_directive,                    '#silent'.skip & :ruby_expression_list & :directive_end
+      #
+      # Like the #echo directive, a convienient shorthand syntax is available:
+      #
+      #   # expressions(s) #
+      #
+      # Equivalent to the long form:
+      #
+      #   #silent expressions(s) #
+      #
+      # And similar to but more concise than the ERB syntax:
+      #
+      #   <% expressions(s) %>
+      #
+      # Note that the space between the opening hash character and the expression(s) is required in order for Walrus to distinguish the shorthand for the #silent directive from the other directives. That is, the following is not legal:
+      #
+      #   #expressions(s) #
+      #
+      rule            :silent_directive,                    '#silent'.skip & :ruby_expression_list & :directive_end | # long form
+                                                            '# '.skip & :ruby_expression_list & '#'.skip              # short form
       production      :silent_directive.build(:directive, :expression)
       
       # Accept multiple expressions separated by a semi-colon.
