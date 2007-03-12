@@ -280,7 +280,7 @@ module Walrus
       rule            :placeholder_parameter,               :placeholder | :ruby_expression
       
       # simplified Ruby subset 
-      rule            :ruby_expression,                     :unary_expression | :assignment_expression | :addition_expression
+      rule            :ruby_expression,                     :assignment_expression | :addition_expression | :unary_expression
       node            :ruby_expression
       
       rule            :literal_expression,                  :string_literal     |
@@ -289,7 +289,7 @@ module Walrus
                                                             :hash_literal       |
                                                             :lvalue             |
                                                             :symbol_literal
-      rule            :unary_expression,                    :literal_expression | :message_expression
+      rule            :unary_expression,                    :message_expression | :literal_expression
       
       rule            :lvalue,                              :class_variable | :instance_variable | :identifier | :constant
       

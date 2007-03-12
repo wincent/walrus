@@ -1224,18 +1224,11 @@ THERE_DOCUMENT') }.should_raise Grammar::ParseError
       result.expression[1].lexeme.should == 'bar'
       
       # more complex expression
-      result = @parser.parse("#  @secret_ivar = 'foo' #")
-      # note the extra space: that's officially a bug that appears when using an assignment expression
-      # also happens with long form
-      result = @parser.parse("#  foo + bar #")  # same happens for addition expressions
-      result = @parser.parse("#  foo.bar #")    # and message expressions
-      
-      
-      result = @parser.parse("# [foo, bar]#")       # array literal works fine without extra space
-      result = @parser.parse("# { :foo => bar }#")  # hash literal also
-      
-      
-      
+      result = @parser.parse("# @secret_ivar = 'foo' #")
+      result = @parser.parse("# foo + bar #")
+      result = @parser.parse("# foo.bar #")
+      result = @parser.parse("# [foo, bar]#")
+      result = @parser.parse("# { :foo => bar }#")
       
       # leading whitespace is obligatory
       lambda { @parser.parse('#1 #') }.should_raise Grammar::ParseError
