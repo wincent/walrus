@@ -69,14 +69,16 @@ module Walrus
             begin
               check_left_recursion(parseable, options)
             rescue LeftRecursionException => e
-              left_recursion = true
-              continuation  = nil
-              value         = callcc { |c| continuation = c }         
+              left_recursion  = true
+              continuation    = nil
+              value           = callcc { |c| continuation = c }         
               if value == continuation                    # first time that we're here
                 e.continuation = continuation             # pack continuation into exception
                 raise e                                   # and propagate
               else
-                state.parsed(value)
+                grammar   = state.options[:grammar]
+                rule_name = state.options[:rule_name]
+                state.parsed(grammar.wrap(value, rule_name))
                 next
               end
             end
@@ -138,29 +140,19 @@ module Walrus
       
       # Left-recursion helper
       def recurse(state)
-        if state.remainder == ''
-          return state.results
-        end
-        
-        grammar   = state.options[:grammar]
-        rule_name = state.options[:rule_name]
-        results   = grammar.wrap(state.results, rule_name)
-        
+        return state.results if state.remainder == '' # further recursion is not possible
         new_state = ParserState.new(state.remainder, state.options)
-        
         last_successful_result = nil
         while state.remainder != ''
           begin
             new_results = parse_remainder(new_state.remainder, new_state.options)
             new_state.parsed(new_results)
-            last_successful_result = ArrayResult[last_successful_result || results, new_results]
+            last_successful_result = ArrayResult[last_successful_result || state.results, new_results]
           rescue ParseError
             break
           end
         end
-        
-        return last_successful_result || state.results
-        
+        last_successful_result || state.results
       end
       
       def eql?(other)

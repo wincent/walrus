@@ -305,7 +305,7 @@ module Walrus
       rule            :assignment_expression,               :lvalue & '='.skip & (:addition_expression | :unary_expression)
       production      :assignment_expression.build(:ruby_expression, :lvalue, :expression)
       
-      #rule            :addition_expression,                 :unary_expression & '+'.skip & (:addition_expression | :unary_expression)
+      # addition is left-associative (left-recursive)
       rule            :addition_expression,                 :addition_expression & '+'.skip & :unary_expression |
                                                             :unary_expression & '+'.skip & :unary_expression
       

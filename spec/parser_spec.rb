@@ -603,13 +603,15 @@ module Walrus
       result.should_be_kind_of WalrusGrammar::Directive
       result.should_be_kind_of WalrusGrammar::SilentDirective
       result.expression.should be_kind_of(WalrusGrammar::MessageExpression)
-      
-      # right-associativity is now working, but get an array here for "target" instead of a message expression:
-      # [Identifier, MethodExpression]      
-      #result.expression.target.should_be_kind_of WalrusGrammar::MessageExpression
-      #result.expression.target.target.lexeme.should == 'foo'
-      
+      result.expression.target.should be_kind_of(WalrusGrammar::MessageExpression)
+      result.expression.target.target.should be_kind_of(WalrusGrammar::Identifier)
+      result.expression.target.target.lexeme.to_s.should == 'foo'
+      result.expression.target.message.should be_kind_of(WalrusGrammar::MethodExpression)
+      result.expression.target.message.name.should be_kind_of(WalrusGrammar::Identifier)
+      result.expression.target.message.name.lexeme.to_s.should == 'bar'
+      result.expression.target.message.params.should == []
       result.expression.message.should be_kind_of(WalrusGrammar::MethodExpression)
+      result.expression.message.name.should be_kind_of(WalrusGrammar::Identifier)
       result.expression.message.name.lexeme.to_s.should == 'baz'
       result.expression.message.params.should == []
       
@@ -657,6 +659,13 @@ module Walrus
       result.should_be_kind_of WalrusGrammar::Directive
       result.should_be_kind_of WalrusGrammar::SilentDirective
       result.expression.should_be_kind_of WalrusGrammar::AdditionExpression
+      result.expression.left.should be_kind_of(WalrusGrammar::AdditionExpression)
+      result.expression.left.left.should be_kind_of(WalrusGrammar::NumericLiteral)
+      result.expression.left.left.lexeme.to_s.should == '1'
+      result.expression.left.right.should be_kind_of(WalrusGrammar::NumericLiteral)
+      result.expression.left.right.lexeme.to_s.should == '2'
+      result.expression.right.should be_kind_of(WalrusGrammar::NumericLiteral)
+      result.expression.right.lexeme.to_s.should == '3'
       
       # addition and assignment
       result = @parser.parse('#silent foo = bar + 1')
