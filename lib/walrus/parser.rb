@@ -2,20 +2,21 @@
 # $Id$
 
 require 'walrus'
+require 'pathname'
 
 module Walrus
   
   class Parser
     
-    def parse(string)
-      @@grammar.parse(string)
+    def parse(string, options = {})
+      @@grammar.parse(string, options)
     end
     
     def compile(string, options = {})
       @@compiler ||= Compiler.new
       parsed = []
       catch :AndPredicateSuccess do # catch here because an empty file will throw
-        parsed = parse string
+        parsed = parse string, options
       end
       @@compiler.compile parsed, options
     end
@@ -150,10 +151,46 @@ module Walrus
       rule            :include_directive,                   '#include'.skip & :string_literal & :directive_end
       production      :include_directive.build(:directive, :file_name)
       
+      rule            :include_subparslet,                  lambda { |string, options|
+        
+        # scans a string literal 
+        state   = Grammar::ParserState.new(string, options)
+        parslet = :string_literal & :directive_end
+        parsed  = parslet.parse(state.remainder, state.options)
+        state.skipped(parsed)
+        
+        # if options contains non-nil "origin" then try to construct relative path; otherwise just look in current working directory
+        if options[:origin]
+          current_location  = Pathname.new(options[:origin]).dirname
+          include_target    = current_location + parsed.to_s
+        else
+          include_target    = parsed.to_s
+        end
+        
+        # read file into string
+        content = include_target.read
+        
+        # try to parse string in sub-parser
+        sub_options = { :origin => include_target.to_s }
+        sub_result = nil
+        catch :AndPredicateSuccess do
+          # need to make this play nicely with the memoizer
+          sub_result  = Parser.parse(content, sub_options)
+        end
+        
+        # want to insert a bunch of nodes (a subtree) into the parse tree without advance the location counters
+        if sub_result
+          sub_tree = Grammar::ArrayResult.new(state.results)
+        else
+          sub_tree
+        end
+        
+      }
+      
       # "Any section of a template definition that is inside a #raw ... #end raw tag pair will be printed verbatim without any parsing of $placeholders or other directives."
       # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.raw.html
       # Unlike Cheetah, Walrus uses a bare "#end" marker and not an "#end raw" to mark the end of the raw block.
-      # The presence of a literal #end within a raw block is made possible by using a "here doc"-style delimiter:
+      # The presence of a literal #end within a raw block is made possible by using an optional "here doc"-style delimiter:
       #
       # #raw <<END_MARKER
       #     content goes here
