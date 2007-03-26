@@ -295,26 +295,6 @@ module Walrus
       
     end
     
-    specify 'should be able to parse an "include" directive' do
-      
-      # basic case: double-quoted file name
-      result = @parser.parse('#include "file/to/include"')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::IncludeDirective
-      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.file_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
-      result.file_name.lexeme.should == 'file/to/include'
-      
-      # basic case: single-quoted file name
-      result = @parser.parse("#include 'file/to/include'")
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::IncludeDirective
-      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.file_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
-      result.file_name.lexeme.should == 'file/to/include'
-      
-    end
-    
     specify 'should be able to parse single quoted string literals' do
       
       # string literals have no special meaning when part of raw text
@@ -323,46 +303,46 @@ module Walrus
       result.lexeme.should == "'hello'"
       
       # empty string
-      result = @parser.parse("#include ''")
-      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.file_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
-      result.file_name.lexeme.to_s.should == '' # actually just returns []; I might need to add a "flatten" or "to_string" method to my Grammar specification system
+      result = @parser.parse("#import ''")
+      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.class_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
+      result.class_name.lexeme.to_s.should == '' # actually just returns []; I might need to add a "flatten" or "to_string" method to my Grammar specification system
       
       # with escaped single quotes inside
-      result = @parser.parse("#include 'hello \\'world\\''")
-      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.file_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
-      result.file_name.lexeme.should == "hello \\'world\\'"
+      result = @parser.parse("#import 'hello \\'world\\''")
+      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.class_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
+      result.class_name.lexeme.should == "hello \\'world\\'"
       
       # with other escapes inside
-      result = @parser.parse("#include 'hello\\nworld'")
-      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.file_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
-      result.file_name.lexeme.should == 'hello\nworld'
+      result = @parser.parse("#import 'hello\\nworld'")
+      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.class_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
+      result.class_name.lexeme.should == 'hello\nworld'
       
       # with double quotes inside
-      result = @parser.parse("#include 'hello \"world\"'")
-      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.file_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
-      result.file_name.lexeme.should == 'hello "world"'
+      result = @parser.parse("#import 'hello \"world\"'")
+      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.class_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
+      result.class_name.lexeme.should == 'hello "world"'
       
       # with Walrus comments inside (ignored)
-      result = @parser.parse("#include 'hello ##world'")
-      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.file_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
-      result.file_name.lexeme.should == 'hello ##world'
+      result = @parser.parse("#import 'hello ##world'")
+      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.class_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
+      result.class_name.lexeme.should == 'hello ##world'
       
       # with Walrus placeholders inside (no interpolation)
-      result = @parser.parse("#include 'hello $world'")
-      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.file_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
-      result.file_name.lexeme.should == 'hello $world'
+      result = @parser.parse("#import 'hello $world'")
+      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.class_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
+      result.class_name.lexeme.should == 'hello $world'
       
       # with Walrus directives inside (no interpolation)
-      result = @parser.parse("#include 'hello #end'")
-      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.file_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
-      result.file_name.lexeme.should == 'hello #end'
+      result = @parser.parse("#import 'hello #end'")
+      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.class_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
+      result.class_name.lexeme.should == 'hello #end'
       
     end
     
@@ -374,46 +354,46 @@ module Walrus
       result.lexeme.should == '"hello"'
       
       # empty string
-      result = @parser.parse('#include ""')
-      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.file_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
-      result.file_name.lexeme.to_s.should == '' # actually just returns []; I might need to add a "flatten" or "to_string" method to my Grammar specification system
+      result = @parser.parse('#import ""')
+      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.class_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.class_name.lexeme.to_s.should == '' # actually just returns []; I might need to add a "flatten" or "to_string" method to my Grammar specification system
       
       # with escaped double quotes inside
-      result = @parser.parse('#include "hello \\"world\\""')
-      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.file_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
-      result.file_name.lexeme.should == 'hello \\"world\\"'
+      result = @parser.parse('#import "hello \\"world\\""')
+      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.class_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.class_name.lexeme.should == 'hello \\"world\\"'
       
       # with other escapes inside
-      result = @parser.parse('#include "hello\\nworld"')
-      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.file_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
-      result.file_name.lexeme.should == 'hello\\nworld'
+      result = @parser.parse('#import "hello\\nworld"')
+      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.class_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.class_name.lexeme.should == 'hello\\nworld'
       
       # with single quotes inside
-      result = @parser.parse('#include "hello \'world\'"')
-      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.file_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
-      result.file_name.lexeme.should == "hello 'world'"
+      result = @parser.parse('#import "hello \'world\'"')
+      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.class_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.class_name.lexeme.should == "hello 'world'"
       
       # with Walrus comments inside (ignored)
-      result = @parser.parse('#include "hello ##world"')
-      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.file_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
-      result.file_name.lexeme.should == 'hello ##world'
+      result = @parser.parse('#import "hello ##world"')
+      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.class_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.class_name.lexeme.should == 'hello ##world'
       
       # with Walrus placeholders inside (no interpolation)
-      result = @parser.parse('#include "hello $world"')
-      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.file_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
-      result.file_name.lexeme.should == 'hello $world'
+      result = @parser.parse('#import "hello $world"')
+      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.class_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.class_name.lexeme.should == 'hello $world'
       
       # with Walrus directives inside (no interpolation)
-      result = @parser.parse('#include "hello #end"')
-      result.file_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.file_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
-      result.file_name.lexeme.should == 'hello #end'
+      result = @parser.parse('#import "hello #end"')
+      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
+      result.class_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.class_name.lexeme.should == 'hello #end'
       
     end
     

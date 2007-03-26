@@ -1,0 +1,3 @@
+This example features an include file which itself contains a variety of directives.
+#include 'complicated_included_file.txt'
+Final paragraph, referencing an instance variable defined in the included file: #= @my_ivar #

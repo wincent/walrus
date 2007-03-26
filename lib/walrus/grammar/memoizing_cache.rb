@@ -39,6 +39,7 @@ module Walrus
         
         # construct a unique identifier
         identifier = [options[:parseable], options[:line_start], options[:column_start]]
+        identifier << options[:origin] if options.has_key? :origin
         identifier << options[:skipping_override] if options.has_key? :skipping_override
         
         if (result = @cache[identifier]) != NoValueForKey.instance

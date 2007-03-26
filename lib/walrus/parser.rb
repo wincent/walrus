@@ -148,23 +148,21 @@ module Walrus
       production      :import_directive.build(:directive, :class_name)          # superclass (ImportDirective) must be created
       production      :extends_directive.build(:import_directive, :class_name)  # before the subclass (ExtendsDirective)
       
-      rule            :include_directive,                   '#include'.skip & :string_literal & :directive_end
-      production      :include_directive.build(:directive, :file_name)
+      rule            :include_directive,                   '#include'.skip & :include_subparslet
+      production      :include_directive.build(:directive, :file_name, :subtree)
       
       rule            :include_subparslet,                  lambda { |string, options|
         
         # scans a string literal 
-        state   = Grammar::ParserState.new(string, options)
-        parslet = :string_literal & :directive_end
-        parsed  = parslet.parse(state.remainder, state.options)
-        state.skipped(parsed)
+        parslet   = :string_literal & :directive_end
+        file_name = parslet.parse(string, options)
         
         # if options contains non-nil "origin" then try to construct relative path; otherwise just look in current working directory
         if options[:origin]
           current_location  = Pathname.new(options[:origin]).dirname
-          include_target    = current_location + parsed.to_s
+          include_target    = current_location + file_name.to_s
         else
-          include_target    = parsed.to_s
+          include_target    = Pathname.new file_name.to_s
         end
         
         # read file into string
@@ -172,19 +170,16 @@ module Walrus
         
         # try to parse string in sub-parser
         sub_options = { :origin => include_target.to_s }
-        sub_result = nil
+        sub_result  = nil
         catch :AndPredicateSuccess do
-          # need to make this play nicely with the memoizer
-          sub_result  = Parser.parse(content, sub_options)
+          sub_result  = Parser.new.parse(content, sub_options)
         end
         
         # want to insert a bunch of nodes (a subtree) into the parse tree without advance the location counters
-        if sub_result
-          sub_tree = Grammar::ArrayResult.new(state.results)
-        else
-          sub_tree
-        end
-        
+        sub_tree = Grammar::ArrayResult.new [ file_name, sub_result ? sub_result : [] ]
+        sub_tree.start  = file_name.start
+        sub_tree.end    = file_name.end
+        sub_tree
       }
       
       # "Any section of a template definition that is inside a #raw ... #end raw tag pair will be printed verbatim without any parsing of $placeholders or other directives."
@@ -390,6 +385,7 @@ module Walrus
       require 'walrus/walrus_grammar/echo_directive'
       require 'walrus/walrus_grammar/escape_sequence'
       require 'walrus/walrus_grammar/import_directive'
+      require 'walrus/walrus_grammar/include_directive'
       require 'walrus/walrus_grammar/instance_variable'
       require 'walrus/walrus_grammar/literal'
       require 'walrus/walrus_grammar/multiline_comment'

@@ -104,11 +104,13 @@ module Walrus
         raise if param_count < 1
         
         # dynamically build up a message send
-        if param_count == 1 : params        = 'result'
-        else                  params        = 'result[0]'
-        end
-        for i in 1..(param_count - 1)
-          params << ", result[#{i.to_s}]"
+        if param_count == 1
+          params = 'result'
+        else
+          params = 'result[0]'
+          for i in 1..(param_count - 1)
+            params << ", result[#{i.to_s}]"
+          end
         end
         
         node                = node_class.class_eval('new(%s)' % params)
