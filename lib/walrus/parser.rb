@@ -348,29 +348,10 @@ module Walrus
       
       production      :addition_expression.build(:ruby_expression, :left, :right)
       
-      # the original definition is right-recursive and that yields a right-associative expression (not what we want):
-      #
-      #rule            :message_expression,                  :literal_expression & '.'.skip & (:message_expression | :method_expression)
-      #
-      # written as a left-recursive definition we get:
-      #
+      # message expressions are left-associative (left-recursive)
       rule            :message_expression,                  :message_expression & '.'.skip & :method_expression |
                                                             :literal_expression & '.'.skip & :method_expression
       production      :message_expression.build(:ruby_expression, :target, :message)
-      #
-      # but left-recursion is technically not legal in a PEG so we have three options:
-      #
-      #   1. manually refactor to be right recursive; for example:
-      #
-      #     rule      :message_expression,                  :literal_expression & :message_expression_suffix
-      #     rule      :message_expression_suffix,           ('.'.skip & :method_expression & :message_expression_suffix) | ('.'.skip & :method_expression)
-      #
-      #   2. see page 69 of Ford's thesis for an idea of how this refactoring could be done automatically
-      #
-      #   3. do some runtime trickery to detect simple (direct) left recursion on the fly and handle it
-      #
-      # I've gone with approch 3 for now as it seems the simplest and most elegant. The problem with the first two approaches is that the right-refactoring
-      # changes the associativity (to right-associative) and in turn requires more trickery to manipulate the parse result and warp it back into a left-growing tree.
       
       rule            :method_expression,                   :method_with_parentheses | :method_without_parentheses
       node            :method_expression, :ruby_expression
