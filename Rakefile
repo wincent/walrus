@@ -61,8 +61,8 @@ SPEC = Gem::Specification.new do |s|
   s.platform      = Gem::Platform::RUBY
   s.summary       = 'Object-oriented templating system'
   s.description   = <<-ENDDESC
-    Walrus is an object-oriented templating system inspired by and similar to
-    the Cheetah Python-powered template engine. It includes a Parser
+    Walrus is an object-oriented templating system inspired by and similar
+    to the Cheetah Python-powered template engine. It includes a Parser
     Expression Grammar (PEG) parser generator capable of generating an
     integrated lexer, "packrat" parser, and Abstract Syntax Tree (AST)
     builder.
