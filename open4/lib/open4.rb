@@ -8,8 +8,7 @@
 #
 # Usage example:
 #
-#   result = ''
-#   errors = ''
+#   result, errors = '', ''
 #   Open4.popen4('svn', 'log') do |stdin, stdout, stderr|
 #     threads = []
 #     threads << Thread.new(stdout) do |out|
