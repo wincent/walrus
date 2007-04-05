@@ -14,13 +14,13 @@ module Walrus
     context 'using an "and predicate"' do
       
       specify 'should complain on trying to parse a nil string' do
-        lambda { AndPredicate.new('irrelevant').parse(nil) }.should_raise ArgumentError
+        lambda { AndPredicate.new('irrelevant').parse(nil) }.should raise_error(ArgumentError)
       end
       
       specify 'should be able to compare for equality' do
-        AndPredicate.new('foo').should_eql AndPredicate.new('foo')      # same
-        AndPredicate.new('foo').should_not_eql AndPredicate.new('bar')  # different
-        AndPredicate.new('foo').should_not_eql Predicate.new('foo')     # same, but different classes
+        AndPredicate.new('foo').should eql(AndPredicate.new('foo'))      # same
+        AndPredicate.new('foo').should_not eql(AndPredicate.new('bar'))  # different
+        AndPredicate.new('foo').should_not eql(Predicate.new('foo'))     # same, but different classes
       end
       
     end

@@ -14,7 +14,7 @@ module Walrus
     context 'using a string enumerator' do
       
       specify 'should raise an ArgumentError if initialized with nil' do
-        lambda { StringEnumerator.new(nil) }.should_raise ArgumentError
+        lambda { StringEnumerator.new(nil) }.should raise_error(ArgumentError)
       end
       
       specify 'should return characters one by one until end of string, then return nil' do
@@ -24,7 +24,7 @@ module Walrus
         enumerator.next.should == 'l'
         enumerator.next.should == 'l'
         enumerator.next.should == 'o'
-        enumerator.next.should_be_nil
+        enumerator.next.should be_nil
       end
       
       specify 'enumerators should be Unicode-aware (UTF-8)' do
@@ -36,7 +36,7 @@ module Walrus
         enumerator.next.should == 'ñ'
         enumerator.next.should == 'o'
         enumerator.next.should == 'n'
-        enumerator.next.should_be_nil
+        enumerator.next.should be_nil
       end
       
       # this was a bug

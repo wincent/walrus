@@ -19,7 +19,7 @@ module Walrus
       end
       
       specify 'should raise if initialized with nil' do
-        lambda { MatchDataWrapper.new(nil) }.should_raise ArgumentError
+        lambda { MatchDataWrapper.new(nil) }.should raise_error(ArgumentError)
       end
       
       specify 'stored match data should persist after multiple matches are executed' do

@@ -14,7 +14,7 @@ module Walrus
     context 'creating a continuation wrapper exception' do
       
       specify 'should complain if initialized with nil' do
-        lambda { ContinuationWrapperException.new(nil) }.should_raise ArgumentError
+        lambda { ContinuationWrapperException.new(nil) }.should raise_error(ArgumentError)
       end
       
     end

@@ -18,43 +18,43 @@ module Walrus
       end
       
       specify 'should raise an ArgumentError if initialized with nil' do
-        lambda { RegexpParslet.new(nil) }.should_raise ArgumentError
+        lambda { RegexpParslet.new(nil) }.should raise_error(ArgumentError)
       end
       
       specify 'parse should succeed if the input string matches' do
-        lambda { @parslet.parse('an_identifier') }.should_not_raise
-        lambda { @parslet.parse('An_Identifier') }.should_not_raise
-        lambda { @parslet.parse('AN_IDENTIFIER') }.should_not_raise
-        lambda { @parslet.parse('an_identifier1') }.should_not_raise
-        lambda { @parslet.parse('An_Identifier1') }.should_not_raise
-        lambda { @parslet.parse('AN_IDENTIFIER1') }.should_not_raise
-        lambda { @parslet.parse('a') }.should_not_raise
-        lambda { @parslet.parse('A') }.should_not_raise
-        lambda { @parslet.parse('a9') }.should_not_raise
-        lambda { @parslet.parse('A9') }.should_not_raise
-        lambda { @parslet.parse('_identifier') }.should_not_raise
-        lambda { @parslet.parse('_Identifier') }.should_not_raise
-        lambda { @parslet.parse('_IDENTIFIER') }.should_not_raise
-        lambda { @parslet.parse('_9Identifier') }.should_not_raise
-        lambda { @parslet.parse('_') }.should_not_raise
+        lambda { @parslet.parse('an_identifier') }.should_not raise_error
+        lambda { @parslet.parse('An_Identifier') }.should_not raise_error
+        lambda { @parslet.parse('AN_IDENTIFIER') }.should_not raise_error
+        lambda { @parslet.parse('an_identifier1') }.should_not raise_error
+        lambda { @parslet.parse('An_Identifier1') }.should_not raise_error
+        lambda { @parslet.parse('AN_IDENTIFIER1') }.should_not raise_error
+        lambda { @parslet.parse('a') }.should_not raise_error
+        lambda { @parslet.parse('A') }.should_not raise_error
+        lambda { @parslet.parse('a9') }.should_not raise_error
+        lambda { @parslet.parse('A9') }.should_not raise_error
+        lambda { @parslet.parse('_identifier') }.should_not raise_error
+        lambda { @parslet.parse('_Identifier') }.should_not raise_error
+        lambda { @parslet.parse('_IDENTIFIER') }.should_not raise_error
+        lambda { @parslet.parse('_9Identifier') }.should_not raise_error
+        lambda { @parslet.parse('_') }.should_not raise_error
       end
       
       specify 'parse should succeed if the input string matches, even if it continues after the match' do
-        lambda { @parslet.parse('an_identifier, more') }.should_not_raise
-        lambda { @parslet.parse('An_Identifier, more') }.should_not_raise
-        lambda { @parslet.parse('AN_IDENTIFIER, more') }.should_not_raise
-        lambda { @parslet.parse('an_identifier1, more') }.should_not_raise
-        lambda { @parslet.parse('An_Identifier1, more') }.should_not_raise
-        lambda { @parslet.parse('AN_IDENTIFIER1, more') }.should_not_raise
-        lambda { @parslet.parse('a, more') }.should_not_raise
-        lambda { @parslet.parse('A, more') }.should_not_raise
-        lambda { @parslet.parse('a9, more') }.should_not_raise
-        lambda { @parslet.parse('A9, more') }.should_not_raise
-        lambda { @parslet.parse('_identifier, more') }.should_not_raise
-        lambda { @parslet.parse('_Identifier, more') }.should_not_raise
-        lambda { @parslet.parse('_IDENTIFIER, more') }.should_not_raise
-        lambda { @parslet.parse('_9Identifier, more') }.should_not_raise
-        lambda { @parslet.parse('_, more') }.should_not_raise
+        lambda { @parslet.parse('an_identifier, more') }.should_not raise_error
+        lambda { @parslet.parse('An_Identifier, more') }.should_not raise_error
+        lambda { @parslet.parse('AN_IDENTIFIER, more') }.should_not raise_error
+        lambda { @parslet.parse('an_identifier1, more') }.should_not raise_error
+        lambda { @parslet.parse('An_Identifier1, more') }.should_not raise_error
+        lambda { @parslet.parse('AN_IDENTIFIER1, more') }.should_not raise_error
+        lambda { @parslet.parse('a, more') }.should_not raise_error
+        lambda { @parslet.parse('A, more') }.should_not raise_error
+        lambda { @parslet.parse('a9, more') }.should_not raise_error
+        lambda { @parslet.parse('A9, more') }.should_not raise_error
+        lambda { @parslet.parse('_identifier, more') }.should_not raise_error
+        lambda { @parslet.parse('_Identifier, more') }.should_not raise_error
+        lambda { @parslet.parse('_IDENTIFIER, more') }.should_not raise_error
+        lambda { @parslet.parse('_9Identifier, more') }.should_not raise_error
+        lambda { @parslet.parse('_, more') }.should_not raise_error
       end
       
       specify 'parse should return a MatchDataWrapper object' do
@@ -63,21 +63,21 @@ module Walrus
       end
       
       specify 'parse should raise an ArgumentError if passed nil' do
-        lambda { @parslet.parse(nil) }.should_raise ArgumentError
+        lambda { @parslet.parse(nil) }.should raise_error(ArgumentError)
       end
       
       specify 'parse should raise a ParseError if the input string does not match' do
-        lambda { @parslet.parse('9') }.should_raise ParseError               # a number is not a valid identifier
-        lambda { @parslet.parse('9fff') }.should_raise ParseError            # identifiers must not start with numbers
-        lambda { @parslet.parse(' identifier') }.should_raise ParseError     # note the leading whitespace
-        lambda { @parslet.parse('') }.should_raise ParseError                # empty strings can't match
+        lambda { @parslet.parse('9') }.should raise_error(ParseError)           # a number is not a valid identifier
+        lambda { @parslet.parse('9fff') }.should raise_error(ParseError)        # identifiers must not start with numbers
+        lambda { @parslet.parse(' identifier') }.should raise_error(ParseError) # note the leading whitespace
+        lambda { @parslet.parse('') }.should raise_error(ParseError)            # empty strings can't match
       end
       
       specify 'should be able to compare parslets for equality' do
-        /foo/.to_parseable.should_eql /foo/.to_parseable        # equal
-        /foo/.to_parseable.should_not_eql /bar/.to_parseable    # different
-        /foo/.to_parseable.should_not_eql /Foo/.to_parseable    # differing only in case
-        /foo/.to_parseable.should_not_eql 'foo'                 # totally different classes
+        /foo/.to_parseable.should eql(/foo/.to_parseable)        # equal
+        /foo/.to_parseable.should_not eql(/bar/.to_parseable)    # different
+        /foo/.to_parseable.should_not eql(/Foo/.to_parseable)    # differing only in case
+        /foo/.to_parseable.should_not eql('foo')                 # totally different classes
       end
       
       specify 'should accurately pack line and column ends into whatever gets returned from "parse"' do
@@ -167,7 +167,7 @@ module Walrus
         
         # the first parslet should gobble up the entire string, preventing the second parslet from succeeding
         parslet = RegexpParslet.new(/foo.+\d/) & RegexpParslet.new(/bar.+\d/)
-        lambda { parslet.parse('foo_1bar_2') }.should_raise ParseError
+        lambda { parslet.parse('foo_1bar_2') }.should raise_error(ParseError)
         
       end
       
@@ -183,7 +183,7 @@ module Walrus
       
       specify 'should fail if no parslet generates a match' do
         parslet = RegexpParslet.new(/\d+/) | RegexpParslet.new(/[A-Z]+/)
-        lambda { parslet.parse('abc') }.should_raise ParseError
+        lambda { parslet.parse('abc') }.should raise_error(ParseError)
       end
       
       specify 'parslets should be tried in left-to-right order' do
@@ -224,7 +224,7 @@ module Walrus
       
       specify 'should fail if no parslet generates a match' do
         parslet = RegexpParslet.new(/\d+/) | RegexpParslet.new(/[A-Z]+/) | RegexpParslet.new(/[a-z]+/)
-        lambda { parslet.parse(':::') }.should_raise ParseError
+        lambda { parslet.parse(':::') }.should raise_error(ParseError)
       end
       
       specify 'parslets should be tried in left-to-right order' do
@@ -258,15 +258,15 @@ module Walrus
         parslet = RegexpParslet.new(/foo/) | RegexpParslet.new(/bar/) & RegexpParslet.new(/abc/)
         parslet.parse('foo').should == 'foo'                                            # succeed on first choice
         parslet.parse('barabc').should == ['bar', 'abc']                                # succeed on alternate path
-        lambda { parslet.parse('bar...') }.should_raise ParseError                      # fail half-way down alternate path
-        lambda { parslet.parse('lemon') }.should_raise ParseError                       # fail immediately
+        lambda { parslet.parse('bar...') }.should raise_error(ParseError)               # fail half-way down alternate path
+        lambda { parslet.parse('lemon') }.should raise_error(ParseError)                # fail immediately
         
         # swap the order, now equivalent to: ( /bar/ & /abc/ ) | /foo/
         parslet = RegexpParslet.new(/bar/) & RegexpParslet.new(/abc/) | RegexpParslet.new(/foo/)
         parslet.parse('barabc').should == ['bar', 'abc']                                # succeed on first choice
         parslet.parse('foo').should == 'foo'                                            # succeed on alternate path
-        lambda { parslet.parse('bar...') }.should_raise ParseError                      # fail half-way down first path
-        lambda { parslet.parse('lemon') }.should_raise ParseError                       # fail immediately
+        lambda { parslet.parse('bar...') }.should raise_error(ParseError)               # fail half-way down first path
+        lambda { parslet.parse('lemon') }.should raise_error(ParseError)                # fail immediately
         
       end
       
@@ -276,21 +276,21 @@ module Walrus
         parslet = (RegexpParslet.new(/foo/) | RegexpParslet.new(/bar/)) & RegexpParslet.new(/abc/)
         parslet.parse('fooabc').should == ['foo', 'abc']                                # first choice
         parslet.parse('barabc').should == ['bar', 'abc']                                # second choice
-        lambda { parslet.parse('foo...') }.should_raise ParseError                      # fail in second half
-        lambda { parslet.parse('bar...') }.should_raise ParseError                      # another way of failing in second half
-        lambda { parslet.parse('foo') }.should_raise ParseError                         # another way of failing in second half
-        lambda { parslet.parse('bar') }.should_raise ParseError                         # another way of failing in second half
-        lambda { parslet.parse('lemon') }.should_raise ParseError                       # fail immediately
-        lambda { parslet.parse('abcfoo') }.should_raise ParseError                      # order matters
+        lambda { parslet.parse('foo...') }.should raise_error(ParseError)               # fail in second half
+        lambda { parslet.parse('bar...') }.should raise_error(ParseError)               # another way of failing in second half
+        lambda { parslet.parse('foo') }.should raise_error(ParseError)                  # another way of failing in second half
+        lambda { parslet.parse('bar') }.should raise_error(ParseError)                  # another way of failing in second half
+        lambda { parslet.parse('lemon') }.should raise_error(ParseError)                # fail immediately
+        lambda { parslet.parse('abcfoo') }.should raise_error(ParseError)               # order matters
         
         # take second example above and make it /bar/ & ( /abc/ | /foo/ )
         parslet = RegexpParslet.new(/bar/) & (RegexpParslet.new(/abc/) | RegexpParslet.new(/foo/))
         parslet.parse('barabc').should == ['bar', 'abc']                                # succeed on first choice
         parslet.parse('barfoo').should == ['bar', 'foo']                                # second choice
-        lambda { parslet.parse('bar...') }.should_raise ParseError                      # fail in second part
-        lambda { parslet.parse('bar') }.should_raise ParseError                         # another way to fail in second part
-        lambda { parslet.parse('lemon') }.should_raise ParseError                       # fail immediately
-        lambda { parslet.parse('abcbar') }.should_raise ParseError                      # order matters
+        lambda { parslet.parse('bar...') }.should raise_error(ParseError)               # fail in second part
+        lambda { parslet.parse('bar') }.should raise_error(ParseError)                  # another way to fail in second part
+        lambda { parslet.parse('lemon') }.should raise_error(ParseError)                # fail immediately
+        lambda { parslet.parse('abcbar') }.should raise_error(ParseError)               # order matters
         
       end
       
@@ -300,7 +300,7 @@ module Walrus
         parslet = RegexpParslet.new(/a/) & RegexpParslet.new(/b/) & RegexpParslet.new(/c/) & RegexpParslet.new(/d/) | RegexpParslet.new(/e/)
         parslet.parse('abcd').should == ['a', 'b', 'c', 'd']
         parslet.parse('e').should == 'e'
-        lambda { parslet.parse('f') }.should_raise ParseError
+        lambda { parslet.parse('f') }.should raise_error(ParseError)
         
       end
       
@@ -312,7 +312,7 @@ module Walrus
         parslet.parse('b').should == 'b'
         parslet.parse('c').should == 'c'
         parslet.parse('de').should == ['d', 'e']
-        lambda { parslet.parse('f') }.should_raise ParseError
+        lambda { parslet.parse('f') }.should raise_error(ParseError)
         
       end
       
@@ -323,7 +323,7 @@ module Walrus
         parslet.parse('ab').should == ['a', 'b']
         parslet.parse('cd').should == ['c', 'd']
         parslet.parse('e').should == 'e'
-        lambda { parslet.parse('f') }.should_raise ParseError
+        lambda { parslet.parse('f') }.should raise_error(ParseError)
         
       end
       
@@ -337,7 +337,7 @@ module Walrus
         parslet.parse('d').should == 'd'
         parslet.parse('e').should == 'e'
         parslet.parse('fgh').should == ['f', 'g', 'h']
-        lambda { parslet.parse('i') }.should_raise ParseError
+        lambda { parslet.parse('i') }.should raise_error(ParseError)
         
       end
       

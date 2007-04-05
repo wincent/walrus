@@ -27,9 +27,9 @@ module Walrus
     end
     
     specify 'those accessors should be "private"' do
-      lambda { ByCopyAccessDemo.attr_bycopy :hello }.should_raise NoMethodError
-      lambda { ByCopyAccessDemo.attr_writer_bycopy :hello }.should_raise NoMethodError
-      lambda { ByCopyAccessDemo.attr_accessor_bycopy :hello }.should_raise NoMethodError
+      lambda { ByCopyAccessDemo.attr_bycopy :hello }.should raise_error(NoMethodError)
+      lambda { ByCopyAccessDemo.attr_writer_bycopy :hello }.should raise_error(NoMethodError)
+      lambda { ByCopyAccessDemo.attr_accessor_bycopy :hello }.should raise_error(NoMethodError)
     end
     
     specify 'should accept "normal" objects like String, making copies of them' do
@@ -46,8 +46,8 @@ module Walrus
       gamma3  = "pqr"
       
       # assignments
-      lambda { @instance.foo = foo }.should_raise NoMethodError # no writer defined
-      lambda { @instance.bar = bar }.should_raise NoMethodError # no writer defined
+      lambda { @instance.foo = foo }.should raise_error(NoMethodError) # no writer defined
+      lambda { @instance.bar = bar }.should raise_error(NoMethodError) # no writer defined
       @instance.baz     = baz
       @instance.beta    = beta
       @instance.gamma   = gamma
@@ -90,8 +90,8 @@ module Walrus
       gamma3  = :symbol
       
       # assignments
-      lambda { @instance.foo = foo }.should_raise NoMethodError # no writer defined
-      lambda { @instance.bar = bar }.should_raise NoMethodError # no writer defined
+      lambda { @instance.foo = foo }.should raise_error(NoMethodError) # no writer defined
+      lambda { @instance.bar = bar }.should raise_error(NoMethodError) # no writer defined
       @instance.baz     = baz
       @instance.beta    = beta
       @instance.gamma   = gamma

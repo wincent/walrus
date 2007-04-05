@@ -16,20 +16,20 @@ module Walrus
       specify 'should be able to create new Grammar subclasses on the fly' do
         
         # first create a new subclass and make sure the returned instance is non-nil
-        Grammar.subclass('MyGrammar').should_not_be_nil
+        Grammar.subclass('MyGrammar').should_not be_nil
         
         # the class constant should now be available for creating new instances 
-        MyGrammar.new.should_not_be_nil
+        MyGrammar.new.should_not be_nil
       
       end
       
       specify 'should complain if an attempt is made to create the same subclass twice' do
-        lambda { Grammar.subclass('FooGrammar') }.should_not_raise
-        lambda { Grammar.subclass('FooGrammar') }.should_raise
+        lambda { Grammar.subclass('FooGrammar') }.should_not raise_error
+        lambda { Grammar.subclass('FooGrammar') }.should raise_error
       end
       
       specify 'should complain if subclass name is nil' do
-        lambda { Grammar.subclass(nil) }.should_raise ArgumentError
+        lambda { Grammar.subclass(nil) }.should raise_error(ArgumentError)
       end
       
       specify 'should be able to pass a block while defining a new subclass' do
@@ -46,9 +46,9 @@ module Walrus
     context 'defining rules in a grammar' do
       
       specify '"rules" method should complain if either parameter is nil' do
-        lambda { Grammar.subclass('AxeGrammar') { rule nil, 'expression' } }.should_raise ArgumentError
-        lambda { Grammar.subclass('BoneGrammar') { rule :my_rule, nil } }.should_raise ArgumentError
-        lambda { Grammar.subclass('CatGrammar') { rule nil, nil } }.should_raise ArgumentError
+        lambda { Grammar.subclass('AxeGrammar') { rule nil, 'expression' } }.should raise_error(ArgumentError)
+        lambda { Grammar.subclass('BoneGrammar') { rule :my_rule, nil } }.should raise_error(ArgumentError)
+        lambda { Grammar.subclass('CatGrammar') { rule nil, nil } }.should raise_error(ArgumentError)
       end
       
       specify '"rules" method should complain if an attempt is made to define a rule a second time' do
@@ -57,7 +57,7 @@ module Walrus
             rule :my_rule, 'foo'
             rule :my_rule, 'bar'
           end
-        end.should_raise ArgumentError
+        end.should raise_error(ArgumentError)
       end
       
       specify 'should be able to define rules in the block using the "rule" method' do
@@ -71,7 +71,7 @@ module Walrus
       specify '"node" method should complain if new class name is nil' do
         lambda do
           Grammar.subclass('NodeComplainingGrammar') { node nil }
-        end.should_raise ArgumentError
+        end.should raise_error(ArgumentError)
       end
       
       specify 'should be able to define a simple Node subclass using the "node" function' do
@@ -108,9 +108,9 @@ module Walrus
         node.bar.should == 'world'
         
         # try passing the wrong number of parameters
-        lambda { HeMeansJavaRuntimeAPIs::Foobar.new }.should_raise ArgumentError                # no parameters
-        lambda { HeMeansJavaRuntimeAPIs::Foobar.new('hi') }.should_raise ArgumentError          # one parameter too few
-        lambda { HeMeansJavaRuntimeAPIs::Foobar.new('a', 'b', 'c') }.should_raise ArgumentError # one parameter too many
+        lambda { HeMeansJavaRuntimeAPIs::Foobar.new }.should raise_error(ArgumentError)                 # no parameters
+        lambda { HeMeansJavaRuntimeAPIs::Foobar.new('hi') }.should raise_error(ArgumentError)           # one parameter too few
+        lambda { HeMeansJavaRuntimeAPIs::Foobar.new('a', 'b', 'c') }.should raise_error(ArgumentError)  # one parameter too many
         
       end
       
@@ -121,13 +121,13 @@ module Walrus
             production  :foo
             production  :foo
           end
-        end.should_raise ArgumentError
+        end.should raise_error(ArgumentError)
       end
       
       specify 'should complain if an attempt is made to create a production for a rule that does not exist yet' do
         lambda do
           Grammar.subclass('GettingControlOfJavaAwayFromSun') { production :foo }
-        end.should_raise ArgumentError
+        end.should raise_error(ArgumentError)
       end
       
     end
@@ -135,11 +135,11 @@ module Walrus
     context 'parsing using a grammar' do
       
       specify 'should complain if asked to parse a nil string' do
-        lambda { Grammar.subclass('BobGrammar').parse(nil) }.should_raise ArgumentError
+        lambda { Grammar.subclass('BobGrammar').parse(nil) }.should raise_error(ArgumentError)
       end
       
       specify 'should complain if trying to parse without first defining a start symbol' do
-        lambda { Grammar.subclass('RoyalGrammar').parse('foo') }.should_raise
+        lambda { Grammar.subclass('RoyalGrammar').parse('foo') }.should raise_error
       end
       
       specify 'should parse starting with the start symbol' do
@@ -149,13 +149,13 @@ module Walrus
         end
         
         grammar.parse('foo').should == 'foo'
-        lambda { grammar.parse('') }.should_raise ParseError
+        lambda { grammar.parse('') }.should raise_error(ParseError)
         
       end
       
       specify 'should complain if reference is made to an undefined symbol' do
         grammar = Grammar.subclass('RoyGrammar') { starting_symbol :expr } # :expr is not defined
-        lambda { grammar.parse('foo') }.should_raise
+        lambda { grammar.parse('foo') }.should raise_error
       end
       
       specify 'should be able to parse using a simple grammar (one rule)' do
@@ -164,7 +164,7 @@ module Walrus
           rule            :foo, 'foo!'
         end
         grammar.parse('foo!').should == 'foo!'
-        lambda { grammar.parse('---') }.should_raise ParseError
+        lambda { grammar.parse('---') }.should raise_error(ParseError)
       end
       
       specify 'should be able to parse using a simple grammar (two rules)' do
@@ -175,7 +175,7 @@ module Walrus
         end
         grammar.parse('foo!').should == 'foo!'
         grammar.parse('bar').should == 'bar'
-        lambda { grammar.parse('---') }.should_raise ParseError
+        lambda { grammar.parse('---') }.should raise_error(ParseError)
       end
       
       specify 'should be able to parse using a simple grammar (three rules)' do
@@ -193,7 +193,7 @@ module Walrus
         end
         grammar.parse('## hello!').should == ['##', ' hello!']
         grammar.parse('##').should == '##'
-        lambda { grammar.parse('foobar') }.should_raise ParseError
+        lambda { grammar.parse('foobar') }.should raise_error(ParseError)
         
         # the same grammar rewritten without intermediary parslets (three rules, no standalone parslets)
         grammar = Grammar.subclass('MacAltGrammar') do
@@ -204,7 +204,7 @@ module Walrus
         end
         grammar.parse('## hello!').should == ['##', ' hello!']
         grammar.parse('##').should == '##'
-        lambda { grammar.parse('foobar') }.should_raise ParseError
+        lambda { grammar.parse('foobar') }.should raise_error(ParseError)
       end
       
       specify 'should be able to parse using recursive rules (nested parentheses)' do
@@ -220,7 +220,7 @@ module Walrus
         grammar.parse('()').should == ['(', ')']
         grammar.parse('(content)').should == ['(', 'content', ')']
         grammar.parse('(content (and more content))').should == ['(', ['content ', ['(', 'and more content', ')']], ')']
-        lambda { grammar.parse('(') }.should_raise ParseError
+        lambda { grammar.parse('(') }.should raise_error(ParseError)
         
         # same example but automatically skipping the delimiting braces for clearer output
         grammar = Grammar.subclass('NestedSkippingGrammar') do
@@ -233,7 +233,7 @@ module Walrus
         grammar.parse('(content (and more content)(and more))').should == ['content ', 'and more content', 'and more']
         grammar.parse('(content (and more content)(and more)(more still))').should == ['content ', 'and more content', 'and more', 'more still']
         grammar.parse('(content (and more content)(and more(more still)))').should == ['content ', 'and more content', ['and more', 'more still']]
-        lambda { grammar.parse('(') }.should_raise ParseError
+        lambda { grammar.parse('(') }.should raise_error(ParseError)
         
         # note that this confusing (possible even misleading) nesting goes away if you use a proper AST
         grammar = Grammar.subclass('NestedBracketsWithAST') do
@@ -273,7 +273,7 @@ module Walrus
         results.children[2].children[1].children.should == 'more still'
         
         # bad input case
-        lambda { grammar.parse('(') }.should_raise ParseError
+        lambda { grammar.parse('(') }.should raise_error(ParseError)
         
       end
       
@@ -288,7 +288,7 @@ module Walrus
         grammar.parse('/**/').should == ['/*', '*/']        
         grammar.parse('/*comment*/').should == ['/*', 'comment', '*/']
         grammar.parse('/* comment /* nested */*/').should == ['/*', [' comment ', ['/*', ' nested ', '*/']], '*/']        
-        lambda { grammar.parse('/*') }.should_raise ParseError
+        lambda { grammar.parse('/*') }.should raise_error(ParseError)
       end
       
       specify 'should be able to write a grammar that produces an AST for a simple language that supports addition and assignment' do
@@ -314,49 +314,49 @@ module Walrus
         end
         
         results = grammar.parse('hello')
-        results.should_be_kind_of SimpleASTLanguage::Identifier
+        results.should be_kind_of(SimpleASTLanguage::Identifier)
         results.lexeme.should == 'hello'
         
         results = grammar.parse('1234')
-        results.should_be_kind_of SimpleASTLanguage::IntegerLiteral
+        results.should be_kind_of(SimpleASTLanguage::IntegerLiteral)
         results.lexeme.should == '1234'
         
         results = grammar.parse('foo=bar')
-        results.should_be_kind_of SimpleASTLanguage::Expression
-        results.should_be_kind_of SimpleASTLanguage::AssignmentExpression
-        results.target.should_be_kind_of SimpleASTLanguage::Identifier
+        results.should be_kind_of(SimpleASTLanguage::Expression)
+        results.should be_kind_of(SimpleASTLanguage::AssignmentExpression)
+        results.target.should be_kind_of(SimpleASTLanguage::Identifier)
         results.target.lexeme.should == 'foo'
-        results.value.should_be_kind_of SimpleASTLanguage::Identifier
+        results.value.should be_kind_of(SimpleASTLanguage::Identifier)
         results.value.lexeme.should == 'bar'
         
         results = grammar.parse('baz+123')
-        results.should_be_kind_of SimpleASTLanguage::Expression
-        results.should_be_kind_of SimpleASTLanguage::AdditionExpression
-        results.summee.should_be_kind_of SimpleASTLanguage::Identifier
+        results.should be_kind_of(SimpleASTLanguage::Expression)
+        results.should be_kind_of(SimpleASTLanguage::AdditionExpression)
+        results.summee.should be_kind_of(SimpleASTLanguage::Identifier)
         results.summee.lexeme.should == 'baz'
-        results.summor.should_be_kind_of SimpleASTLanguage::IntegerLiteral
+        results.summor.should be_kind_of(SimpleASTLanguage::IntegerLiteral)
         results.summor.lexeme.should == '123'
         
         results = grammar.parse('foo=abc+123')
-        results.should_be_kind_of SimpleASTLanguage::Expression
-        results.should_be_kind_of SimpleASTLanguage::AssignmentExpression
-        results.target.should_be_kind_of SimpleASTLanguage::Identifier
+        results.should be_kind_of(SimpleASTLanguage::Expression)
+        results.should be_kind_of(SimpleASTLanguage::AssignmentExpression)
+        results.target.should be_kind_of(SimpleASTLanguage::Identifier)
         results.target.lexeme.should == 'foo'
-        results.value.should_be_kind_of SimpleASTLanguage::AdditionExpression
-        results.value.summee.should_be_kind_of SimpleASTLanguage::Identifier
+        results.value.should be_kind_of(SimpleASTLanguage::AdditionExpression)
+        results.value.summee.should be_kind_of(SimpleASTLanguage::Identifier)
         results.value.summee.lexeme.should == 'abc'
-        results.value.summor.should_be_kind_of SimpleASTLanguage::IntegerLiteral
+        results.value.summor.should be_kind_of(SimpleASTLanguage::IntegerLiteral)
         results.value.summor.lexeme.should == '123'
         
         results = grammar.parse('a+b+2')
-        results.should_be_kind_of SimpleASTLanguage::Expression
-        results.should_be_kind_of SimpleASTLanguage::AdditionExpression
-        results.summee.should_be_kind_of SimpleASTLanguage::Identifier
+        results.should be_kind_of(SimpleASTLanguage::Expression)
+        results.should be_kind_of(SimpleASTLanguage::AdditionExpression)
+        results.summee.should be_kind_of(SimpleASTLanguage::Identifier)
         results.summee.lexeme.should == 'a'
-        results.summor.should_be_kind_of SimpleASTLanguage::AdditionExpression
-        results.summor.summee.should_be_kind_of SimpleASTLanguage::Identifier
+        results.summor.should be_kind_of(SimpleASTLanguage::AdditionExpression)
+        results.summor.summee.should be_kind_of(SimpleASTLanguage::Identifier)
         results.summor.summee.lexeme.should == 'b'
-        results.summor.summor.should_be_kind_of SimpleASTLanguage::IntegerLiteral
+        results.summor.summor.should be_kind_of(SimpleASTLanguage::IntegerLiteral)
         results.summor.summor.lexeme.should == '2'
         
       end
@@ -375,9 +375,9 @@ module Walrus
         grammar.parse('').should == ''
         grammar.parse('foo').should == 'foo'
         grammar.parse('foo bar').should == ['foo', 'bar']
-        lambda { grammar.parse('...') }.should_raise ParseError
-        lambda { grammar.parse('foo...') }.should_raise ParseError
-        lambda { grammar.parse('foo bar...') }.should_raise ParseError
+        lambda { grammar.parse('...') }.should raise_error(ParseError)
+        lambda { grammar.parse('foo...') }.should raise_error(ParseError)
+        lambda { grammar.parse('foo bar...') }.should raise_error(ParseError)
         
       end
       
@@ -397,7 +397,7 @@ module Walrus
         # not sure if I can justify the difference in behaviour here compared with the previous grammar
         # if I catch these throws at the grammar level I can return nil
         # but note that the previous grammar returns an empty array, which to_s is just ""
-        lambda { grammar.parse('') }.should_throw :AndPredicateSuccess
+        lambda { grammar.parse('') }.should throw_symbol(:AndPredicateSuccess)
         
         grammar.parse('foo').should == 'foo'
         grammar.parse('foo bar').should == ['foo', 'bar']       # intervening whitespace
@@ -438,13 +438,13 @@ module Walrus
             skipping :first   # fine
             skipping :again   # should raise here
           end
-        end.should_raise
+        end.should raise_error
       end
       
       specify 'should complain if passed nil' do
         lambda do
           Grammar.subclass('PassNilToSkipping') { skipping nil }
-        end.should_raise ArgumentError
+        end.should raise_error(ArgumentError)
       end
       
       specify 'should be able to override default skipping parslet on a per-rule basis' do
@@ -496,13 +496,13 @@ module Walrus
             skipping  :the_rule, :the_override  # fine
             skipping  :the_rule, :the_override  # should raise
           end
-        end.should_raise ArgumentError
+        end.should raise_error(ArgumentError)
       end
       
       specify "should complain if trying to set an override for a rule that hasn't been defined yet" do
         lambda do
           Grammar.subclass('OverrideUndefinedRule') { skipping :non_existent_rule, :the_override }
-        end.should_raise ArgumentError
+        end.should raise_error(ArgumentError)
       end
       
       specify 'use of the "skipping" directive should play nicely with predicates' do
@@ -518,9 +518,9 @@ module Walrus
         grammar.parse('hello world').should == 'hello'
         grammar.parse('hello      world').should == 'hello'
         grammar.parse('helloworld').should == 'hello'
-        lambda { grammar.parse('hello') }.should_raise ParseError
-        lambda { grammar.parse('hello buddy') }.should_raise ParseError
-        lambda { grammar.parse("hello\nbuddy") }.should_raise ParseError
+        lambda { grammar.parse('hello') }.should raise_error(ParseError)
+        lambda { grammar.parse('hello buddy') }.should raise_error(ParseError)
+        lambda { grammar.parse("hello\nbuddy") }.should raise_error(ParseError)
         
         # example 2: word + predicate + other word
         grammar = Grammar.subclass('NicePlayer2') do
@@ -533,9 +533,9 @@ module Walrus
         grammar.parse('hello world').should == ['hello', 'world']
         grammar.parse('hello      world').should == ['hello', 'world']
         grammar.parse('helloworld').should == ['hello', 'world']
-        lambda { grammar.parse('hello') }.should_raise ParseError
-        lambda { grammar.parse('hello buddy') }.should_raise ParseError
-        lambda { grammar.parse("hello\nbuddy") }.should_raise ParseError
+        lambda { grammar.parse('hello') }.should raise_error(ParseError)
+        lambda { grammar.parse('hello buddy') }.should raise_error(ParseError)
+        lambda { grammar.parse("hello\nbuddy") }.should raise_error(ParseError)
         
       end
       

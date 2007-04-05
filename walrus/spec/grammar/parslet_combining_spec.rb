@@ -18,16 +18,16 @@ module Walrus
         # try in one order
         sequence = 'foo' & /\d+/
         sequence.parse('foo1000').should == ['foo', '1000']
-        lambda { sequence.parse('foo') }.should_raise ParseError      # first part alone is not enough
-        lambda { sequence.parse('1000') }.should_raise ParseError     # neither is second part alone
-        lambda { sequence.parse('1000foo') }.should_raise ParseError  # order matters
+        lambda { sequence.parse('foo') }.should raise_error(ParseError) # first part alone is not enough
+        lambda { sequence.parse('1000') }.should raise_error(ParseError) # neither is second part alone
+        lambda { sequence.parse('1000foo') }.should raise_error(ParseError) # order matters
         
         # same test but in reverse order
         sequence = /\d+/ & 'foo'
         sequence.parse('1000foo').should == ['1000', 'foo']
-        lambda { sequence.parse('foo') }.should_raise ParseError      # first part alone is not enough
-        lambda { sequence.parse('1000') }.should_raise ParseError     # neither is second part alone
-        lambda { sequence.parse('foo1000') }.should_raise ParseError  # order matters
+        lambda { sequence.parse('foo') }.should raise_error(ParseError) # first part alone is not enough
+        lambda { sequence.parse('1000') }.should raise_error(ParseError) # neither is second part alone
+        lambda { sequence.parse('foo1000') }.should raise_error(ParseError) # order matters
         
       end
       
@@ -37,13 +37,13 @@ module Walrus
         sequence = 'foo' | /\d+/
         sequence.parse('foo').should == 'foo'
         sequence.parse('100').should == '100'
-        lambda { sequence.parse('bar') }.should_raise ParseError
+        lambda { sequence.parse('bar') }.should raise_error(ParseError)
         
         # same test but in reverse order
         sequence = /\d+/ | 'foo'
         sequence.parse('foo').should == 'foo'
         sequence.parse('100').should == '100'
-        lambda { sequence.parse('bar') }.should_raise ParseError
+        lambda { sequence.parse('bar') }.should raise_error(ParseError)
         
       end
       
@@ -52,11 +52,11 @@ module Walrus
         sequence = 'foo' & /\d+/ | 'bar' & /[XYZ]{3}/
         sequence.parse('foo123').should == ['foo', '123']
         sequence.parse('barZYX').should == ['bar', 'ZYX']
-        lambda { sequence.parse('foo') }.should_raise ParseError
-        lambda { sequence.parse('123') }.should_raise ParseError
-        lambda { sequence.parse('bar') }.should_raise ParseError
-        lambda { sequence.parse('XYZ') }.should_raise ParseError
-        lambda { sequence.parse('barXY') }.should_raise ParseError
+        lambda { sequence.parse('foo') }.should raise_error(ParseError)
+        lambda { sequence.parse('123') }.should raise_error(ParseError)
+        lambda { sequence.parse('bar') }.should raise_error(ParseError)
+        lambda { sequence.parse('XYZ') }.should raise_error(ParseError)
+        lambda { sequence.parse('barXY') }.should raise_error(ParseError)
         
       end
       
@@ -65,24 +65,24 @@ module Walrus
         # optional (same as "?" in regular expressions)
         sequence = 'foo'.optional
         sequence.parse('foo').should == 'foo'
-        lambda { sequence.parse('bar') }.should_throw :ZeroWidthParseSuccess
+        lambda { sequence.parse('bar') }.should throw_symbol(:ZeroWidthParseSuccess)
         
         # zero_or_one (same as optional; "?" in regular expressions)
         sequence = 'foo'.zero_or_one
         sequence.parse('foo').should == 'foo'
-        lambda { sequence.parse('bar') }.should_throw :ZeroWidthParseSuccess
+        lambda { sequence.parse('bar') }.should throw_symbol(:ZeroWidthParseSuccess)
         
         # zero_or_more (same as "*" in regular expressions)
         sequence = 'foo'.zero_or_more
         sequence.parse('foo').should == 'foo'
         sequence.parse('foofoofoobar').should == ['foo', 'foo', 'foo']
-        lambda { sequence.parse('bar') }.should_throw :ZeroWidthParseSuccess
+        lambda { sequence.parse('bar') }.should throw_symbol(:ZeroWidthParseSuccess)
         
         # one_or_more (same as "+" in regular expressions)
         sequence = 'foo'.one_or_more
         sequence.parse('foo').should == 'foo'
         sequence.parse('foofoofoobar').should == ['foo', 'foo', 'foo']
-        lambda { sequence.parse('bar') }.should_raise ParseError
+        lambda { sequence.parse('bar') }.should raise_error(ParseError)
         
         # repeat (arbitary limits for min, max; same as {min, max} in regular expressions) 
         sequence = 'foo'.repeat(3, 5)
@@ -90,9 +90,9 @@ module Walrus
         sequence.parse('foofoofoofoobar').should == ['foo', 'foo', 'foo', 'foo']
         sequence.parse('foofoofoofoofoobar').should == ['foo', 'foo', 'foo', 'foo', 'foo']
         sequence.parse('foofoofoofoofoofoobar').should == ['foo', 'foo', 'foo', 'foo', 'foo']
-        lambda { sequence.parse('bar') }.should_raise ParseError
-        lambda { sequence.parse('foo') }.should_raise ParseError
-        lambda { sequence.parse('foofoo') }.should_raise ParseError
+        lambda { sequence.parse('bar') }.should raise_error(ParseError)
+        lambda { sequence.parse('foo') }.should raise_error(ParseError)
+        lambda { sequence.parse('foofoo') }.should raise_error(ParseError)
         
       end
       
@@ -109,7 +109,7 @@ module Walrus
         sequence.parse('foobarabc').should == ['foo', 'bar', 'abc']
         sequence.parse('foobarabcabc').should == ['foo', 'bar', ['abc', 'abc']]
         sequence.parse('barabc').should == ['bar', 'abc']
-        lambda { sequence.parse('abc') }.should_raise ParseError
+        lambda { sequence.parse('abc') }.should raise_error(ParseError)
         
         # similar test but with alternation
         sequence = 'foo' | 'bar' | 'abc'.one_or_more
@@ -117,12 +117,12 @@ module Walrus
         sequence.parse('barabc').should == 'bar'
         sequence.parse('abc').should == 'abc'
         sequence.parse('abcabc').should == ['abc', 'abc']
-        lambda { sequence.parse('nothing') }.should_raise ParseError
+        lambda { sequence.parse('nothing') }.should raise_error(ParseError)
         
         # test with defective sequence (makes no sense to use "optional" with alternation, will always succeed)
         sequence = 'foo'.optional | 'bar' | 'abc'.one_or_more
         sequence.parse('foobarabc').should == 'foo'
-        lambda { sequence.parse('nothing') }.should_throw :ZeroWidthParseSuccess
+        lambda { sequence.parse('nothing') }.should throw_symbol(:ZeroWidthParseSuccess)
         
       end
       
@@ -130,36 +130,36 @@ module Walrus
         sequence = 'foo' & 'bar'.not!
         sequence.parse('foo').should == 'foo' # fails with ['foo'] because that's the way ParserState works...
         sequence.parse('foo...').should == 'foo' # same
-        lambda { sequence.parse('foobar') }.should_raise ParseError
+        lambda { sequence.parse('foobar') }.should raise_error(ParseError)
       end
       
       specify 'an isolated "not predicate" should return a zero-width match' do
         sequence = 'foo'.not!
-        lambda { sequence.parse('foo') }.should_raise ParseError
-        lambda { sequence.parse('bar') }.should_throw :NotPredicateSuccess
+        lambda { sequence.parse('foo') }.should raise_error(ParseError)
+        lambda { sequence.parse('bar') }.should throw_symbol(:NotPredicateSuccess)
       end
       
       specify 'two "not predicates" chained together should act like a union' do
         
         # this means "not followed by 'foo' and not followed by 'bar'"
         sequence = 'foo'.not! & 'bar'.not!
-        lambda { sequence.parse('foo') }.should_raise ParseError
-        lambda { sequence.parse('bar') }.should_raise ParseError
-        lambda { sequence.parse('abc') }.should_throw :NotPredicateSuccess 
+        lambda { sequence.parse('foo') }.should raise_error(ParseError)
+        lambda { sequence.parse('bar') }.should raise_error(ParseError)
+        lambda { sequence.parse('abc') }.should throw_symbol(:NotPredicateSuccess) 
         
       end
       
       specify 'should be able to chain an "and predicate"' do
         sequence = 'foo' & 'bar'.and?
         sequence.parse('foobar').should == 'foo' # same problem, returns ['foo']
-        lambda { sequence.parse('foo...') }.should_raise ParseError
-        lambda { sequence.parse('foo') }.should_raise ParseError
+        lambda { sequence.parse('foo...') }.should raise_error(ParseError)
+        lambda { sequence.parse('foo') }.should raise_error(ParseError)
       end
       
       specify 'an isolated "and predicate" should return a zero-width match' do
         sequence = 'foo'.and?
-        lambda { sequence.parse('bar') }.should_raise ParseError
-        lambda { sequence.parse('foo') }.should_throw :AndPredicateSuccess
+        lambda { sequence.parse('bar') }.should raise_error(ParseError)
+        lambda { sequence.parse('foo') }.should throw_symbol(:AndPredicateSuccess)
       end
       
       specify 'should be able to follow an "and predicate" with other parslets or combinations' do
@@ -168,7 +168,7 @@ module Walrus
         sequence = 'foo' & 'bar'.and? | /.../
         sequence.parse('foobar').should == 'foo' # returns ['foo']
         sequence.parse('abc').should == 'abc'
-        lambda { sequence.parse('') }.should_raise ParseError
+        lambda { sequence.parse('') }.should raise_error(ParseError)
         
         # it makes little sense for the predicate to follows a choice operator so we don't test that
         
@@ -179,9 +179,9 @@ module Walrus
         # this is equivalent to "foo" followed by any three characters other than "bar"
         sequence = 'foo' & 'bar'.not! & /.../
         sequence.parse('fooabc').should == ['foo', 'abc']
-        lambda { sequence.parse('foobar') }.should_raise ParseError
-        lambda { sequence.parse('foo') }.should_raise ParseError
-        lambda { sequence.parse('') }.should_raise ParseError
+        lambda { sequence.parse('foobar') }.should raise_error(ParseError)
+        lambda { sequence.parse('foo') }.should raise_error(ParseError)
+        lambda { sequence.parse('') }.should raise_error(ParseError)
         
       end
       
@@ -192,14 +192,14 @@ module Walrus
         sequence.parse('foo').should == 'foo'
         sequence.parse('foofoobar').should == 'foo'
         sequence.parse('foofoo').should == ['foo', 'foo']
-        lambda { sequence.parse('bar') }.should_raise ParseError
-        lambda { sequence.parse('foobar') }.should_raise ParseError
+        lambda { sequence.parse('bar') }.should raise_error(ParseError)
+        lambda { sequence.parse('foobar') }.should raise_error(ParseError)
         
         # variation: note that greedy matching alters the behaviour
         sequence = ('foo' & 'bar').one_or_more & 'abc'.not!
         sequence.parse('foobar').should == ['foo', 'bar']
         sequence.parse('foobarfoobar').should == [['foo', 'bar'], ['foo', 'bar']]
-        lambda { sequence.parse('foobarabc') }.should_raise ParseError             
+        lambda { sequence.parse('foobarabc') }.should raise_error(ParseError)
         
       end
       
@@ -209,12 +209,12 @@ module Walrus
         sequence = 'foo' & /\d/.not!
         sequence.parse('foo').should == 'foo'
         sequence.parse('foobar').should == 'foo'
-        lambda { sequence.parse('foo1') }.should_raise ParseError
+        lambda { sequence.parse('foo1') }.should raise_error(ParseError)
         
         # match "word" characters as long as they're not followed by whitespace
         sequence = /\w+/ & /\s/.not!
         sequence.parse('foo').should == 'foo'
-        lambda { sequence.parse('foo ') }.should_raise ParseError
+        lambda { sequence.parse('foo ') }.should raise_error(ParseError)
         
       end
       

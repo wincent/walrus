@@ -14,19 +14,19 @@ module Walrus
     context 'using a Parslet Omission' do
       
       specify 'should raise if "parseable" argument is nil' do
-        lambda { ParsletOmission.new(nil) }.should_raise ArgumentError
+        lambda { ParsletOmission.new(nil) }.should raise_error(ArgumentError)
       end
       
       specify 'should complain if pass nil string for parsing' do
-        lambda { ParsletOmission.new('foo'.to_parseable).parse(nil) }.should_raise ArgumentError
+        lambda { ParsletOmission.new('foo'.to_parseable).parse(nil) }.should raise_error(ArgumentError)
       end
       
       specify 'should let parse errors from lower levels fall through' do
-        lambda { ParsletOmission.new('foo'.to_parseable).parse('bar') }.should_raise ParseError
+        lambda { ParsletOmission.new('foo'.to_parseable).parse('bar') }.should raise_error(ParseError)
       end
       
       specify 'should indicate parse errors with a SubstringSkippedException' do
-        lambda { ParsletOmission.new('foo'.to_parseable).parse('foo') }.should_raise SkippedSubstringException
+        lambda { ParsletOmission.new('foo'.to_parseable).parse('foo') }.should raise_error(SkippedSubstringException)
       end
       
       specify 'the raised SubstringSkippedException should include the parsed substring' do
@@ -48,8 +48,8 @@ module Walrus
       end
       
       specify 'should be able to compare for equality' do
-        ParsletOmission.new('foo').should_eql ParsletOmission.new('foo')
-        ParsletOmission.new('foo').should_not_eql ParsletOmission.new('bar')
+        ParsletOmission.new('foo').should eql(ParsletOmission.new('foo'))
+        ParsletOmission.new('foo').should_not eql(ParsletOmission.new('bar'))
       end
       
     end

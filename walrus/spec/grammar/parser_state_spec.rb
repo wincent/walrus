@@ -19,7 +19,7 @@ module Walrus
       end
       
       specify 'should raise an ArgumentError if initialized with nil' do
-        lambda { ParserState.new(nil) }.should_raise ArgumentError
+        lambda { ParserState.new(nil) }.should raise_error(ArgumentError)
       end
       
       specify 'before parsing has started "remainder" should equal the entire string' do
@@ -31,15 +31,15 @@ module Walrus
       end
       
       specify 'before parsing has started "results" should be empty' do
-        @state.results.should_be_empty
+        @state.results.should be_empty
       end
       
       specify '"parsed" should complain if passed nil' do
-        lambda { @state.parsed(nil) }.should_raise ArgumentError
+        lambda { @state.parsed(nil) }.should raise_error(ArgumentError)
       end
       
       specify '"skipped" should complain if passed nil' do
-        lambda { @state.skipped(nil) }.should_raise ArgumentError
+        lambda { @state.skipped(nil) }.should raise_error(ArgumentError)
       end
       
       specify '"parsed" should return the remainder of the string' do
@@ -61,7 +61,7 @@ module Walrus
       
       specify 'skipped substrings should not appear in "results"' do
         @state.skipped('this')
-        @state.results.should_be_empty
+        @state.results.should be_empty
       end
       
       specify 'should return an array of the parsed results (for multiple results)' do
@@ -77,7 +77,7 @@ module Walrus
       
       specify 'should work when the entire string is consumed in a single operation (using "skipped")' do
         @state.skipped(@base_string).should == ''
-        @state.results.should_be_empty
+        @state.results.should be_empty
       end
       
       specify '"parsed" should complain if passed something that doesn\'t respond to the "line_end" and "column_end" messages' do
@@ -85,12 +85,12 @@ module Walrus
         # line_end
         my_mock = mock('mock_which_does_not_implement_line_end', :null_object => true) 
         my_mock.should_receive(:line_end).and_raise(NoMethodError) 
-        lambda { @state.parsed(my_mock) }.should_raise NoMethodError
+        lambda { @state.parsed(my_mock) }.should raise_error(NoMethodError)
         
         # column_end
         my_mock = mock('mock_which_does_not_implement_column_end', :null_object => true) 
         my_mock.should_receive(:column_end).and_raise(NoMethodError) 
-        lambda { @state.parsed(my_mock) }.should_raise NoMethodError
+        lambda { @state.parsed(my_mock) }.should raise_error(NoMethodError)
         
       end
       
@@ -99,12 +99,12 @@ module Walrus
         # line_end
         my_mock = mock('mock_which_does_not_implement_line_end', :null_object => true) 
         my_mock.should_receive(:line_end).and_raise(NoMethodError) 
-        lambda { @state.skipped(my_mock) }.should_raise NoMethodError
+        lambda { @state.skipped(my_mock) }.should raise_error(NoMethodError)
         
         # column_end
         my_mock = mock('mock_which_does_not_implement_column_end', :null_object => true) 
         my_mock.should_receive(:column_end).and_raise(NoMethodError) 
-        lambda { @state.skipped(my_mock) }.should_raise NoMethodError
+        lambda { @state.skipped(my_mock) }.should raise_error(NoMethodError)
         
       end
       
@@ -112,7 +112,7 @@ module Walrus
         
         # first example
         @state.skipped('this is the ').should  == 'string to be parsed'
-        @state.results.should_be_empty
+        @state.results.should be_empty
         @state.parsed('string ').should       == 'to be parsed'
         @state.results.should == 'string '
         @state.skipped('to be parsed').should  == ''
@@ -122,7 +122,7 @@ module Walrus
         state = ParserState.new('foo1...')
         state.skipped('foo').should == '1...'
         state.remainder.should == '1...'
-        state.results.should_be_empty
+        state.results.should be_empty
         state.parsed('1').should == '...'
         state.remainder.should == '...'
         state.results.should == '1'
@@ -157,7 +157,7 @@ module Walrus
         state = ParserState.new('400€, foo')
         state.remainder.should == '400€, foo'
         state.skipped('4').should == '00€, foo'
-        state.results.should_be_empty
+        state.results.should be_empty
         state.parsed('0').should == '0€, foo'
         state.results.should == '0'
         state.skipped('0€, ').should == 'foo'

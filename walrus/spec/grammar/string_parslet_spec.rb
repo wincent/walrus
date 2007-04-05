@@ -18,15 +18,15 @@ module Walrus
       end
       
       specify 'should raise an ArgumentError if initialized with nil' do
-        lambda { StringParslet.new(nil) }.should_raise ArgumentError
+        lambda { StringParslet.new(nil) }.should raise_error(ArgumentError)
       end
       
       specify 'parse should succeed if the input string matches' do
-        lambda { @parslet.parse('HELLO') }.should_not_raise
+        lambda { @parslet.parse('HELLO') }.should_not raise_error
       end
       
       specify 'parse should succeed if the input string matches, even if it continues after the match' do
-        lambda { @parslet.parse('HELLO...') }.should_not_raise
+        lambda { @parslet.parse('HELLO...') }.should_not raise_error
       end
       
       specify 'parse should return parsed string' do
@@ -35,27 +35,28 @@ module Walrus
       end
       
       specify 'parse should raise an ArgumentError if passed nil' do
-        lambda { @parslet.parse(nil) }.should_raise ArgumentError
+        lambda { @parslet.parse(nil) }.should raise_error(ArgumentError)
       end
       
       specify 'parse should raise a ParseError if the input string does not match' do
-        lambda { @parslet.parse('GOODBYE') }.should_raise ParseError         # total mismatch
-        lambda { @parslet.parse('GOODBYE, HELLO') }.should_raise ParseError  # eventually would match, but too late
-        lambda { @parslet.parse('HELL...') }.should_raise ParseError         # starts well, but fails
-        lambda { @parslet.parse(' HELLO') }.should_raise ParseError          # note the leading whitespace
-        lambda { @parslet.parse('') }.should_raise ParseError                # empty strings can't match
+        lambda { @parslet.parse('GOODBYE') }.should raise_error(ParseError)        # total mismatch
+        lambda { @parslet.parse('GOODBYE, HELLO') }.should raise_error(ParseError) # eventually would match, but too late
+        lambda { @parslet.parse('HELL...') }.should raise_error(ParseError)        # starts well, but fails
+        lambda { @parslet.parse(' HELLO') }.should raise_error(ParseError)         # note the leading whitespace
+        lambda { @parslet.parse('') }.should raise_error(ParseError)               # empty strings can't match
       end
       
       specify 'parse exceptions should include a detailed error message' do
-        lambda { @parslet.parse('HELL...') }.should_raise ParseError, 'unexpected character "." (expected "O") while parsing "HELLO"'
-        lambda { @parslet.parse('HELL') }.should_raise ParseError, 'unexpected end-of-string (expected "O") while parsing "HELLO"'
+        # TODO: catch the raised exception and compare the message
+        lambda { @parslet.parse('HELL...') }.should raise_error(ParseError)
+        lambda { @parslet.parse('HELL') }.should raise_error(ParseError)
       end
       
       specify 'should be able to compare string parslets for equality' do
-        'foo'.to_parseable.should_eql 'foo'.to_parseable           # equal
-        'foo'.to_parseable.should_not_eql 'bar'.to_parseable    # different
-        'foo'.to_parseable.should_not_eql 'Foo'.to_parseable    # differing only in case
-        'foo'.to_parseable.should_not_eql /foo/                 # totally different classes
+        'foo'.to_parseable.should eql('foo'.to_parseable)           # equal
+        'foo'.to_parseable.should_not eql('bar'.to_parseable)       # different
+        'foo'.to_parseable.should_not eql('Foo'.to_parseable)       # differing only in case
+        'foo'.to_parseable.should_not eql(/foo/)                    # totally different classes
       end
       
       specify 'should accurately pack line and column ends into whatever is returned by "parse"' do

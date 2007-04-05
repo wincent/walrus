@@ -16,7 +16,7 @@ module Walrus
       context 'using the NoValueForKey class' do
         
         specify 'NoValueForKey should be a singleton' do
-          lambda { NoValueForKey.new }.should_raise
+          lambda { NoValueForKey.new }.should raise_error
           NoValueForKey.instance.object_id.should == NoValueForKey.instance.object_id
         end
         

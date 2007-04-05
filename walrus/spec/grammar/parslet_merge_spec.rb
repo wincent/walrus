@@ -14,8 +14,8 @@ module Walrus
     context 'using a Parslet Merge' do
       
       specify 'should be able to compare for equality' do
-        ParsletMerge.new('foo', 'bar').should_eql ParsletMerge.new('foo', 'bar')
-        ParsletMerge.new('foo', 'bar').should_not_eql ParsletOmission.new('foo') # wrong class
+        ParsletMerge.new('foo', 'bar').should eql(ParsletMerge.new('foo', 'bar'))
+        ParsletMerge.new('foo', 'bar').should_not eql(ParsletOmission.new('foo')) # wrong class
       end
       
       specify 'ParsletMerge and ParsletSequence hashs should not match even if created using the same parseable instances' do
@@ -24,7 +24,7 @@ module Walrus
         p1 = ParsletMerge.new(parseable1, parseable2)
         p2 = ParsletSequence.new(parseable1, parseable2)
         p1.hash.should_not == p2.hash
-        p1.should_not_eql p2
+        p1.should_not eql(p2)
       end
       
     end

@@ -20,17 +20,17 @@ module Walrus
 
       specify 'hashes should be the same if initialized with the same parseables' do
         ParsletSequence.new(@p1, @p2).hash.should == ParsletSequence.new(@p1, @p2).hash
-        ParsletSequence.new(@p1, @p2).should_eql ParsletSequence.new(@p1, @p2)
+        ParsletSequence.new(@p1, @p2).should eql(ParsletSequence.new(@p1, @p2))
       end
 
       specify 'hashes should (ideally) be different if initialized with different parseables' do
         ParsletSequence.new(@p1, @p2).hash.should_not == ParsletSequence.new('baz'.to_parseable, 'abc'.to_parseable).hash
-        ParsletSequence.new(@p1, @p2).should_not_eql ParsletSequence.new('baz'.to_parseable, 'abc'.to_parseable)
+        ParsletSequence.new(@p1, @p2).should_not eql(ParsletSequence.new('baz'.to_parseable, 'abc'.to_parseable))
       end
 
       specify 'hashes should be different compared to other similar classes even if initialized with the same parseables' do
         ParsletSequence.new(@p1, @p2).hash.should_not == ParsletChoice.new(@p1, @p2).hash
-        ParsletSequence.new(@p1, @p2).should_not_eql ParsletChoice.new(@p1, @p2)
+        ParsletSequence.new(@p1, @p2).should_not eql(ParsletChoice.new(@p1, @p2))
       end
 
       specify 'should be able to use Parslet Choice instances as keys in a hash' do

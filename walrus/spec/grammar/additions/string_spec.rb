@@ -67,7 +67,7 @@ module Walrus
         enumerator.next.should == 'l'
         enumerator.next.should == 'o'
         enumerator.next.should == '€'
-        enumerator.next.should_be_nil
+        enumerator.next.should be_nil
       end
       
       specify 'the "jlength" method should correctly report the number of characters in a string' do
@@ -83,13 +83,13 @@ module Walrus
       specify 'chaining two Strings with the "&" operator should yield a two-element sequence' do
         sequence = 'foo' & 'bar'
         sequence.parse('foobar').should == ['foo', 'bar']
-        lambda { sequence.parse('no match') }.should_raise ParseError
+        lambda { sequence.parse('no match') }.should raise_error(ParseError)
       end
       
       specify 'chaining three Strings with the "&" operator should yield a three-element sequence' do
         sequence = 'foo' & 'bar' & '...'
         sequence.parse('foobar...').should == ['foo', 'bar', '...']
-        lambda { sequence.parse('no match') }.should_raise ParseError
+        lambda { sequence.parse('no match') }.should raise_error(ParseError)
       end
       
       specify 'alternating two Strings with the "|" operator should yield a single string' do
@@ -97,7 +97,7 @@ module Walrus
         sequence.parse('foo').should == 'foo'
         sequence.parse('foobar').should == 'foo'
         sequence.parse('bar').should == 'bar'
-        lambda { sequence.parse('no match') }.should_raise ParseError
+        lambda { sequence.parse('no match') }.should raise_error(ParseError)
       end
       
     end

@@ -17,16 +17,16 @@ module Walrus
     context 'using a predicate' do
       
       specify 'should raise an ArgumentError if initialized with nil' do
-        lambda { Predicate.new(nil) }.should_raise ArgumentError
+        lambda { Predicate.new(nil) }.should raise_error(ArgumentError)
       end
       
       specify 'should complain if sent "parse" message (Predicate abstract superclass, "parse" is the responsibility of the subclasses)' do
-        lambda { Predicate.new('foo').parse('bar') }.should_raise NotImplementedError
+        lambda { Predicate.new('foo').parse('bar') }.should raise_error(NotImplementedError)
       end
       
       specify 'should be able to compare predicates for equality' do
-        Predicate.new('foo').should_eql Predicate.new('foo')
-        Predicate.new('foo').should_not_eql Predicate.new('bar')
+        Predicate.new('foo').should eql(Predicate.new('foo'))
+        Predicate.new('foo').should_not eql(Predicate.new('bar'))
       end
       
       specify '"and" and "not" predicates should yield different hashes even if initialized with the same "parseable"' do
@@ -40,9 +40,9 @@ module Walrus
         p2.hash.should_not == p3.hash
         p3.hash.should_not == p1.hash
         
-        p1.should_not_eql p2
-        p2.should_not_eql p3
-        p3.should_not_eql p1
+        p1.should_not eql(p2)
+        p2.should_not eql(p3)
+        p3.should_not eql(p1)
         
       end
       

@@ -28,7 +28,7 @@ module Walrus
         sequence = /foo/ | /bar/
         sequence.parse('foobar').to_s.should == 'foo'
         sequence.parse('bar...').to_s.should == 'bar'
-        lambda { sequence.parse('no match') }.should_raise ParseError
+        lambda { sequence.parse('no match') }.should raise_error(ParseError)
       end
       
     end

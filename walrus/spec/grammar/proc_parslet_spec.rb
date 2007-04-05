@@ -22,15 +22,15 @@ module Walrus
       end
       
       specify 'should raise an ArgumentError if initialized with nil' do
-        lambda { ProcParslet.new(nil) }.should_raise ArgumentError
+        lambda { ProcParslet.new(nil) }.should raise_error(ArgumentError)
       end
       
       specify 'should complain if asked to parse nil' do
-        lambda { @parslet.parse(nil) }.should_raise ArgumentError
+        lambda { @parslet.parse(nil) }.should raise_error(ArgumentError)
       end
       
       specify 'should raise ParseError if unable to parse' do
-        lambda { @parslet.parse('bar') }.should_raise ParseError
+        lambda { @parslet.parse('bar') }.should raise_error(ParseError)
       end
       
       specify 'should return a parsed value if able to parse' do
@@ -40,9 +40,9 @@ module Walrus
       specify 'should be able to compare parslets for equality' do
         
         # in practice only parslets created with the exact same Proc instance will be eql because Proc returns different hashes for each
-        @parslet.should_eql @parslet.clone
-        @parslet.should_eql @parslet.dup
-        @parslet.should_not_eql lambda { nil }.to_parseable
+        @parslet.should eql(@parslet.clone)
+        @parslet.should eql(@parslet.dup)
+        @parslet.should_not eql(lambda { nil }.to_parseable)
         
       end
       

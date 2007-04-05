@@ -17,24 +17,24 @@ module Walrus
     end
     
     specify 'should be able to instantiate the parser' do
-      @parser.should_not_be_nil
+      @parser.should_not be_nil
     end
     
     specify 'should be able to parse a plaintext string' do
       
       # a single word
       result = @parser.parse('foo')
-      result.should_be_kind_of WalrusGrammar::RawText
+      result.should be_kind_of(WalrusGrammar::RawText)
       result.lexeme.should == 'foo'
       
       # multiple words
       result = @parser.parse('foo bar')
-      result.should_be_kind_of WalrusGrammar::RawText
+      result.should be_kind_of(WalrusGrammar::RawText)
       result.lexeme.should == 'foo bar'
       
       # multiple lines
       result = @parser.parse("hello\nworld")
-      result.should_be_kind_of WalrusGrammar::RawText
+      result.should be_kind_of(WalrusGrammar::RawText)
       result.lexeme.should == "hello\nworld"
       
     end
@@ -43,51 +43,51 @@ module Walrus
       
       # comment with content
       result = @parser.parse('## hello world')
-      result.should_be_kind_of WalrusGrammar::Comment
+      result.should be_kind_of(WalrusGrammar::Comment)
       result.lexeme.should == ' hello world'
       
       # comment with no content
       result = @parser.parse('##')
-      result.should_be_kind_of WalrusGrammar::Comment
+      result.should be_kind_of(WalrusGrammar::Comment)
       result.lexeme.should == ''
       
       # multi-line comment (empty)
       result = @parser.parse('#**#')
-      result.should_be_kind_of WalrusGrammar::Comment
-      result.should_be_kind_of WalrusGrammar::MultilineComment
+      result.should be_kind_of(WalrusGrammar::Comment)
+      result.should be_kind_of(WalrusGrammar::MultilineComment)
       result.content.should == ''
       
       # multi-line comment (with content)
       result = @parser.parse('#* hello world *#')
-      result.should_be_kind_of WalrusGrammar::MultilineComment
+      result.should be_kind_of(WalrusGrammar::MultilineComment)
       result.content.should == ' hello world '
       
       # multi-line comment (spanning multiple lines)
       result = @parser.parse("#* hello\nworld *#")
-      result.should_be_kind_of WalrusGrammar::MultilineComment
+      result.should be_kind_of(WalrusGrammar::MultilineComment)
       result.content.should == " hello\nworld "
       
       # multi-line comment (with nested comment)
       result = @parser.parse('#* hello #*world*# *#')
-      result.should_be_kind_of WalrusGrammar::MultilineComment
+      result.should be_kind_of(WalrusGrammar::MultilineComment)
       result.content[0].should == ' hello '
-      result.content[1].should_be_kind_of WalrusGrammar::MultilineComment
+      result.content[1].should be_kind_of(WalrusGrammar::MultilineComment)
       result.content[1].content.should == 'world'
       result.content[2].should == ' '
       
       # multi-line comment (with nested comment, spanning multiple lines)
       result = @parser.parse("#* hello\n#* world\n... *# *#")
-      result.should_be_kind_of WalrusGrammar::MultilineComment
+      result.should be_kind_of(WalrusGrammar::MultilineComment)
       result.content[0].should == " hello\n"
-      result.content[1].should_be_kind_of WalrusGrammar::MultilineComment
+      result.content[1].should be_kind_of(WalrusGrammar::MultilineComment)
       result.content[1].content.should == " world\n... "
       result.content[2].should == ' '
       
       # multi-line comment (with nested single-line comment)
       result = @parser.parse("#* ##hello\n*#")
-      result.should_be_kind_of WalrusGrammar::MultilineComment
+      result.should be_kind_of(WalrusGrammar::MultilineComment)
       result.content[0].should == ' '
-      result.content[1].should_be_kind_of WalrusGrammar::Comment
+      result.content[1].should be_kind_of(WalrusGrammar::Comment)
       result.content[1].lexeme.should == 'hello' # here the newline gets eaten
       
     end
@@ -96,26 +96,26 @@ module Walrus
       
       # directive marker
       result = @parser.parse('\\#')
-      result.should_be_kind_of WalrusGrammar::EscapeSequence
+      result.should be_kind_of(WalrusGrammar::EscapeSequence)
       result.lexeme.should == '#'
       
       # placeholder marker
       result = @parser.parse('\\$')
-      result.should_be_kind_of WalrusGrammar::EscapeSequence
+      result.should be_kind_of(WalrusGrammar::EscapeSequence)
       result.lexeme.should == '$'
       
       # escape marker
       result = @parser.parse('\\\\')
-      result.should_be_kind_of WalrusGrammar::EscapeSequence
+      result.should be_kind_of(WalrusGrammar::EscapeSequence)
       result.lexeme.should == '\\'
       
       # multiple escape markers
       result = @parser.parse('\\#\\$\\\\')
-      result[0].should_be_kind_of WalrusGrammar::EscapeSequence
+      result[0].should be_kind_of(WalrusGrammar::EscapeSequence)
       result[0].lexeme.should == '#'
-      result[1].should_be_kind_of WalrusGrammar::EscapeSequence
+      result[1].should be_kind_of(WalrusGrammar::EscapeSequence)
       result[1].lexeme.should == '$'
-      result[2].should_be_kind_of WalrusGrammar::EscapeSequence
+      result[2].should be_kind_of(WalrusGrammar::EscapeSequence)
       result[2].lexeme.should == '\\'
       
     end
@@ -123,10 +123,10 @@ module Walrus
     specify 'should complain on finding an illegal escape marker' do
       
       # invalid character
-      lambda { @parser.parse('\\x') }.should_raise Grammar::ParseError
+      lambda { @parser.parse('\\x') }.should raise_error(Grammar::ParseError)
       
       # no character
-      lambda { @parser.parse('\\') }.should_raise Grammar::ParseError
+      lambda { @parser.parse('\\') }.should raise_error(Grammar::ParseError)
       
     end
     
@@ -134,14 +134,14 @@ module Walrus
       
       # plain text followed by comment
       result = @parser.parse('foobar ## hello world')
-      result[0].should_be_kind_of WalrusGrammar::RawText
+      result[0].should be_kind_of(WalrusGrammar::RawText)
       result[0].lexeme.should == 'foobar '
-      result[1].should_be_kind_of WalrusGrammar::Comment
+      result[1].should be_kind_of(WalrusGrammar::Comment)
       result[1].lexeme.should == ' hello world'
       
       # comment should only extend up until the next newline
       result = @parser.parse("## hello world\nfoobar")
-      result[0].should_be_kind_of WalrusGrammar::Comment
+      result[0].should be_kind_of(WalrusGrammar::Comment)
       result[0].lexeme.should == ' hello world'
       
     end
@@ -150,32 +150,32 @@ module Walrus
       
       # plain text followed by an escape marker
       result = @parser.parse('hello \\#')
-      result[0].should_be_kind_of WalrusGrammar::RawText
+      result[0].should be_kind_of(WalrusGrammar::RawText)
       result[0].lexeme.should == 'hello '
-      result[1].should_be_kind_of WalrusGrammar::EscapeSequence
+      result[1].should be_kind_of(WalrusGrammar::EscapeSequence)
       result[1].lexeme.should == '#'
       
       # an escape marker followed by plain text
       result = @parser.parse('\\$hello')
-      result[0].should_be_kind_of WalrusGrammar::EscapeSequence
+      result[0].should be_kind_of(WalrusGrammar::EscapeSequence)
       result[0].lexeme.should == '$'
-      result[1].should_be_kind_of WalrusGrammar::RawText
+      result[1].should be_kind_of(WalrusGrammar::RawText)
       result[1].lexeme.should == 'hello'
       
       # alternation
       result = @parser.parse('hello \\\\ world')
-      result[0].should_be_kind_of WalrusGrammar::RawText
+      result[0].should be_kind_of(WalrusGrammar::RawText)
       result[0].lexeme.should == 'hello '
-      result[1].should_be_kind_of WalrusGrammar::EscapeSequence
+      result[1].should be_kind_of(WalrusGrammar::EscapeSequence)
       result[1].lexeme.should == '\\'
-      result[2].should_be_kind_of WalrusGrammar::RawText
+      result[2].should be_kind_of(WalrusGrammar::RawText)
       result[2].lexeme.should == ' world'
       
       # with newlines thrown into the mix
       result = @parser.parse("hello\n\\#")
-      result[0].should_be_kind_of WalrusGrammar::RawText
+      result[0].should be_kind_of(WalrusGrammar::RawText)
       result[0].lexeme.should == "hello\n"
-      result[1].should_be_kind_of WalrusGrammar::EscapeSequence
+      result[1].should be_kind_of(WalrusGrammar::EscapeSequence)
       result[1].lexeme.should == '#'
       
     end
@@ -188,18 +188,18 @@ module Walrus
     end
     
     specify 'should complain on encountering an unknown or invalid directive name' do
-      lambda { @parser.parse('#glindenburgen') }.should_raise Grammar::ParseError
-      lambda { @parser.parse('#') }.should_raise Grammar::ParseError
+      lambda { @parser.parse('#glindenburgen') }.should raise_error(Grammar::ParseError)
+      lambda { @parser.parse('#') }.should raise_error(Grammar::ParseError)
     end
     
     specify 'should complain if there is whitespace between the directive marker (#) and the directive name' do
-      lambda { @parser.parse('# extends "other_template"') }.should_raise Grammar::ParseError
+      lambda { @parser.parse('# extends "other_template"') }.should raise_error(Grammar::ParseError)
     end
     
     specify 'should be able to parse a directive that takes a single parameter' do
       result = @parser.parse('#extends "other_template"')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::ExtendsDirective
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::ExtendsDirective)
       result.class_name.lexeme.should == 'other_template'
     end
     
@@ -207,33 +207,33 @@ module Walrus
       
       # no intervening whitespace ("extends" directive, takes one parameter)
       result = @parser.parse('#extends "other_template"### comment')
-      result[0].should_be_kind_of WalrusGrammar::ExtendsDirective
+      result[0].should be_kind_of(WalrusGrammar::ExtendsDirective)
       result[0].class_name.lexeme.should == 'other_template'
-      result[1].should_be_kind_of WalrusGrammar::Comment
+      result[1].should be_kind_of(WalrusGrammar::Comment)
       result[1].lexeme.should == ' comment'
       
       # counter-example
-      lambda { @parser.parse('#extends "other_template"## comment') }.should_raise Grammar::ParseError
+      lambda { @parser.parse('#extends "other_template"## comment') }.should raise_error(Grammar::ParseError)
       
       # intervening whitespace (between parameter and trailing comment)
       result = @parser.parse('#extends "other_template"           ### comment')
-      result[0].should_be_kind_of WalrusGrammar::ExtendsDirective
+      result[0].should be_kind_of(WalrusGrammar::ExtendsDirective)
       result[0].class_name.lexeme.should == 'other_template'
-      result[1].should_be_kind_of WalrusGrammar::Comment
+      result[1].should be_kind_of(WalrusGrammar::Comment)
       result[1].lexeme.should == ' comment'
       
       # counter-example
-      lambda { @parser.parse('#extends "other_template"           ## comment') }.should_raise Grammar::ParseError
+      lambda { @parser.parse('#extends "other_template"           ## comment') }.should raise_error(Grammar::ParseError)
       
       # intervening whitespace (between directive and parameter)
       result = @parser.parse('#extends          "other_template"           ### comment')
-      result[0].should_be_kind_of WalrusGrammar::ExtendsDirective
+      result[0].should be_kind_of(WalrusGrammar::ExtendsDirective)
       result[0].class_name.lexeme.should == 'other_template'
-      result[1].should_be_kind_of WalrusGrammar::Comment
+      result[1].should be_kind_of(WalrusGrammar::Comment)
       result[1].lexeme.should == ' comment'
       
       # counter-example
-      lambda { @parser.parse('#extends          "other_template"           ## comment') }.should_raise Grammar::ParseError
+      lambda { @parser.parse('#extends          "other_template"           ## comment') }.should raise_error(Grammar::ParseError)
       
     end
     
@@ -241,11 +241,11 @@ module Walrus
       
       # basic case
       result = @parser.parse("#extends \\\n'other_template'")
-      result.should_be_kind_of WalrusGrammar::ExtendsDirective
+      result.should be_kind_of(WalrusGrammar::ExtendsDirective)
       result.class_name.lexeme.should == 'other_template'
       
       # should fail if backslash is not the last character on the line
-      lambda { @parser.parse("#extends \\ \n'other_template'") }.should_raise Grammar::ParseError
+      lambda { @parser.parse("#extends \\ \n'other_template'") }.should raise_error(Grammar::ParseError)
       
     end
 
@@ -253,50 +253,50 @@ module Walrus
       
       # followed by a newline
       result = @parser.parse("#import 'other_template'\nhello")
-      result[0].should_be_kind_of WalrusGrammar::ImportDirective
+      result[0].should be_kind_of(WalrusGrammar::ImportDirective)
       result[0].class_name.lexeme.should == 'other_template'
-      result[1].should_be_kind_of WalrusGrammar::RawText
+      result[1].should be_kind_of(WalrusGrammar::RawText)
       result[1].lexeme.should == 'hello' # newline gets eaten
       
       # followed by whitespace
       result = @parser.parse('#import "other_template"     ')
-      result.should_be_kind_of WalrusGrammar::ImportDirective
+      result.should be_kind_of(WalrusGrammar::ImportDirective)
       result.class_name.lexeme.should == 'other_template'
       
       # followed by the end of the input
       result = @parser.parse('#import "other_template"')
-      result.should_be_kind_of WalrusGrammar::ImportDirective
+      result.should be_kind_of(WalrusGrammar::ImportDirective)
       result.class_name.lexeme.should == 'other_template'
       
       # comment with no intervening whitespace
       result = @parser.parse('#import "other_template"### comment')
-      result[0].should_be_kind_of WalrusGrammar::ImportDirective
+      result[0].should be_kind_of(WalrusGrammar::ImportDirective)
       result[0].class_name.lexeme.should == 'other_template'
-      result[1].should_be_kind_of WalrusGrammar::Comment
+      result[1].should be_kind_of(WalrusGrammar::Comment)
       result[1].lexeme.should == ' comment'
       
       # counter-example
-      lambda { @parser.parse('#import "other_template"## comment') }.should_raise Grammar::ParseError
+      lambda { @parser.parse('#import "other_template"## comment') }.should raise_error(Grammar::ParseError)
       
       # intervening whitespace (between parameter and trailing comment)
       result = @parser.parse('#import "other_template"           ### comment')
-      result[0].should_be_kind_of WalrusGrammar::ImportDirective
+      result[0].should be_kind_of(WalrusGrammar::ImportDirective)
       result[0].class_name.lexeme.should == 'other_template'
-      result[1].should_be_kind_of WalrusGrammar::Comment
+      result[1].should be_kind_of(WalrusGrammar::Comment)
       result[1].lexeme.should == ' comment'
       
       # counter-example
-      lambda { @parser.parse('#import "other_template"           ## comment') }.should_raise Grammar::ParseError
+      lambda { @parser.parse('#import "other_template"           ## comment') }.should raise_error(Grammar::ParseError)
       
       # intervening whitespace (between directive and parameter)
       result = @parser.parse('#import          "other_template"           ### comment')
-      result[0].should_be_kind_of WalrusGrammar::ImportDirective
+      result[0].should be_kind_of(WalrusGrammar::ImportDirective)
       result[0].class_name.lexeme.should == 'other_template'
-      result[1].should_be_kind_of WalrusGrammar::Comment
+      result[1].should be_kind_of(WalrusGrammar::Comment)
       result[1].lexeme.should == ' comment'
       
       # counter-example
-      lambda { @parser.parse('#import          "other_template"           ## comment') }.should_raise Grammar::ParseError
+      lambda { @parser.parse('#import          "other_template"           ## comment') }.should raise_error(Grammar::ParseError)
       
     end
     
@@ -304,49 +304,49 @@ module Walrus
       
       # string literals have no special meaning when part of raw text
       result = @parser.parse("'hello'")
-      result.should_be_kind_of WalrusGrammar::RawText
+      result.should be_kind_of(WalrusGrammar::RawText)
       result.lexeme.should == "'hello'"
       
       # empty string
       result = @parser.parse("#import ''")
-      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.class_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
+      result.class_name.should be_kind_of(WalrusGrammar::StringLiteral)
+      result.class_name.should be_kind_of(WalrusGrammar::SingleQuotedStringLiteral)
       result.class_name.lexeme.to_s.should == '' # actually just returns []; I might need to add a "flatten" or "to_string" method to my Grammar specification system
       
       # with escaped single quotes inside
       result = @parser.parse("#import 'hello \\'world\\''")
-      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.class_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
+      result.class_name.should be_kind_of(WalrusGrammar::StringLiteral)
+      result.class_name.should be_kind_of(WalrusGrammar::SingleQuotedStringLiteral)
       result.class_name.lexeme.should == "hello \\'world\\'"
       
       # with other escapes inside
       result = @parser.parse("#import 'hello\\nworld'")
-      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.class_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
+      result.class_name.should be_kind_of(WalrusGrammar::StringLiteral)
+      result.class_name.should be_kind_of(WalrusGrammar::SingleQuotedStringLiteral)
       result.class_name.lexeme.should == 'hello\nworld'
       
       # with double quotes inside
       result = @parser.parse("#import 'hello \"world\"'")
-      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.class_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
+      result.class_name.should be_kind_of(WalrusGrammar::StringLiteral)
+      result.class_name.should be_kind_of(WalrusGrammar::SingleQuotedStringLiteral)
       result.class_name.lexeme.should == 'hello "world"'
       
       # with Walrus comments inside (ignored)
       result = @parser.parse("#import 'hello ##world'")
-      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.class_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
+      result.class_name.should be_kind_of(WalrusGrammar::StringLiteral)
+      result.class_name.should be_kind_of(WalrusGrammar::SingleQuotedStringLiteral)
       result.class_name.lexeme.should == 'hello ##world'
       
       # with Walrus placeholders inside (no interpolation)
       result = @parser.parse("#import 'hello $world'")
-      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.class_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
+      result.class_name.should be_kind_of(WalrusGrammar::StringLiteral)
+      result.class_name.should be_kind_of(WalrusGrammar::SingleQuotedStringLiteral)
       result.class_name.lexeme.should == 'hello $world'
       
       # with Walrus directives inside (no interpolation)
       result = @parser.parse("#import 'hello #end'")
-      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.class_name.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
+      result.class_name.should be_kind_of(WalrusGrammar::StringLiteral)
+      result.class_name.should be_kind_of(WalrusGrammar::SingleQuotedStringLiteral)
       result.class_name.lexeme.should == 'hello #end'
       
     end
@@ -355,49 +355,49 @@ module Walrus
       
       # string literals have no special meaning when part of raw text
       result = @parser.parse('"hello"')
-      result.should_be_kind_of WalrusGrammar::RawText
+      result.should be_kind_of(WalrusGrammar::RawText)
       result.lexeme.should == '"hello"'
       
       # empty string
       result = @parser.parse('#import ""')
-      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.class_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.class_name.should be_kind_of(WalrusGrammar::StringLiteral)
+      result.class_name.should be_kind_of(WalrusGrammar::DoubleQuotedStringLiteral)
       result.class_name.lexeme.to_s.should == '' # actually just returns []; I might need to add a "flatten" or "to_string" method to my Grammar specification system
       
       # with escaped double quotes inside
       result = @parser.parse('#import "hello \\"world\\""')
-      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.class_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.class_name.should be_kind_of(WalrusGrammar::StringLiteral)
+      result.class_name.should be_kind_of(WalrusGrammar::DoubleQuotedStringLiteral)
       result.class_name.lexeme.should == 'hello \\"world\\"'
       
       # with other escapes inside
       result = @parser.parse('#import "hello\\nworld"')
-      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.class_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.class_name.should be_kind_of(WalrusGrammar::StringLiteral)
+      result.class_name.should be_kind_of(WalrusGrammar::DoubleQuotedStringLiteral)
       result.class_name.lexeme.should == 'hello\\nworld'
       
       # with single quotes inside
       result = @parser.parse('#import "hello \'world\'"')
-      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.class_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.class_name.should be_kind_of(WalrusGrammar::StringLiteral)
+      result.class_name.should be_kind_of(WalrusGrammar::DoubleQuotedStringLiteral)
       result.class_name.lexeme.should == "hello 'world'"
       
       # with Walrus comments inside (ignored)
       result = @parser.parse('#import "hello ##world"')
-      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.class_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.class_name.should be_kind_of(WalrusGrammar::StringLiteral)
+      result.class_name.should be_kind_of(WalrusGrammar::DoubleQuotedStringLiteral)
       result.class_name.lexeme.should == 'hello ##world'
       
       # with Walrus placeholders inside (no interpolation)
       result = @parser.parse('#import "hello $world"')
-      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.class_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.class_name.should be_kind_of(WalrusGrammar::StringLiteral)
+      result.class_name.should be_kind_of(WalrusGrammar::DoubleQuotedStringLiteral)
       result.class_name.lexeme.should == 'hello $world'
       
       # with Walrus directives inside (no interpolation)
       result = @parser.parse('#import "hello #end"')
-      result.class_name.should_be_kind_of WalrusGrammar::StringLiteral
-      result.class_name.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.class_name.should be_kind_of(WalrusGrammar::StringLiteral)
+      result.class_name.should be_kind_of(WalrusGrammar::DoubleQuotedStringLiteral)
       result.class_name.lexeme.should == 'hello #end'
       
     end
@@ -407,186 +407,186 @@ module Walrus
       
       # a numeric literal
       result = @parser.parse('#silent 1')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::NumericLiteral
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::NumericLiteral)
       result.expression.lexeme.should == '1'
       
       # a single-quoted string literal
       result = @parser.parse("#silent 'foo'")
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::SingleQuotedStringLiteral
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::SingleQuotedStringLiteral)
       result.expression.lexeme.should == 'foo'
       
       # a double-quoted string literal
       result = @parser.parse('#silent "foo"')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::DoubleQuotedStringLiteral)
       result.expression.lexeme.should == 'foo'
       
       # an identifier
       result = @parser.parse('#silent foo')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::Identifier
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::Identifier)
       result.expression.lexeme.should == 'foo'
       
       result = @parser.parse('#silent foo_bar')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::Identifier
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::Identifier)
       result.expression.lexeme.should == 'foo_bar'
       
       # a constant
       result = @parser.parse('#silent Foo')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::Constant
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::Constant)
       result.expression.lexeme.should == 'Foo'
       
       result = @parser.parse('#silent FooBar')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::Constant
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::Constant)
       result.expression.lexeme.should == 'FooBar'
       
       # a symbol
       result = @parser.parse('#silent :foo')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::SymbolLiteral
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::SymbolLiteral)
       result.expression.lexeme.should == ':foo'
       
       result = @parser.parse('#silent :Foo')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::SymbolLiteral
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::SymbolLiteral)
       result.expression.lexeme.should == ':Foo'
       
       # an array literal
       result = @parser.parse('#silent [1]')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::RubyExpression
-      result.expression.should_be_kind_of WalrusGrammar::ArrayLiteral
-      result.expression.elements.should_be_kind_of WalrusGrammar::NumericLiteral
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::RubyExpression)
+      result.expression.should be_kind_of(WalrusGrammar::ArrayLiteral)
+      result.expression.elements.should be_kind_of(WalrusGrammar::NumericLiteral)
       result.expression.elements.lexeme.should == '1'
       
       result = @parser.parse('#silent [1, 2, 3]')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::RubyExpression
-      result.expression.should_be_kind_of WalrusGrammar::ArrayLiteral
-      result.expression.elements.should_be_kind_of Array
-      result.expression.elements[0].should_be_kind_of WalrusGrammar::NumericLiteral
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::RubyExpression)
+      result.expression.should be_kind_of(WalrusGrammar::ArrayLiteral)
+      result.expression.elements.should be_kind_of(Array)
+      result.expression.elements[0].should be_kind_of(WalrusGrammar::NumericLiteral)
       result.expression.elements[0].lexeme.should == '1'
-      result.expression.elements[1].should_be_kind_of WalrusGrammar::NumericLiteral
+      result.expression.elements[1].should be_kind_of(WalrusGrammar::NumericLiteral)
       result.expression.elements[1].lexeme.should == '2'
-      result.expression.elements[2].should_be_kind_of WalrusGrammar::NumericLiteral
+      result.expression.elements[2].should be_kind_of(WalrusGrammar::NumericLiteral)
       result.expression.elements[2].lexeme.should == '3'
       
       # a hash literal
       result = @parser.parse('#silent { :foo => "bar" }')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::RubyExpression
-      result.expression.should_be_kind_of WalrusGrammar::HashLiteral
-      result.expression.pairs.should_be_kind_of WalrusGrammar::RubyExpression
-      result.expression.pairs.should_be_kind_of WalrusGrammar::HashAssignment
-      result.expression.pairs.lvalue.should_be_kind_of WalrusGrammar::SymbolLiteral
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::RubyExpression)
+      result.expression.should be_kind_of(WalrusGrammar::HashLiteral)
+      result.expression.pairs.should be_kind_of(WalrusGrammar::RubyExpression)
+      result.expression.pairs.should be_kind_of(WalrusGrammar::HashAssignment)
+      result.expression.pairs.lvalue.should be_kind_of(WalrusGrammar::SymbolLiteral)
       result.expression.pairs.lvalue.lexeme.should == ':foo'
-      result.expression.pairs.expression.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.expression.pairs.expression.should be_kind_of(WalrusGrammar::DoubleQuotedStringLiteral)
       result.expression.pairs.expression.lexeme.should == 'bar'
       
       result = @parser.parse('#silent { :foo => "bar", :baz => "xyz" }')
-      result.expression.should_be_kind_of WalrusGrammar::HashLiteral
-      result.expression.pairs.should_be_kind_of Array
-      result.expression.pairs[0].should_be_kind_of WalrusGrammar::HashAssignment
-      result.expression.pairs[0].lvalue.should_be_kind_of WalrusGrammar::SymbolLiteral
+      result.expression.should be_kind_of(WalrusGrammar::HashLiteral)
+      result.expression.pairs.should be_kind_of(Array)
+      result.expression.pairs[0].should be_kind_of(WalrusGrammar::HashAssignment)
+      result.expression.pairs[0].lvalue.should be_kind_of(WalrusGrammar::SymbolLiteral)
       result.expression.pairs[0].lvalue.lexeme.should == ':foo'
-      result.expression.pairs[0].expression.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.expression.pairs[0].expression.should be_kind_of(WalrusGrammar::DoubleQuotedStringLiteral)
       result.expression.pairs[0].expression.lexeme.should == 'bar'
-      result.expression.pairs[1].should_be_kind_of WalrusGrammar::HashAssignment
-      result.expression.pairs[1].lvalue.should_be_kind_of WalrusGrammar::SymbolLiteral
+      result.expression.pairs[1].should be_kind_of(WalrusGrammar::HashAssignment)
+      result.expression.pairs[1].lvalue.should be_kind_of(WalrusGrammar::SymbolLiteral)
       result.expression.pairs[1].lvalue.lexeme.should == ':baz'
-      result.expression.pairs[1].expression.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.expression.pairs[1].expression.should be_kind_of(WalrusGrammar::DoubleQuotedStringLiteral)
       result.expression.pairs[1].expression.lexeme.should == 'xyz'
       
       # an addition expression
       result = @parser.parse('#silent 1 + 2')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::RubyExpression
-      result.expression.should_be_kind_of WalrusGrammar::AdditionExpression
-      result.expression.left.should_be_kind_of WalrusGrammar::NumericLiteral
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::RubyExpression)
+      result.expression.should be_kind_of(WalrusGrammar::AdditionExpression)
+      result.expression.left.should be_kind_of(WalrusGrammar::NumericLiteral)
       result.expression.left.lexeme.should == '1'
-      result.expression.right.should_be_kind_of WalrusGrammar::NumericLiteral
+      result.expression.right.should be_kind_of(WalrusGrammar::NumericLiteral)
       result.expression.right.lexeme.should == '2'
       
       # an assignment expression
       result = @parser.parse('#silent foo = 1')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::RubyExpression
-      result.expression.should_be_kind_of WalrusGrammar::AssignmentExpression
-      result.expression.lvalue.should_be_kind_of WalrusGrammar::Identifier
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::RubyExpression)
+      result.expression.should be_kind_of(WalrusGrammar::AssignmentExpression)
+      result.expression.lvalue.should be_kind_of(WalrusGrammar::Identifier)
       result.expression.lvalue.lexeme.should == 'foo'
-      result.expression.expression.should_be_kind_of WalrusGrammar::NumericLiteral
+      result.expression.expression.should be_kind_of(WalrusGrammar::NumericLiteral)
       result.expression.expression.lexeme.should == '1'
       
       # a method invocation
       result = @parser.parse('#silent foo.delete')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::RubyExpression
-      result.expression.should_be_kind_of WalrusGrammar::MessageExpression
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::RubyExpression)
+      result.expression.should be_kind_of(WalrusGrammar::MessageExpression)
       
       result = @parser.parse('#silent foo.delete()')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::MessageExpression
-      result.expression.target.should_be_kind_of WalrusGrammar::Identifier
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::MessageExpression)
+      result.expression.target.should be_kind_of(WalrusGrammar::Identifier)
       result.expression.target.lexeme.should == 'foo'
-      result.expression.message.should_be_kind_of WalrusGrammar::RubyExpression
-      result.expression.message.should_be_kind_of WalrusGrammar::MethodExpression
-      result.expression.message.name.should_be_kind_of WalrusGrammar::Identifier
+      result.expression.message.should be_kind_of(WalrusGrammar::RubyExpression)
+      result.expression.message.should be_kind_of(WalrusGrammar::MethodExpression)
+      result.expression.message.name.should be_kind_of(WalrusGrammar::Identifier)
       result.expression.message.name.lexeme.should == 'delete'
-      result.expression.message.params.should_be_kind_of Array
+      result.expression.message.params.should be_kind_of(Array)
       result.expression.message.params.should == []
       
       result = @parser.parse('#silent foo.delete(1)')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::MessageExpression
-      result.expression.target.should_be_kind_of WalrusGrammar::Identifier
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::MessageExpression)
+      result.expression.target.should be_kind_of(WalrusGrammar::Identifier)
       result.expression.target.lexeme.should == 'foo'
-      result.expression.message.should_be_kind_of WalrusGrammar::MethodExpression
-      result.expression.message.name.should_be_kind_of WalrusGrammar::Identifier
+      result.expression.message.should be_kind_of(WalrusGrammar::MethodExpression)
+      result.expression.message.name.should be_kind_of(WalrusGrammar::Identifier)
       result.expression.message.name.lexeme.should == 'delete'
-      result.expression.message.params.should_be_kind_of WalrusGrammar::NumericLiteral
+      result.expression.message.params.should be_kind_of(WalrusGrammar::NumericLiteral)
       result.expression.message.params.lexeme.should == '1'
       
       result = @parser.parse('#silent foo.delete(bar, baz)')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::MessageExpression
-      result.expression.target.should_be_kind_of WalrusGrammar::Identifier
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::MessageExpression)
+      result.expression.target.should be_kind_of(WalrusGrammar::Identifier)
       result.expression.target.lexeme.should == 'foo'
-      result.expression.message.should_be_kind_of WalrusGrammar::MethodExpression
-      result.expression.message.name.should_be_kind_of WalrusGrammar::Identifier
+      result.expression.message.should be_kind_of(WalrusGrammar::MethodExpression)
+      result.expression.message.name.should be_kind_of(WalrusGrammar::Identifier)
       result.expression.message.name.lexeme.should == 'delete'
-      result.expression.message.params.should_be_kind_of Array
-      result.expression.message.params[0].should_be_kind_of WalrusGrammar::Identifier
+      result.expression.message.params.should be_kind_of(Array)
+      result.expression.message.params[0].should be_kind_of(WalrusGrammar::Identifier)
       result.expression.message.params[0].lexeme.should == 'bar'
-      result.expression.message.params[1].should_be_kind_of WalrusGrammar::Identifier
+      result.expression.message.params[1].should be_kind_of(WalrusGrammar::Identifier)
       result.expression.message.params[1].lexeme.should == 'baz'
       
       # chained method invocation
       result = @parser.parse('#silent foo.bar.baz')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
       result.expression.should be_kind_of(WalrusGrammar::MessageExpression)
       result.expression.target.should be_kind_of(WalrusGrammar::MessageExpression)
       result.expression.target.target.should be_kind_of(WalrusGrammar::Identifier)
@@ -602,26 +602,26 @@ module Walrus
       
       # chained method invocation with arguments
       result = @parser.parse('#silent foo.bar(1).baz')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::MessageExpression
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::MessageExpression)
       
       result = @parser.parse('#silent foo.bar.baz(2)')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::MessageExpression
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::MessageExpression)
             
       result = @parser.parse('#silent foo.bar(1).baz(2)')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::MessageExpression
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::MessageExpression)
       
       # nested arrays
       result = @parser.parse('#silent [1, 2, [foo, bar]]')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::ArrayLiteral
-      result.expression.elements.should_be_kind_of Array
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::ArrayLiteral)
+      result.expression.elements.should be_kind_of(Array)
       result.expression.elements[0].should be_kind_of(WalrusGrammar::NumericLiteral)
       result.expression.elements[0].lexeme.to_s.should == '1'
       result.expression.elements[1].should be_kind_of(WalrusGrammar::NumericLiteral)
@@ -635,15 +635,15 @@ module Walrus
       
       # nesting in a hash
       result = @parser.parse('#silent { :foo => [1, 2] }')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::HashLiteral
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::HashLiteral)
       
       # multiple addition expressions
       result = @parser.parse('#silent 1 + 2 + 3')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::AdditionExpression
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::AdditionExpression)
       result.expression.left.should be_kind_of(WalrusGrammar::AdditionExpression)
       result.expression.left.left.should be_kind_of(WalrusGrammar::NumericLiteral)
       result.expression.left.left.lexeme.to_s.should == '1'
@@ -654,9 +654,9 @@ module Walrus
       
       # addition and assignment
       result = @parser.parse('#silent foo = bar + 1')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::AssignmentExpression
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::AssignmentExpression)
       
     end
     
@@ -672,77 +672,77 @@ module Walrus
       
       # simple case: no parameters, no content
       result = @parser.parse("#block foo\n#end")
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::BlockDirective
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::BlockDirective)
       result.identifier.to_s.should == 'foo'
       result.params.should == []
       result.content.should == []
       
       # pathologically short case
       result = @parser.parse('#block foo##end')
-      result.should_be_kind_of WalrusGrammar::BlockDirective
+      result.should be_kind_of(WalrusGrammar::BlockDirective)
       result.identifier.to_s.should == 'foo'
       result.params.should == []
       result.content.should == []
       
       # some content
       result = @parser.parse('#block foo#hello#end')
-      result.should_be_kind_of WalrusGrammar::BlockDirective
+      result.should be_kind_of(WalrusGrammar::BlockDirective)
       result.identifier.to_s.should == 'foo'
       result.params.should == []
-      result.content.should_be_kind_of WalrusGrammar::RawText
+      result.content.should be_kind_of(WalrusGrammar::RawText)
       result.content.lexeme.should == 'hello'
       
       result = @parser.parse("#block foo\nhello\n#end")
-      result.should_be_kind_of WalrusGrammar::BlockDirective
+      result.should be_kind_of(WalrusGrammar::BlockDirective)
       result.identifier.to_s.should == 'foo'
       result.params.should == []
-      result.content.should_be_kind_of WalrusGrammar::RawText
+      result.content.should be_kind_of(WalrusGrammar::RawText)
       result.content.lexeme.should == "hello\n"
       
       # empty params list
       result = @parser.parse("#block foo()\n#end")
-      result.should_be_kind_of WalrusGrammar::BlockDirective
+      result.should be_kind_of(WalrusGrammar::BlockDirective)
       result.identifier.to_s.should == 'foo'
       result.params.should == []
       result.content.should == []
       
       # one param
       result = @parser.parse("#block foo(bar)\n#end")
-      result.should_be_kind_of WalrusGrammar::BlockDirective
+      result.should be_kind_of(WalrusGrammar::BlockDirective)
       result.identifier.to_s.should == 'foo'
-      result.params.should_be_kind_of WalrusGrammar::Identifier
+      result.params.should be_kind_of(WalrusGrammar::Identifier)
       result.params.lexeme.should == 'bar'
       result.content.should == []
       
       # one param with blockault value
       result = @parser.parse("#block foo(bar = 1)\n#end")
-      result.should_be_kind_of WalrusGrammar::BlockDirective
+      result.should be_kind_of(WalrusGrammar::BlockDirective)
       result.identifier.to_s.should == 'foo'
-      result.params.should_be_kind_of WalrusGrammar::AssignmentExpression
-      result.params.lvalue.should_be_kind_of WalrusGrammar::Identifier
+      result.params.should be_kind_of(WalrusGrammar::AssignmentExpression)
+      result.params.lvalue.should be_kind_of(WalrusGrammar::Identifier)
       result.params.lvalue.lexeme.should == 'bar'
-      result.params.expression.should_be_kind_of WalrusGrammar::NumericLiteral
+      result.params.expression.should be_kind_of(WalrusGrammar::NumericLiteral)
       result.params.expression.lexeme.should == '1'
       result.content.should == []
       
       result = @parser.parse("#block foo(bar = nil)\n#end")
-      result.should_be_kind_of WalrusGrammar::BlockDirective
+      result.should be_kind_of(WalrusGrammar::BlockDirective)
       result.identifier.to_s.should == 'foo'
-      result.params.should_be_kind_of WalrusGrammar::AssignmentExpression
-      result.params.lvalue.should_be_kind_of WalrusGrammar::Identifier
+      result.params.should be_kind_of(WalrusGrammar::AssignmentExpression)
+      result.params.lvalue.should be_kind_of(WalrusGrammar::Identifier)
       result.params.lvalue.lexeme.should == 'bar'
-      result.params.expression.should_be_kind_of WalrusGrammar::Identifier
+      result.params.expression.should be_kind_of(WalrusGrammar::Identifier)
       result.params.expression.lexeme.should == 'nil'
       result.content.should == []
       
       # two params
       result = @parser.parse("#block foo(bar, baz)\n#end")
-      result.should_be_kind_of WalrusGrammar::BlockDirective
+      result.should be_kind_of(WalrusGrammar::BlockDirective)
       result.identifier.to_s.should == 'foo'
-      result.params[0].should_be_kind_of WalrusGrammar::Identifier
+      result.params[0].should be_kind_of(WalrusGrammar::Identifier)
       result.params[0].lexeme.should == 'bar'
-      result.params[1].should_be_kind_of WalrusGrammar::Identifier
+      result.params[1].should be_kind_of(WalrusGrammar::Identifier)
       result.params[1].lexeme.should == 'baz'
       result.content.should == []
       
@@ -754,30 +754,30 @@ world
 #end
 ...
 #end})
-      result.should_be_kind_of WalrusGrammar::BlockDirective
+      result.should be_kind_of(WalrusGrammar::BlockDirective)
       result.identifier.to_s.should == 'outer'
       result.params.should == []
-      result.content[0].should_be_kind_of WalrusGrammar::RawText
+      result.content[0].should be_kind_of(WalrusGrammar::RawText)
       result.content[0].lexeme.should == "hello\n"
-      result.content[1].should_be_kind_of WalrusGrammar::BlockDirective
+      result.content[1].should be_kind_of(WalrusGrammar::BlockDirective)
       result.content[1].identifier.to_s.should == 'inner'
       result.content[1].params.should == []
-      result.content[1].content.should_be_kind_of WalrusGrammar::RawText
+      result.content[1].content.should be_kind_of(WalrusGrammar::RawText)
       result.content[1].content.lexeme.should == "world\n"
-      result.content[2].should_be_kind_of WalrusGrammar::RawText
+      result.content[2].should be_kind_of(WalrusGrammar::RawText)
       result.content[2].lexeme.should == "...\n"
       
       # missing identifier
-      lambda { @parser.parse("#block\n#end") }.should_raise Grammar::ParseError
-      lambda { @parser.parse("#block ()\n#end") }.should_raise Grammar::ParseError
+      lambda { @parser.parse("#block\n#end") }.should raise_error(Grammar::ParseError)
+      lambda { @parser.parse("#block ()\n#end") }.should raise_error(Grammar::ParseError)
       
       # non-terminated parameter list
-      lambda { @parser.parse("#block foo(bar\n#end") }.should_raise Grammar::ParseError
-      lambda { @parser.parse("#block foo(bar,)\n#end") }.should_raise Grammar::ParseError
+      lambda { @parser.parse("#block foo(bar\n#end") }.should raise_error(Grammar::ParseError)
+      lambda { @parser.parse("#block foo(bar,)\n#end") }.should raise_error(Grammar::ParseError)
       
       # illegal parameter type
-      lambda { @parser.parse("#block foo(1)\n#end") }.should_raise Grammar::ParseError
-      lambda { @parser.parse("#block foo($bar)\n#end") }.should_raise Grammar::ParseError
+      lambda { @parser.parse("#block foo(1)\n#end") }.should raise_error(Grammar::ParseError)
+      lambda { @parser.parse("#block foo($bar)\n#end") }.should raise_error(Grammar::ParseError)
       
     end
     
@@ -785,77 +785,77 @@ world
       
       # simple case: no parameters, no content
       result = @parser.parse("#def foo\n#end")
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::DefDirective
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::DefDirective)
       result.identifier.to_s.should == 'foo'
       result.params.should == []
       result.content.should == []
       
       # pathologically short case
       result = @parser.parse('#def foo##end')
-      result.should_be_kind_of WalrusGrammar::DefDirective
+      result.should be_kind_of(WalrusGrammar::DefDirective)
       result.identifier.to_s.should == 'foo'
       result.params.should == []
       result.content.should == []
       
       # some content
       result = @parser.parse('#def foo#hello#end')
-      result.should_be_kind_of WalrusGrammar::DefDirective
+      result.should be_kind_of(WalrusGrammar::DefDirective)
       result.identifier.to_s.should == 'foo'
       result.params.should == []
-      result.content.should_be_kind_of WalrusGrammar::RawText
+      result.content.should be_kind_of(WalrusGrammar::RawText)
       result.content.lexeme.should == 'hello'
       
       result = @parser.parse("#def foo\nhello\n#end")
-      result.should_be_kind_of WalrusGrammar::DefDirective
+      result.should be_kind_of(WalrusGrammar::DefDirective)
       result.identifier.to_s.should == 'foo'
       result.params.should == []
-      result.content.should_be_kind_of WalrusGrammar::RawText
+      result.content.should be_kind_of(WalrusGrammar::RawText)
       result.content.lexeme.should == "hello\n"
       
       # empty params list
       result = @parser.parse("#def foo()\n#end")
-      result.should_be_kind_of WalrusGrammar::DefDirective
+      result.should be_kind_of(WalrusGrammar::DefDirective)
       result.identifier.to_s.should == 'foo'
       result.params.should == []
       result.content.should == []
       
       # one param
       result = @parser.parse("#def foo(bar)\n#end")
-      result.should_be_kind_of WalrusGrammar::DefDirective
+      result.should be_kind_of(WalrusGrammar::DefDirective)
       result.identifier.to_s.should == 'foo'
-      result.params.should_be_kind_of WalrusGrammar::Identifier
+      result.params.should be_kind_of(WalrusGrammar::Identifier)
       result.params.lexeme.should == 'bar'
       result.content.should == []
       
       # one param with default value
       result = @parser.parse("#def foo(bar = 1)\n#end")
-      result.should_be_kind_of WalrusGrammar::DefDirective
+      result.should be_kind_of(WalrusGrammar::DefDirective)
       result.identifier.to_s.should == 'foo'
-      result.params.should_be_kind_of WalrusGrammar::AssignmentExpression
-      result.params.lvalue.should_be_kind_of WalrusGrammar::Identifier
+      result.params.should be_kind_of(WalrusGrammar::AssignmentExpression)
+      result.params.lvalue.should be_kind_of(WalrusGrammar::Identifier)
       result.params.lvalue.lexeme.should == 'bar'
-      result.params.expression.should_be_kind_of WalrusGrammar::NumericLiteral
+      result.params.expression.should be_kind_of(WalrusGrammar::NumericLiteral)
       result.params.expression.lexeme.should == '1'
       result.content.should == []
       
       result = @parser.parse("#def foo(bar = nil)\n#end")
-      result.should_be_kind_of WalrusGrammar::DefDirective
+      result.should be_kind_of(WalrusGrammar::DefDirective)
       result.identifier.to_s.should == 'foo'
-      result.params.should_be_kind_of WalrusGrammar::AssignmentExpression
-      result.params.lvalue.should_be_kind_of WalrusGrammar::Identifier
+      result.params.should be_kind_of(WalrusGrammar::AssignmentExpression)
+      result.params.lvalue.should be_kind_of(WalrusGrammar::Identifier)
       result.params.lvalue.lexeme.should == 'bar'
-      result.params.expression.should_be_kind_of WalrusGrammar::Identifier
+      result.params.expression.should be_kind_of(WalrusGrammar::Identifier)
       result.params.expression.lexeme.should == 'nil'
       result.content.should == []
       
       # two params
       result = @parser.parse("#def foo(bar, baz)\n#end")
-      result.should_be_kind_of WalrusGrammar::DefDirective
+      result.should be_kind_of(WalrusGrammar::DefDirective)
       result.identifier.to_s.should == 'foo'
-      result.params[0].should_be_kind_of WalrusGrammar::Identifier
+      result.params[0].should be_kind_of(WalrusGrammar::Identifier)
       result.params[0].lexeme.should == 'bar'
-      result.params[1].should_be_kind_of WalrusGrammar::Identifier
+      result.params[1].should be_kind_of(WalrusGrammar::Identifier)
       result.params[1].lexeme.should == 'baz'
       result.content.should == []
       
@@ -867,30 +867,30 @@ world
 #end
 ...
 #end})
-      result.should_be_kind_of WalrusGrammar::DefDirective
+      result.should be_kind_of(WalrusGrammar::DefDirective)
       result.identifier.to_s.should == 'outer'
       result.params.should == []
-      result.content[0].should_be_kind_of WalrusGrammar::RawText
+      result.content[0].should be_kind_of(WalrusGrammar::RawText)
       result.content[0].lexeme.should == "hello\n"
-      result.content[1].should_be_kind_of WalrusGrammar::DefDirective
+      result.content[1].should be_kind_of(WalrusGrammar::DefDirective)
       result.content[1].identifier.to_s.should == 'inner'
       result.content[1].params.should == []
-      result.content[1].content.should_be_kind_of WalrusGrammar::RawText
+      result.content[1].content.should be_kind_of(WalrusGrammar::RawText)
       result.content[1].content.lexeme.should == "world\n"
-      result.content[2].should_be_kind_of WalrusGrammar::RawText
+      result.content[2].should be_kind_of(WalrusGrammar::RawText)
       result.content[2].lexeme.should == "...\n"
       
       # missing identifier
-      lambda { @parser.parse("#def\n#end") }.should_raise Grammar::ParseError
-      lambda { @parser.parse("#def ()\n#end") }.should_raise Grammar::ParseError
+      lambda { @parser.parse("#def\n#end") }.should raise_error(Grammar::ParseError)
+      lambda { @parser.parse("#def ()\n#end") }.should raise_error(Grammar::ParseError)
       
       # non-terminated parameter list
-      lambda { @parser.parse("#def foo(bar\n#end") }.should_raise Grammar::ParseError
-      lambda { @parser.parse("#def foo(bar,)\n#end") }.should_raise Grammar::ParseError
+      lambda { @parser.parse("#def foo(bar\n#end") }.should raise_error(Grammar::ParseError)
+      lambda { @parser.parse("#def foo(bar,)\n#end") }.should raise_error(Grammar::ParseError)
       
       # illegal parameter type
-      lambda { @parser.parse("#def foo(1)\n#end") }.should_raise Grammar::ParseError
-      lambda { @parser.parse("#def foo($bar)\n#end") }.should_raise Grammar::ParseError
+      lambda { @parser.parse("#def foo(1)\n#end") }.should raise_error(Grammar::ParseError)
+      lambda { @parser.parse("#def foo($bar)\n#end") }.should raise_error(Grammar::ParseError)
       
     end
     
@@ -898,21 +898,21 @@ world
       
       # success case
       result = @parser.parse('#echo foo')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::EchoDirective
-      result.expression.should_be_kind_of WalrusGrammar::Identifier
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::EchoDirective)
+      result.expression.should be_kind_of(WalrusGrammar::Identifier)
       result.expression.lexeme.should == 'foo'
       
       # failing case
-      lambda { @parser.parse('#echo') }.should_raise Grammar::ParseError
+      lambda { @parser.parse('#echo') }.should raise_error(Grammar::ParseError)
       
       # allow multiple expressions separated by semicolons
       result = @parser.parse('#echo foo; bar')
-      result.should_be_kind_of WalrusGrammar::EchoDirective
-      result.expression.should_be_kind_of Array
-      result.expression[0].should_be_kind_of WalrusGrammar::Identifier
+      result.should be_kind_of(WalrusGrammar::EchoDirective)
+      result.expression.should be_kind_of(Array)
+      result.expression[0].should be_kind_of(WalrusGrammar::Identifier)
       result.expression[0].lexeme.should == 'foo'
-      result.expression[1].should_be_kind_of WalrusGrammar::Identifier
+      result.expression[1].should be_kind_of(WalrusGrammar::Identifier)
       result.expression[1].lexeme.should == 'bar'
       
     end
@@ -921,23 +921,23 @@ world
       
       # single expression
       result = @parser.parse('#= 1 #')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::EchoDirective
-      result.expression.should_be_kind_of WalrusGrammar::NumericLiteral
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::EchoDirective)
+      result.expression.should be_kind_of(WalrusGrammar::NumericLiteral)
       result.expression.lexeme.should == '1'
       
       # expression list
       result = @parser.parse('#= foo; bar #')
-      result.should_be_kind_of WalrusGrammar::EchoDirective
-      result.expression.should_be_kind_of Array
-      result.expression[0].should_be_kind_of WalrusGrammar::Identifier
+      result.should be_kind_of(WalrusGrammar::EchoDirective)
+      result.expression.should be_kind_of(Array)
+      result.expression[0].should be_kind_of(WalrusGrammar::Identifier)
       result.expression[0].lexeme.should == 'foo'
-      result.expression[1].should_be_kind_of WalrusGrammar::Identifier
+      result.expression[1].should be_kind_of(WalrusGrammar::Identifier)
       result.expression[1].lexeme.should == 'bar'
       
       # explicit end marker is required
-      lambda { @parser.parse('#= 1') }.should_raise Grammar::ParseError
-      lambda { @parser.parse('#= foo; bar') }.should_raise Grammar::ParseError
+      lambda { @parser.parse('#= 1') }.should raise_error(Grammar::ParseError)
+      lambda { @parser.parse('#= foo; bar') }.should raise_error(Grammar::ParseError)
       
     end
     
@@ -945,199 +945,199 @@ world
       
       # shortest example possible
       result = @parser.parse('#raw##end')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::RawDirective)
       result.content.should == ''
       
       # one character longer
       result = @parser.parse('#raw##end#')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::RawDirective)
       result.content.should == ''
       
       # same but with trailing newline instead
       result = @parser.parse("#raw##end\n")
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::RawDirective)
       result.content.should == ''
       
       # only slightly longer (still on one line)
       result = @parser.parse('#raw#hello world#end')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::RawDirective)
       result.content.should == 'hello world'
       
       result = @parser.parse('#raw#hello world#end#')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::RawDirective)
       result.content.should == 'hello world'
       
       result = @parser.parse("#raw#hello world#end\n")
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::RawDirective)
       result.content.should == 'hello world'
       
       result = @parser.parse("#raw\nhello world\n#end")
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::RawDirective)
       result.content.should == "hello world\n"
       
       result = @parser.parse("#raw\nhello world\n#end#")
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::RawDirective)
       result.content.should == "hello world\n"
       
       # with embedded directives (should be ignored)
       result = @parser.parse('#raw##def example#end')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::RawDirective)
       result.content.should == '#def example'
       
       # with embedded placeholders (should be ignored)
       result = @parser.parse('#raw#$foobar#end')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::RawDirective)
       result.content.should == '$foobar'
       
       # with embedded escapes (should be ignored)
       result = @parser.parse('#raw#\\$placeholder#end')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::RawDirective)
       result.content.should == '\\$placeholder'
       
       # note that you can't include a literal "#end" in the raw block
-      lambda { @parser.parse('#raw# here is my #end! #end') }.should_raise Grammar::ParseError
+      lambda { @parser.parse('#raw# here is my #end! #end') }.should raise_error(Grammar::ParseError)
       
       # must use a "here doc" in order to do that
       result = @parser.parse('#raw <<HERE_DOCUMENT
 #end
 HERE_DOCUMENT')
-      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.should be_kind_of(WalrusGrammar::RawDirective)
       result.content.should == "#end\n"
       
       # optionally indented end marker
       result = @parser.parse('#raw <<-HERE_DOCUMENT
 #end
 HERE_DOCUMENT')
-      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.should be_kind_of(WalrusGrammar::RawDirective)
       result.content.should == "#end\n"
       
       # actually indented end marker
       result = @parser.parse('#raw <<-HERE_DOCUMENT
 #end
       HERE_DOCUMENT')
-      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.should be_kind_of(WalrusGrammar::RawDirective)
       result.content.should == "#end\n"
       
       # empty here document
       result = @parser.parse('#raw <<HERE_DOCUMENT
 HERE_DOCUMENT')
-      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.should be_kind_of(WalrusGrammar::RawDirective)
       result.content.should == ''
       
       result = @parser.parse('#raw <<-HERE_DOCUMENT
 HERE_DOCUMENT')
-      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.should be_kind_of(WalrusGrammar::RawDirective)
       result.content.should == ''
       
       # whitespace after end marker
       result = @parser.parse('#raw <<HERE_DOCUMENT
 #end
 HERE_DOCUMENT     ')
-      result.should_be_kind_of WalrusGrammar::RawDirective
+      result.should be_kind_of(WalrusGrammar::RawDirective)
       result.content.should == "#end\n"
       
       # invalid here document (whitespace before end marker)
       lambda { @parser.parse('#raw <<HERE_DOCUMENT
 #end
-    HERE_DOCUMENT') }.should_raise Grammar::ParseError
+    HERE_DOCUMENT') }.should raise_error(Grammar::ParseError)
       
       # invalid here document (non-matching end marker)
       lambda { @parser.parse('#raw <<HERE_DOCUMENT
 #end
-THERE_DOCUMENT') }.should_raise Grammar::ParseError
+THERE_DOCUMENT') }.should raise_error(Grammar::ParseError)
 
     end
     
     specify 'should be able to parse the "ruby" directive' do
       
       # the end marker is required
-      lambda { @parser.parse('#ruby') }.should_raise Grammar::ParseError
-      lambda { @parser.parse('#ruby#foo') }.should_raise Grammar::ParseError
+      lambda { @parser.parse('#ruby') }.should raise_error(Grammar::ParseError)
+      lambda { @parser.parse('#ruby#foo') }.should raise_error(Grammar::ParseError)
       
       # shortest possible version
       result = @parser.parse('#ruby##end')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::RubyDirective
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::RubyDirective)
       result.content.should == ''
       
       # two line version, also short
       result = @parser.parse("#ruby\n#end")
-      result.should_be_kind_of WalrusGrammar::RubyDirective
+      result.should be_kind_of(WalrusGrammar::RubyDirective)
       result.content.should == ''
       
       # simple examples with content
       result = @parser.parse('#ruby#hello world#end')
-      result.should_be_kind_of WalrusGrammar::RubyDirective
+      result.should be_kind_of(WalrusGrammar::RubyDirective)
       result.content.should == 'hello world'
       
       result = @parser.parse("#ruby\nfoobar#end")
-      result.should_be_kind_of WalrusGrammar::RubyDirective
+      result.should be_kind_of(WalrusGrammar::RubyDirective)
       result.content.should == 'foobar'
       
       # can include anything at all in the block, escape sequences, placeholders, directives etc and all will be ignored
       result = @parser.parse("#ruby\n#ignored,$ignored,\\#ignored,\\$ignored#end")
-      result.should_be_kind_of WalrusGrammar::RubyDirective
+      result.should be_kind_of(WalrusGrammar::RubyDirective)
       result.content.should == '#ignored,$ignored,\\#ignored,\\$ignored'
       
       # to include a literal "#end" you must use a here document
       result = @parser.parse('#ruby <<HERE_DOCUMENT
 #end
 HERE_DOCUMENT')
-      result.should_be_kind_of WalrusGrammar::RubyDirective
+      result.should be_kind_of(WalrusGrammar::RubyDirective)
       result.content.should == "#end\n"
       
       # optionally indented end marker
       result = @parser.parse('#ruby <<-HERE_DOCUMENT
 #end
 HERE_DOCUMENT')
-      result.should_be_kind_of WalrusGrammar::RubyDirective
+      result.should be_kind_of(WalrusGrammar::RubyDirective)
       result.content.should == "#end\n"
       
       # actually indented end marker
       result = @parser.parse('#ruby <<-HERE_DOCUMENT
 #end
       HERE_DOCUMENT')
-      result.should_be_kind_of WalrusGrammar::RubyDirective
+      result.should be_kind_of(WalrusGrammar::RubyDirective)
       result.content.should == "#end\n"
       
       # empty here document
       result = @parser.parse('#ruby <<HERE_DOCUMENT
 HERE_DOCUMENT')
-      result.should_be_kind_of WalrusGrammar::RubyDirective
+      result.should be_kind_of(WalrusGrammar::RubyDirective)
       result.content.should == ''
       
       result = @parser.parse('#ruby <<-HERE_DOCUMENT
 HERE_DOCUMENT')
-      result.should_be_kind_of WalrusGrammar::RubyDirective
+      result.should be_kind_of(WalrusGrammar::RubyDirective)
       result.content.should == ''
       
       # whitespace after end marker
       result = @parser.parse('#ruby <<HERE_DOCUMENT
 #end
 HERE_DOCUMENT     ')
-      result.should_be_kind_of WalrusGrammar::RubyDirective
+      result.should be_kind_of(WalrusGrammar::RubyDirective)
       result.content.should == "#end\n"
       
       # invalid here document (whitespace before end marker)
       lambda { @parser.parse('#ruby <<HERE_DOCUMENT
 #end
-    HERE_DOCUMENT') }.should_raise Grammar::ParseError
+    HERE_DOCUMENT') }.should raise_error(Grammar::ParseError)
       
       # invalid here document (non-matching end marker)
       lambda { @parser.parse('#ruby <<HERE_DOCUMENT
 #end
-THERE_DOCUMENT') }.should_raise Grammar::ParseError
+THERE_DOCUMENT') }.should raise_error(Grammar::ParseError)
       
     end
     
@@ -1176,16 +1176,16 @@ THERE_DOCUMENT') }.should_raise Grammar::ParseError
     specify 'should be able to parse the "silent" directive' do
       
       # for more detailed tests see "should be able to parse basic Ruby expressions above"
-      lambda { @parser.parse('#silent') }.should_raise Grammar::ParseError
+      lambda { @parser.parse('#silent') }.should raise_error(Grammar::ParseError)
       
       # allow multiple expressions separated by semicolons
       result = @parser.parse('#silent foo; bar')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of Array
-      result.expression[0].should_be_kind_of WalrusGrammar::Identifier
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(Array)
+      result.expression[0].should be_kind_of(WalrusGrammar::Identifier)
       result.expression[0].lexeme.should == 'foo'
-      result.expression[1].should_be_kind_of WalrusGrammar::Identifier
+      result.expression[1].should be_kind_of(WalrusGrammar::Identifier)
       result.expression[1].lexeme.should == 'bar'
       
     end
@@ -1194,18 +1194,18 @@ THERE_DOCUMENT') }.should_raise Grammar::ParseError
       
       # single expression
       result = @parser.parse('# 1 #')
-      result.should_be_kind_of WalrusGrammar::Directive
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of WalrusGrammar::NumericLiteral
+      result.should be_kind_of(WalrusGrammar::Directive)
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(WalrusGrammar::NumericLiteral)
       result.expression.lexeme.should == '1'
       
       # expression list
       result = @parser.parse('# foo; bar #')
-      result.should_be_kind_of WalrusGrammar::SilentDirective
-      result.expression.should_be_kind_of Array
-      result.expression[0].should_be_kind_of WalrusGrammar::Identifier
+      result.should be_kind_of(WalrusGrammar::SilentDirective)
+      result.expression.should be_kind_of(Array)
+      result.expression[0].should be_kind_of(WalrusGrammar::Identifier)
       result.expression[0].lexeme.should == 'foo'
-      result.expression[1].should_be_kind_of WalrusGrammar::Identifier
+      result.expression[1].should be_kind_of(WalrusGrammar::Identifier)
       result.expression[1].lexeme.should == 'bar'
       
       # more complex expression
@@ -1216,12 +1216,12 @@ THERE_DOCUMENT') }.should_raise Grammar::ParseError
       result = @parser.parse("# { :foo => bar }#")
       
       # leading whitespace is obligatory
-      lambda { @parser.parse('#1 #') }.should_raise Grammar::ParseError
-      lambda { @parser.parse('#foo; bar #') }.should_raise Grammar::ParseError
+      lambda { @parser.parse('#1 #') }.should raise_error(Grammar::ParseError)
+      lambda { @parser.parse('#foo; bar #') }.should raise_error(Grammar::ParseError)
       
       # explicit end marker is required
-      lambda { @parser.parse('# 1') }.should_raise Grammar::ParseError
-      lambda { @parser.parse('# foo; bar') }.should_raise Grammar::ParseError
+      lambda { @parser.parse('# 1') }.should raise_error(Grammar::ParseError)
+      lambda { @parser.parse('# foo; bar') }.should raise_error(Grammar::ParseError)
       
     end
     
@@ -1229,29 +1229,29 @@ THERE_DOCUMENT') }.should_raise Grammar::ParseError
       
       # basic case
       result = @parser.parse("hello #slurp\nworld")
-      result[0].should_be_kind_of WalrusGrammar::RawText
+      result[0].should be_kind_of(WalrusGrammar::RawText)
       result[0].lexeme.should == 'hello '
-      result[1].should_be_kind_of WalrusGrammar::SlurpDirective
-      result[2].should_be_kind_of WalrusGrammar::RawText
+      result[1].should be_kind_of(WalrusGrammar::SlurpDirective)
+      result[2].should be_kind_of(WalrusGrammar::RawText)
       result[2].lexeme.should == 'world'
       
       # must be the last thing on the line (no comments)
-      lambda { @parser.parse("hello #slurp ## my comment...\nworld") }.should_raise Grammar::ParseError
+      lambda { @parser.parse("hello #slurp ## my comment...\nworld") }.should raise_error(Grammar::ParseError)
       
       # but intervening whitespace is ok
       result = @parser.parse("hello #slurp     \nworld")
-      result[0].should_be_kind_of WalrusGrammar::RawText
+      result[0].should be_kind_of(WalrusGrammar::RawText)
       result[0].lexeme.should == 'hello '
-      result[1].should_be_kind_of WalrusGrammar::SlurpDirective
-      result[2].should_be_kind_of WalrusGrammar::RawText
+      result[1].should be_kind_of(WalrusGrammar::SlurpDirective)
+      result[2].should be_kind_of(WalrusGrammar::RawText)
       result[2].lexeme.should == 'world'
       
       # should only slurp one newline, not multiple newlines
       result = @parser.parse("hello #slurp\n\n\nworld")       # three newlines
-      result[0].should_be_kind_of WalrusGrammar::RawText
+      result[0].should be_kind_of(WalrusGrammar::RawText)
       result[0].lexeme.should == 'hello '
-      result[1].should_be_kind_of WalrusGrammar::SlurpDirective
-      result[2].should_be_kind_of WalrusGrammar::RawText
+      result[1].should be_kind_of(WalrusGrammar::SlurpDirective)
+      result[2].should be_kind_of(WalrusGrammar::RawText)
       result[2].lexeme.should == "\n\nworld"                  # one newline slurped, two left
       
     end
@@ -1260,47 +1260,47 @@ THERE_DOCUMENT') }.should_raise Grammar::ParseError
       
       # super with empty params
       result = @parser.parse('#super()')
-      result.should_be_kind_of WalrusGrammar::SuperDirective
+      result.should be_kind_of(WalrusGrammar::SuperDirective)
       result.params.should == []
       
       # same with intervening whitespace
       result = @parser.parse('#super ()')
-      result.should_be_kind_of WalrusGrammar::SuperDirective
+      result.should be_kind_of(WalrusGrammar::SuperDirective)
       result.params.should == []
       
       # super with one param
       result = @parser.parse('#super("foo")')
-      result.should_be_kind_of WalrusGrammar::SuperDirective
-      result.params.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.should be_kind_of(WalrusGrammar::SuperDirective)
+      result.params.should be_kind_of(WalrusGrammar::DoubleQuotedStringLiteral)
       result.params.lexeme.should == 'foo'
       result.params.to_s.should == 'foo'
       
       # same with intervening whitespace
       result = @parser.parse('#super ("foo")')
-      result.should_be_kind_of WalrusGrammar::SuperDirective
-      result.params.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.should be_kind_of(WalrusGrammar::SuperDirective)
+      result.params.should be_kind_of(WalrusGrammar::DoubleQuotedStringLiteral)
       result.params.lexeme.should == 'foo'
       result.params.to_s.should == 'foo'
       
       # super with two params
       result = @parser.parse('#super("foo", "bar")')
-      result.should_be_kind_of WalrusGrammar::SuperDirective
-      result.params.should_be_kind_of Array
-      result.params[0].should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.should be_kind_of(WalrusGrammar::SuperDirective)
+      result.params.should be_kind_of(Array)
+      result.params[0].should be_kind_of(WalrusGrammar::DoubleQuotedStringLiteral)
       result.params[0].lexeme.should == 'foo'
       result.params[0].to_s.should == 'foo'
-      result.params[1].should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.params[1].should be_kind_of(WalrusGrammar::DoubleQuotedStringLiteral)
       result.params[1].lexeme.should == 'bar'
       result.params[1].to_s.should == 'bar'
       
       # same with intervening whitespace
       result = @parser.parse('#super ("foo", "bar")')
-      result.should_be_kind_of WalrusGrammar::SuperDirective
-      result.params.should_be_kind_of Array
-      result.params[0].should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.should be_kind_of(WalrusGrammar::SuperDirective)
+      result.params.should be_kind_of(Array)
+      result.params[0].should be_kind_of(WalrusGrammar::DoubleQuotedStringLiteral)
       result.params[0].lexeme.should == 'foo'
       result.params[0].to_s.should == 'foo'
-      result.params[1].should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.params[1].should be_kind_of(WalrusGrammar::DoubleQuotedStringLiteral)
       result.params[1].lexeme.should == 'bar'
       result.params[1].to_s.should == 'bar'
       
@@ -1310,24 +1310,24 @@ THERE_DOCUMENT') }.should_raise Grammar::ParseError
       
       # super with no params
       result = @parser.parse('#super')
-      result.should_be_kind_of WalrusGrammar::SuperDirective
+      result.should be_kind_of(WalrusGrammar::SuperDirective)
       result.params.should == []
       
       # super with one param
       result = @parser.parse('#super "foo"')
-      result.should_be_kind_of WalrusGrammar::SuperDirective
-      result.params.should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.should be_kind_of(WalrusGrammar::SuperDirective)
+      result.params.should be_kind_of(WalrusGrammar::DoubleQuotedStringLiteral)
       result.params.lexeme.should == 'foo'
       result.params.to_s.should == 'foo'
       
       # super with two params
       result = @parser.parse('#super "foo", "bar"')
-      result.should_be_kind_of WalrusGrammar::SuperDirective
-      result.params.should_be_kind_of Array
-      result.params[0].should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.should be_kind_of(WalrusGrammar::SuperDirective)
+      result.params.should be_kind_of(Array)
+      result.params[0].should be_kind_of(WalrusGrammar::DoubleQuotedStringLiteral)
       result.params[0].lexeme.should == 'foo'
       result.params[0].to_s.should == 'foo'
-      result.params[1].should_be_kind_of WalrusGrammar::DoubleQuotedStringLiteral
+      result.params[1].should be_kind_of(WalrusGrammar::DoubleQuotedStringLiteral)
       result.params[1].lexeme.should == 'bar'
       result.params[1].to_s.should == 'bar'
       
