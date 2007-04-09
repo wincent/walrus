@@ -27,8 +27,13 @@ module Walrus
         @remainder              = @base_string.clone
         @scanned                = ''
         @options                = options.clone
-        @options[:line_start]   = 0 if @options[:line_start].nil?
-        @options[:column_start] = 0 if @options[:column_start].nil?
+        
+        # start wherever we last finished (doesn't seem to behave different to the alternative)
+        @options[:line_start]   = (@options[:line_end] or @options[:line_start] or 0)
+        @options[:column_start] = (@options[:column_end] or @options[:column_start] or 0)
+#        @options[:line_start]   = 0 if @options[:line_start].nil?
+#        @options[:column_start] = 0 if @options[:column_start].nil?
+
         @options[:line_end]     = @options[:line_start]               # before parsing begins, end point is equal to start point
         @options[:column_end]   = @options[:column_start]
         @original_line_start    = @options[:line_start]
@@ -69,12 +74,40 @@ module Walrus
       def results
         if @results.length == 1
           results = @results[0]
+          results.start         = [@original_line_start, @original_column_start]
+          results.end           = [@options[:line_end], @options[:column_end]]
+          results.source_text   = @scanned.clone
         else
           results = @results
+          results.start         = [@original_line_start, @original_column_start]
+          results.end           = [@options[:line_end], @options[:column_end]]
+          results.source_text   = @scanned.clone
         end        
-        results.start         = [@original_line_start, @original_column_start]
-        results.end           = [@options[:line_end], @options[:column_end]]
-        results.source_text   = @scanned.clone
+        
+# so the question is, how could column start be 5 if original column start is 0?
+# answer: echo directive started at 0
+# skipped to, past the "#echo" 5
+# we scanned the expression, starting at 5
+# then, when it came time to wrap up the echo directive
+# we had only one meaningful element in our results array: the expression
+# so when it comes time to return that element for wrapping, it's still correct
+# but then we come to the point were we return the EchoDirective
+# the corresponding parser state has an @original_column_start of 0
+# we get into this method, and the only result in the array is out message expression
+# so we extract the expression; we'll return that instead of an array
+# and that expression has a start of 5
+# which we promptly overwrite below
+# and then we wrap it up as the only parameter to the wrapping method for our EchoDirective
+# so the problem is that here we really have two pieces of information here
+# 1. the coords for the directive as a whole
+# 2. the coords for the expression part
+# and unfortunately "2" is being overwritten by "1"
+# so we need a way to specify two sets of coords instead of 1
+# in the case were we return a single result instead of an array
+# this means extra methods on the thing returned by results
+# to be interpretted by the wrapper
+# not sure if it needs to be interpreted elsewhere as well
+
         results
       end
       

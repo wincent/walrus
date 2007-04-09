@@ -123,7 +123,6 @@ module Walrus
         node.end            = result.end          # and the end information
         node.source_text    = result.source_text  # and the original source text
         node
-        
       else
         result
       end
