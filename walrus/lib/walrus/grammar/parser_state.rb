@@ -72,42 +72,38 @@ module Walrus
       # Returns a single object if only one result has been accumulated.
       # Returns an array of objects if multiple results have been accumulated.
       def results
+        
+        updated_start       = [@original_line_start, @original_column_start]
+        updated_end         = [@options[:line_end], @options[:column_end]]
+        updated_source_text = @scanned.clone
+        
         if @results.length == 1
+          
+          # he we ask the single result to exhibit container-like properties
+          # use the "outer" variants so as to not overwrite any data internal to the result itself
+          # this can happen where a lone result is surrounded only by skipped elements
+          # the result has to convey data about its own limits, plus those of the context just around it
           results = @results[0]
-          results.start         = [@original_line_start, @original_column_start]
-          results.end           = [@options[:line_end], @options[:column_end]]
-          results.source_text   = @scanned.clone
+          results.outer_start       = updated_start if results.start != updated_start
+          results.outer_end         = updated_end if results.end != updated_end
+          results.outer_source_text = updated_source_text if results.source_text != updated_source_text
+          
+          # the above trick fixes some of the location tracking issues but opens up another can of worms
+          # uncomment this line to see
+          #return results
+          
+          # need some way of handling unwrapped results (raw results, not AST nodes) as well
+          results.start             = updated_start
+          results.end               = updated_end
+          results.source_text       = updated_source_text
+          
         else
           results = @results
-          results.start         = [@original_line_start, @original_column_start]
-          results.end           = [@options[:line_end], @options[:column_end]]
-          results.source_text   = @scanned.clone
+          results.start             = updated_start
+          results.end               = updated_end
+          results.source_text       = updated_source_text
         end        
         
-# so the question is, how could column start be 5 if original column start is 0?
-# answer: echo directive started at 0
-# skipped to, past the "#echo" 5
-# we scanned the expression, starting at 5
-# then, when it came time to wrap up the echo directive
-# we had only one meaningful element in our results array: the expression
-# so when it comes time to return that element for wrapping, it's still correct
-# but then we come to the point were we return the EchoDirective
-# the corresponding parser state has an @original_column_start of 0
-# we get into this method, and the only result in the array is out message expression
-# so we extract the expression; we'll return that instead of an array
-# and that expression has a start of 5
-# which we promptly overwrite below
-# and then we wrap it up as the only parameter to the wrapping method for our EchoDirective
-# so the problem is that here we really have two pieces of information here
-# 1. the coords for the directive as a whole
-# 2. the coords for the expression part
-# and unfortunately "2" is being overwritten by "1"
-# so we need a way to specify two sets of coords instead of 1
-# in the case were we return a single result instead of an array
-# this means extra methods on the thing returned by results
-# to be interpretted by the wrapper
-# not sure if it needs to be interpreted elsewhere as well
-
         results
       end
       

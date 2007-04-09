@@ -119,11 +119,14 @@ module Walrus
         end
         
         node                = node_class.class_eval('new(%s)' % params)
-        node.start          = result.start        # propagate the start information
-        node.end            = result.end          # and the end information
-        node.source_text    = result.source_text  # and the original source text
+        node.start          = (result.outer_start or result.start)              # propagate the start information
+        node.end            = (result.outer_end or result.end)                  # and the end information
+        node.source_text    = (result.outer_source_text or result.source_text)  # and the original source text
         node
       else
+        result.start        = result.outer_start if result.outer_start
+        result.end          = result.outer_end if result.outer_end
+        result.source_text  = result.source_text if result.outer_source_text
         result
       end
     end

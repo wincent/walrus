@@ -16,6 +16,11 @@ module Walrus
       
       attr_reader :source_text
       
+      # For occasions where a single item must serve as a carrier for array-like information
+      # (that is, its own start, end and source_text, as well as the "outer" equivalents).
+      # This can happen where a single node appears in a list context surrounded only by skipped content.
+      attr_accessor :outer_start, :outer_end, :outer_source_text
+      
       def source_text=(string)
         @source_text = string.to_s.clone
       end
