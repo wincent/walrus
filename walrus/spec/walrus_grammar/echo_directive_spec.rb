@@ -32,6 +32,13 @@ module Walrus
         @accumulator.content.should == 'hello world'
       end
       
+      # regression test for inputs that previously raised
+      it 'should be able to recognize the short form' do
+        @parser = Parser.new
+        lambda { @parser.parse('#= Walrus::VERSION #') }.should_not raise_error
+        lambda { @parser.parse('<meta name="generator" content="Walrus #= Walrus::VERSION #">') }.should_not raise_error
+      end
+      
     end
     
     describe 'producing a Document containing an EchoDirective' do

@@ -65,10 +65,15 @@ module Walrus
       # TODO: support 1_000_000 syntax for numeric_literals
       rule            :numeric_literal,                     /\d+\.\d+|\d+(?!\.)/
       production      :numeric_literal.build(:literal)
-      rule            :identifier,                          /[a-z_][a-zA-Z0-9_]*/
+      
+      # this matches both "foo" and "Foo::bar"
+      rule            :identifier,                          /([A-Z][a-zA-Z0-9_]*::)*[a-z_][a-zA-Z0-9_]*/
       production      :identifier.build(:literal)
-      rule            :constant,                            /[A-Z][a-zA-Z0-9_]*/
+      
+      # this matches both "Foo" and "Foo::Bar"
+      rule            :constant,                            /([A-Z][a-zA-Z0-9_]*::)*[A-Z][a-zA-Z0-9_]*/
       production      :constant.build(:literal)
+      
       rule            :symbol_literal,                      /:[a-zA-Z_][a-zA-Z0-9_]*/
       production      :symbol_literal.build(:literal)
       
