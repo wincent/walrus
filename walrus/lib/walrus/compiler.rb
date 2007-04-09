@@ -76,6 +76,13 @@ module Walrus
 \#!/usr/bin/env ruby
 \# Generated #{Time.new.to_s} by Walrus version #{VERSION}
 
+begin
+  require 'rubygems'
+rescue LoadError
+  # installing Walrus via RubyGems is recommended
+  # otherwise Walrus must be installed in the RUBYLIB load path
+end
+
 #{require_line}
 
 module Walrus
