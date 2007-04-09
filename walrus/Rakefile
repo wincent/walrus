@@ -19,6 +19,7 @@ desc 'Run specs with coverage'
 Spec::Rake::SpecTask.new('coverage') do |t|
   t.spec_files  = FileList['spec/**/*_spec.rb']
   t.rcov        = true
+  t.rcov_opts = ['--exclude', "spec"]
 end
 
 desc 'Run specs'
@@ -33,6 +34,7 @@ RCov::VerifyTask.new(:verify => :spec) do |t|
 end
 
 # http://blog.nicksieger.com/articles/2007/01/30/rspec-autotest-for-standalone-projects
+desc 'Start autotest'
 namespace :spec do
   task :autotest do
     require './spec/rspec_autotest'

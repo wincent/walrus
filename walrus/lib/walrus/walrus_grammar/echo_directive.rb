@@ -25,7 +25,7 @@ module Walrus
         
         compiled  = ''
         first     = true
-        expression.each do |expr| 
+        expression.each do |expr|
           if first
             compiled << "accumulate(instance_eval { %s }) # Echo directive\n" % expr.compile
             first = false

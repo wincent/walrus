@@ -14,10 +14,16 @@ module Walrus
     class Placeholder
       
       def compile(options = {})
-        # basic implementation to begin with (no parameters)
-        "lookup_and_accumulate_placeholder(#{@name.to_s.to_sym.inspect})\n"
         
-        # special case when placeholder is not used as part of literal text; return the value rather than accumulating
+        # TODO: special case when placeholder is not used as part of literal text; return the value rather than accumulating
+        
+        if @params == []
+          "lookup_and_accumulate_placeholder(#{@name.to_s.to_sym.inspect})\n"
+        else
+          params      = (@params.kind_of? Array) ? @params : [@params]
+          param_list  = params.collect { |param| param.compile }.join(', ')
+          "lookup_and_accumulate_placeholder(#{@name.to_s.to_sym.inspect}, #{param_list})\n"
+        end
         
       end
       

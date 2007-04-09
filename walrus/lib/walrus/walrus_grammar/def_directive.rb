@@ -16,13 +16,17 @@ module Walrus
       # Returns a string containing the compiled (Ruby) version of receiver.
       def compile(options = {})
         internal = ''
-        external = "def #{@identifier.to_s}\n"
+        
+        if @params == []
+          external = "def #{@identifier.to_s}\n"
+        else
+          # this will work for the simple case where params are plain identifiers
+          params = (@params.kind_of? Array) ? @params : [@params]
+          param_list  = params.collect { |param| param.compile }.join(', ')
+          external = "def #{@identifier.to_s}(#{param_list})\n"
+        end
         
         nested  = nil
-        
-        
-        # for now only handle the parameterless case; handle the other cases later
-        #@params.each { |param| compiled << param.compile(options) }
         
         if @content.respond_to? :each   : content = @content
         else                              content = [@content]
