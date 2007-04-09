@@ -22,25 +22,25 @@ module Walrus
       end
     end
     
-    context 'compiling an EscapeSequence instance' do
+    describe 'compiling an EscapeSequence instance' do
       
       setup do
         @accumulator  = EscapeSequenceAccumulator.new
       end
       
-      specify 'should be able to round trip ($)' do
+      it 'should be able to round trip ($)' do
         sequence = EscapeSequence.new('$')
         @accumulator.instance_eval(sequence.compile)
         @accumulator.content.should == '$'
       end
       
-      specify 'should be able to round trip (#)' do
+      it 'should be able to round trip (#)' do
         sequence = EscapeSequence.new('#')
         @accumulator.instance_eval(sequence.compile)
         @accumulator.content.should == '#'
       end
       
-      specify 'should be able to round trip (\\)' do
+      it 'should be able to round trip (\\)' do
         sequence = EscapeSequence.new('\\')
         @accumulator.instance_eval(sequence.compile)
         @accumulator.content.should == '\\'
@@ -48,13 +48,13 @@ module Walrus
       
     end
     
-    context 'producing a Document containing an EscapeSequence' do
+    describe 'producing a Document containing an EscapeSequence' do
       
       setup do
         @parser = Parser.new
       end
       
-      specify 'should be able to round trip' do
+      it 'should be able to round trip' do
         
         # single $
         sequence = @parser.compile('\\$', :class_name => :EscapeSequenceSpecAlpha)

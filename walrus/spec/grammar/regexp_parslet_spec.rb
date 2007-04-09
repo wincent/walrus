@@ -11,17 +11,17 @@ require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 module Walrus
   class Grammar
     
-    context 'using a regexp parslet' do
+    describe 'using a regexp parslet' do
       
       setup do
         @parslet = RegexpParslet.new(/[a-zA-Z_][a-zA-Z0-9_]*/)
       end
       
-      specify 'should raise an ArgumentError if initialized with nil' do
+      it 'should raise an ArgumentError if initialized with nil' do
         lambda { RegexpParslet.new(nil) }.should raise_error(ArgumentError)
       end
       
-      specify 'parse should succeed if the input string matches' do
+      it 'parse should succeed if the input string matches' do
         lambda { @parslet.parse('an_identifier') }.should_not raise_error
         lambda { @parslet.parse('An_Identifier') }.should_not raise_error
         lambda { @parslet.parse('AN_IDENTIFIER') }.should_not raise_error
@@ -39,7 +39,7 @@ module Walrus
         lambda { @parslet.parse('_') }.should_not raise_error
       end
       
-      specify 'parse should succeed if the input string matches, even if it continues after the match' do
+      it 'parse should succeed if the input string matches, even if it continues after the match' do
         lambda { @parslet.parse('an_identifier, more') }.should_not raise_error
         lambda { @parslet.parse('An_Identifier, more') }.should_not raise_error
         lambda { @parslet.parse('AN_IDENTIFIER, more') }.should_not raise_error
@@ -57,30 +57,30 @@ module Walrus
         lambda { @parslet.parse('_, more') }.should_not raise_error
       end
       
-      specify 'parse should return a MatchDataWrapper object' do
+      it 'parse should return a MatchDataWrapper object' do
         @parslet.parse('an_identifier').should == 'an_identifier'
         @parslet.parse('an_identifier, more').should == 'an_identifier'
       end
       
-      specify 'parse should raise an ArgumentError if passed nil' do
+      it 'parse should raise an ArgumentError if passed nil' do
         lambda { @parslet.parse(nil) }.should raise_error(ArgumentError)
       end
       
-      specify 'parse should raise a ParseError if the input string does not match' do
+      it 'parse should raise a ParseError if the input string does not match' do
         lambda { @parslet.parse('9') }.should raise_error(ParseError)           # a number is not a valid identifier
         lambda { @parslet.parse('9fff') }.should raise_error(ParseError)        # identifiers must not start with numbers
         lambda { @parslet.parse(' identifier') }.should raise_error(ParseError) # note the leading whitespace
         lambda { @parslet.parse('') }.should raise_error(ParseError)            # empty strings can't match
       end
       
-      specify 'should be able to compare parslets for equality' do
+      it 'should be able to compare parslets for equality' do
         /foo/.to_parseable.should eql(/foo/.to_parseable)        # equal
         /foo/.to_parseable.should_not eql(/bar/.to_parseable)    # different
         /foo/.to_parseable.should_not eql(/Foo/.to_parseable)    # differing only in case
         /foo/.to_parseable.should_not eql('foo')                 # totally different classes
       end
       
-      specify 'should accurately pack line and column ends into whatever gets returned from "parse"' do
+      it 'should accurately pack line and column ends into whatever gets returned from "parse"' do
         
         # single word
         parslet = /.+/m.to_parseable
@@ -121,7 +121,7 @@ module Walrus
       end
       
       # in the case of RegexpParslets, the "last successfully scanned position" is always 0, 0
-      specify 'line and column end should reflect last succesfully scanned position prior to failure' do
+      it 'line and column end should reflect last succesfully scanned position prior to failure' do
         
         # fail right at start
         parslet = /hello\r\nworld/.to_parseable
@@ -155,15 +155,15 @@ module Walrus
       
     end
     
-    context 'chaining two regexp parslets together' do
+    describe 'chaining two regexp parslets together' do
       
-      specify 'parslets should work in specified order' do
+      it 'parslets should work in specified order' do
         parslet = RegexpParslet.new(/foo.\d/) & RegexpParslet.new(/bar.\d/)
         parslet.parse('foo_1bar_2').should == ['foo_1', 'bar_2']
       end
       
       # Parser Expression Grammars match greedily
-      specify 'parslets should match greedily' do
+      it 'parslets should match greedily' do
         
         # the first parslet should gobble up the entire string, preventing the second parslet from succeeding
         parslet = RegexpParslet.new(/foo.+\d/) & RegexpParslet.new(/bar.+\d/)
@@ -173,20 +173,20 @@ module Walrus
       
     end
     
-    context 'alternating two regexp parslets' do
+    describe 'alternating two regexp parslets' do
       
-      specify 'either parslet should apply to generate a match' do
+      it 'either parslet should apply to generate a match' do
         parslet = RegexpParslet.new(/\d+/) | RegexpParslet.new(/[A-Z]+/)
         parslet.parse('ABC').should == 'ABC'
         parslet.parse('123').should == '123'
       end
       
-      specify 'should fail if no parslet generates a match' do
+      it 'should fail if no parslet generates a match' do
         parslet = RegexpParslet.new(/\d+/) | RegexpParslet.new(/[A-Z]+/)
         lambda { parslet.parse('abc') }.should raise_error(ParseError)
       end
       
-      specify 'parslets should be tried in left-to-right order' do
+      it 'parslets should be tried in left-to-right order' do
         
         # in this case the first parslet should win even though the second one is also a valid match
         parslet = RegexpParslet.new(/(.)(..)/) | RegexpParslet.new(/(..)(.)/)
@@ -204,30 +204,30 @@ module Walrus
       
     end
     
-    context 'chaining three regexp parslets' do
+    describe 'chaining three regexp parslets' do
       
-      specify 'parslets should work in specified order' do
+      it 'parslets should work in specified order' do
         parslet = RegexpParslet.new(/foo.\d/) & RegexpParslet.new(/bar.\d/) & RegexpParslet.new(/.../)
         parslet.parse('foo_1bar_2ABC').should == ['foo_1', 'bar_2', 'ABC']        
       end
       
     end
     
-    context 'alternating three regexp parslets' do
+    describe 'alternating three regexp parslets' do
       
-      specify 'any parslet should apply to generate a match' do
+      it 'any parslet should apply to generate a match' do
         parslet = RegexpParslet.new(/\d+/) | RegexpParslet.new(/[A-Z]+/) | RegexpParslet.new(/[a-z]+/)
         parslet.parse('ABC').should == 'ABC'
         parslet.parse('123').should == '123'
         parslet.parse('abc').should == 'abc'
       end
       
-      specify 'should fail if no parslet generates a match' do
+      it 'should fail if no parslet generates a match' do
         parslet = RegexpParslet.new(/\d+/) | RegexpParslet.new(/[A-Z]+/) | RegexpParslet.new(/[a-z]+/)
         lambda { parslet.parse(':::') }.should raise_error(ParseError)
       end
       
-      specify 'parslets should be tried in left-to-right order' do
+      it 'parslets should be tried in left-to-right order' do
         
         # in this case the first parslet should win even though the others also produce valid matches
         parslet = RegexpParslet.new(/(.)(..)/) | RegexpParslet.new(/(..)(.)/) | RegexpParslet.new(/(...)/)
@@ -250,9 +250,9 @@ module Walrus
       
     end
     
-    context 'combining chaining and alternation' do
+    describe 'combining chaining and alternation' do
       
-      specify 'chaining should having higher precedence than alternation' do
+      it 'chaining should having higher precedence than alternation' do
         
         # equivalent to /foo/ | ( /bar/ & /abc/ )
         parslet = RegexpParslet.new(/foo/) | RegexpParslet.new(/bar/) & RegexpParslet.new(/abc/)
@@ -270,7 +270,7 @@ module Walrus
         
       end
       
-      specify 'should be able to override precedence using parentheses' do
+      it 'should be able to override precedence using parentheses' do
         
         # take first example above and make it ( /foo/ | /bar/ ) & /abc/
         parslet = (RegexpParslet.new(/foo/) | RegexpParslet.new(/bar/)) & RegexpParslet.new(/abc/)
@@ -294,7 +294,7 @@ module Walrus
         
       end
       
-      specify 'should be able to include long runs of sequences' do
+      it 'should be able to include long runs of sequences' do
         
         # A & B & C & D | E
         parslet = RegexpParslet.new(/a/) & RegexpParslet.new(/b/) & RegexpParslet.new(/c/) & RegexpParslet.new(/d/) | RegexpParslet.new(/e/)
@@ -304,7 +304,7 @@ module Walrus
         
       end
       
-      specify 'should be able to include long runs of options' do
+      it 'should be able to include long runs of options' do
         
         # A | B | C | D & E
         parslet = RegexpParslet.new(/a/) | RegexpParslet.new(/b/) | RegexpParslet.new(/c/) | RegexpParslet.new(/d/) & RegexpParslet.new(/e/)
@@ -316,7 +316,7 @@ module Walrus
         
       end
       
-      specify 'should be able to alternate repeatedly between sequences and choices' do
+      it 'should be able to alternate repeatedly between sequences and choices' do
         
         # A & B | C & D | E
         parslet = RegexpParslet.new(/a/) & RegexpParslet.new(/b/) | RegexpParslet.new(/c/) & RegexpParslet.new(/d/) | RegexpParslet.new(/e/)
@@ -327,7 +327,7 @@ module Walrus
         
       end
       
-      specify 'should be able to combine long runs with alternation' do
+      it 'should be able to combine long runs with alternation' do
         
         # A & B & C | D | E | F & G & H
         parslet = RegexpParslet.new(/a/) & RegexpParslet.new(/b/) & RegexpParslet.new(/c/) | 

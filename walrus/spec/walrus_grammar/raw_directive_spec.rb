@@ -22,9 +22,9 @@ module Walrus
       end
     end
     
-    context 'compiling a RawDirective instance' do
+    describe 'compiling a RawDirective instance' do
       
-      specify 'should be able to round trip' do
+      it 'should be able to round trip' do
         @accumulator  = RawDirectiveAccumulator.new
         @raw          = RawDirective.new('hello \'world\'\\... € #raw, $raw, \\raw')
         @accumulator.instance_eval(@raw.compile)
@@ -33,13 +33,13 @@ module Walrus
       
     end
     
-    context 'producing a Document containing RawText' do
+    describe 'producing a Document containing RawText' do
       
       setup do
         @parser = Parser.new
       end
       
-      specify 'should be able to round trip' do
+      it 'should be able to round trip' do
         
         # simple example
         raw = @parser.compile("#raw\nhello world\n#end", :class_name => :RawDirectiveSpecAlpha)

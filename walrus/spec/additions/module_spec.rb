@@ -20,19 +20,19 @@ module Walrus
     attr_accessor_bycopy  :gamma2, :gamma3
   end
   
-  context 'using "by copy" accessors' do
+  describe 'using "by copy" accessors' do
     
     setup do
       @instance = ByCopyAccessDemo.new
     end
     
-    specify 'those accessors should be "private"' do
+    it 'those accessors should be "private"' do
       lambda { ByCopyAccessDemo.attr_bycopy :hello }.should raise_error(NoMethodError)
       lambda { ByCopyAccessDemo.attr_writer_bycopy :hello }.should raise_error(NoMethodError)
       lambda { ByCopyAccessDemo.attr_accessor_bycopy :hello }.should raise_error(NoMethodError)
     end
     
-    specify 'should accept "normal" objects like String, making copies of them' do
+    it 'should accept "normal" objects like String, making copies of them' do
       
       # original values
       foo     = "hello"
@@ -76,7 +76,7 @@ module Walrus
       
     end
     
-    specify 'should accept non-copyable objects like instances of Nil, Symbol and Fixnum' do
+    it 'should accept non-copyable objects like instances of Nil, Symbol and Fixnum' do
       
       # original values
       foo     = nil

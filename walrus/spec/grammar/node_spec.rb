@@ -11,13 +11,13 @@ require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 module Walrus
   class Grammar
     
-    context 'working in the default namespace' do
+    describe 'working in the default namespace' do
       
-      specify 'should complain if passed nil as subclass name' do
+      it 'should complain if passed nil as subclass name' do
         lambda { Node.subclass(nil) }.should raise_error(ArgumentError)
       end
       
-      specify 'should be able to create a Node subclass (default namespace)' do
+      it 'should be able to create a Node subclass (default namespace)' do
         
         # passing a string
         Node.subclass('FooNode').should_not be_nil
@@ -31,7 +31,7 @@ module Walrus
         
       end
       
-      specify 'should be able to create a Node subclass (explicit namespace, Walrus::Grammar)' do
+      it 'should be able to create a Node subclass (explicit namespace, Walrus::Grammar)' do
         
         # default accessor, lexeme
         Node.subclass('ExplicitNamespaceNode', Walrus::Grammar).should_not be_nil
@@ -49,7 +49,7 @@ module Walrus
         
       end
       
-      specify 'should be able to create a Node subclass (totally custom namespace)' do
+      it 'should be able to create a Node subclass (totally custom namespace)' do
         
         # default accessor, lexeme
         Node.subclass('CustomNamespaceNode', Walrus).should_not be_nil
@@ -67,7 +67,7 @@ module Walrus
         
       end
       
-      specify 'read accessors should work on a Node subclasses' do
+      it 'read accessors should work on a Node subclasses' do
         
         # default accessor, lexeme
         Node.subclass('AmazingNode')
@@ -85,7 +85,7 @@ module Walrus
         
       end
       
-      specify 'should complain if initialize called with missing arguments' do
+      it 'should complain if initialize called with missing arguments' do
         
         # default accessor, lexeme
         Node.subclass('AmazingNode2')
@@ -102,7 +102,7 @@ module Walrus
         
       end
       
-      specify 'should be able to subclass a Node subclass' do
+      it 'should be able to subclass a Node subclass' do
         
         Node.subclass('FirstSubclass')
         FirstSubclass.subclass('Grandchild').should_not be_nil
@@ -111,7 +111,7 @@ module Walrus
         
       end
       
-      specify 'read accessors should work on a subclass of a Node subclass' do
+      it 'read accessors should work on a subclass of a Node subclass' do
         Node.subclass('MySubclass')
         MySubclass.subclass('OtherSubclass', Walrus::Grammar, :from, :to).should_not be_nil
         s = OtherSubclass.new('Bob', 'Alice')

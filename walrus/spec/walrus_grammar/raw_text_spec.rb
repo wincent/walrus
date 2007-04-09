@@ -22,9 +22,9 @@ module Walrus
       end
     end
     
-    context 'compiling a RawText instance' do
+    describe 'compiling a RawText instance' do
       
-      specify 'should be able to round trip' do
+      it 'should be able to round trip' do
         @accumulator  = RawTextAccumulator.new
         @raw_text     = RawText.new('hello \'world\'\\... €')
         @accumulator.instance_eval(@raw_text.compile)
@@ -33,13 +33,13 @@ module Walrus
       
     end
     
-    context 'producing a Document containing RawText' do
+    describe 'producing a Document containing RawText' do
       
       setup do
         @parser = Parser.new
       end
       
-      specify 'should be able to round trip' do
+      it 'should be able to round trip' do
         
         # simple example
         raw_text = @parser.compile('hello world', :class_name => :RawTextSpecAlpha)

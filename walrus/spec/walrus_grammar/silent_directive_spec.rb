@@ -12,13 +12,13 @@ require 'walrus/parser' # ensure that WalrusGrammar is defined before continuing
 module Walrus
   class WalrusGrammar
     
-    context 'producing a Document containing a SilentDirective' do
+    describe 'producing a Document containing a SilentDirective' do
       
       setup do
         @parser = Parser.new
       end
       
-      specify 'should produce no output' do
+      it 'should produce no output' do
         
         # simple example
         compiled = @parser.compile("#silent 'foo'", :class_name => :SilentDirectiveSpecAlpha)

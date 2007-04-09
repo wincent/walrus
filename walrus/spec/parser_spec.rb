@@ -10,17 +10,17 @@ require File.join(File.dirname(__FILE__), 'spec_helper.rb')
 
 module Walrus
   
-  context 'parsing raw text, escape markers and comments' do
+  describe 'parsing raw text, escape markers and comments' do
     
     context_setup do
       @parser = Parser.new()
     end
     
-    specify 'should be able to instantiate the parser' do
+    it 'should be able to instantiate the parser' do
       @parser.should_not be_nil
     end
     
-    specify 'should be able to parse a plaintext string' do
+    it 'should be able to parse a plaintext string' do
       
       # a single word
       result = @parser.parse('foo')
@@ -39,7 +39,7 @@ module Walrus
       
     end
     
-    specify 'should be able to parse a comment' do
+    it 'should be able to parse a comment' do
       
       # comment with content
       result = @parser.parse('## hello world')
@@ -92,7 +92,7 @@ module Walrus
       
     end
     
-    specify 'should be able to parse an escape marker' do
+    it 'should be able to parse an escape marker' do
       
       # directive marker
       result = @parser.parse('\\#')
@@ -120,7 +120,7 @@ module Walrus
       
     end
     
-    specify 'should complain on finding an illegal escape marker' do
+    it 'should complain on finding an illegal escape marker' do
       
       # invalid character
       lambda { @parser.parse('\\x') }.should raise_error(Grammar::ParseError)
@@ -130,7 +130,7 @@ module Walrus
       
     end
     
-    specify 'should be able to mix comments and plain text' do
+    it 'should be able to mix comments and plain text' do
       
       # plain text followed by comment
       result = @parser.parse('foobar ## hello world')
@@ -146,7 +146,7 @@ module Walrus
       
     end
     
-    specify 'should be able to mix escape markers and plain text' do
+    it 'should be able to mix escape markers and plain text' do
       
       # plain text followed by an escape marker
       result = @parser.parse('hello \\#')
@@ -181,29 +181,29 @@ module Walrus
     end
   end
     
-  context 'parsing directives' do
+  describe 'parsing directives' do
     
     context_setup do
       @parser = Parser.new()
     end
     
-    specify 'should complain on encountering an unknown or invalid directive name' do
+    it 'should complain on encountering an unknown or invalid directive name' do
       lambda { @parser.parse('#glindenburgen') }.should raise_error(Grammar::ParseError)
       lambda { @parser.parse('#') }.should raise_error(Grammar::ParseError)
     end
     
-    specify 'should complain if there is whitespace between the directive marker (#) and the directive name' do
+    it 'should complain if there is whitespace between the directive marker (#) and the directive name' do
       lambda { @parser.parse('# extends "other_template"') }.should raise_error(Grammar::ParseError)
     end
     
-    specify 'should be able to parse a directive that takes a single parameter' do
+    it 'should be able to parse a directive that takes a single parameter' do
       result = @parser.parse('#extends "other_template"')
       result.should be_kind_of(WalrusGrammar::Directive)
       result.should be_kind_of(WalrusGrammar::ExtendsDirective)
       result.class_name.lexeme.should == 'other_template'
     end
     
-    specify 'should be able to follow a directive by a comment on the same line, only if the directive has an explicit termination marker' do
+    it 'should be able to follow a directive by a comment on the same line, only if the directive has an explicit termination marker' do
       
       # no intervening whitespace ("extends" directive, takes one parameter)
       result = @parser.parse('#extends "other_template"### comment')
@@ -237,7 +237,7 @@ module Walrus
       
     end
     
-    specify 'should be able to span directives across lines by using a line continuation backslash' do
+    it 'should be able to span directives across lines by using a line continuation backslash' do
       
       # basic case
       result = @parser.parse("#extends \\\n'other_template'")
@@ -249,7 +249,7 @@ module Walrus
       
     end
 
-    specify 'should be able to parse an "import" directive' do
+    it 'should be able to parse an "import" directive' do
       
       # followed by a newline
       result = @parser.parse("#import 'other_template'\nhello")
@@ -300,7 +300,7 @@ module Walrus
       
     end
     
-    specify 'should be able to parse single quoted string literals' do
+    it 'should be able to parse single quoted string literals' do
       
       # string literals have no special meaning when part of raw text
       result = @parser.parse("'hello'")
@@ -351,7 +351,7 @@ module Walrus
       
     end
     
-    specify 'should be able to parse double quoted string literals' do
+    it 'should be able to parse double quoted string literals' do
       
       # string literals have no special meaning when part of raw text
       result = @parser.parse('"hello"')
@@ -403,7 +403,7 @@ module Walrus
     end
     
     # will use the #silent directive here because it's an easy way to make the parser look for a ruby expression
-    specify 'should be able to parse basic Ruby expressions' do
+    it 'should be able to parse basic Ruby expressions' do
       
       # a numeric literal
       result = @parser.parse('#silent 1')
@@ -660,7 +660,7 @@ module Walrus
       
     end
     
-    specify 'should be able go from AST representation of a Ruby expression to an evaluable string form' do
+    it 'should be able go from AST representation of a Ruby expression to an evaluable string form' do
       
       result = @parser.parse('#silent 1 + 2 + 3')
       
@@ -668,7 +668,7 @@ module Walrus
       
     end
     
-    specify 'should be able to parse the "block" directive' do
+    it 'should be able to parse the "block" directive' do
       
       # simple case: no parameters, no content
       result = @parser.parse("#block foo\n#end")
@@ -781,7 +781,7 @@ world
       
     end
     
-    specify 'should be able to parse the "def" directive' do
+    it 'should be able to parse the "def" directive' do
       
       # simple case: no parameters, no content
       result = @parser.parse("#def foo\n#end")
@@ -894,7 +894,7 @@ world
       
     end
     
-    specify 'should be able to parse the "echo" directive' do
+    it 'should be able to parse the "echo" directive' do
       
       # success case
       result = @parser.parse('#echo foo')
@@ -917,7 +917,7 @@ world
       
     end
     
-    specify 'should be able to parse "echo" directive, short notation' do
+    it 'should be able to parse "echo" directive, short notation' do
       
       # single expression
       result = @parser.parse('#= 1 #')
@@ -941,7 +941,7 @@ world
       
     end
     
-    specify 'should be able to parse the "raw" directive' do
+    it 'should be able to parse the "raw" directive' do
       
       # shortest example possible
       result = @parser.parse('#raw##end')
@@ -1059,7 +1059,7 @@ THERE_DOCUMENT') }.should raise_error(Grammar::ParseError)
 
     end
     
-    specify 'should be able to parse the "ruby" directive' do
+    it 'should be able to parse the "ruby" directive' do
       
       # the end marker is required
       lambda { @parser.parse('#ruby') }.should raise_error(Grammar::ParseError)
@@ -1141,7 +1141,7 @@ THERE_DOCUMENT') }.should raise_error(Grammar::ParseError)
       
     end
     
-    specify 'should be able to parse the "set" directive' do
+    it 'should be able to parse the "set" directive' do
       
       # assign a string literal 
       result = @parser.parse('#set $foo = "bar"')
@@ -1173,7 +1173,7 @@ THERE_DOCUMENT') }.should raise_error(Grammar::ParseError)
       
     end
     
-    specify 'should be able to parse the "silent" directive' do
+    it 'should be able to parse the "silent" directive' do
       
       # for more detailed tests see "should be able to parse basic Ruby expressions above"
       lambda { @parser.parse('#silent') }.should raise_error(Grammar::ParseError)
@@ -1190,7 +1190,7 @@ THERE_DOCUMENT') }.should raise_error(Grammar::ParseError)
       
     end
     
-    specify 'should be able to parse "silent" directive, short notation' do
+    it 'should be able to parse "silent" directive, short notation' do
       
       # single expression
       result = @parser.parse('# 1 #')
@@ -1225,7 +1225,7 @@ THERE_DOCUMENT') }.should raise_error(Grammar::ParseError)
       
     end
     
-    specify 'should be able to parse the "slurp" directive' do
+    it 'should be able to parse the "slurp" directive' do
       
       # basic case
       result = @parser.parse("hello #slurp\nworld")
@@ -1256,7 +1256,7 @@ THERE_DOCUMENT') }.should raise_error(Grammar::ParseError)
       
     end
     
-    specify 'should be able to parse the "super" directive with parentheses' do
+    it 'should be able to parse the "super" directive with parentheses' do
       
       # super with empty params
       result = @parser.parse('#super()')
@@ -1306,7 +1306,7 @@ THERE_DOCUMENT') }.should raise_error(Grammar::ParseError)
       
     end
     
-    specify 'should be able to parse the "super" directive without parentheses' do
+    it 'should be able to parse the "super" directive without parentheses' do
       
       # super with no params
       result = @parser.parse('#super')
@@ -1333,7 +1333,7 @@ THERE_DOCUMENT') }.should raise_error(Grammar::ParseError)
       
     end
     
-    specify 'parse results should contain information about their location in the original source (line and column start/end)' do
+    it 'parse results should contain information about their location in the original source (line and column start/end)' do
       
       # simple raw text
       result = @parser.parse('hello world')
@@ -1363,7 +1363,7 @@ THERE_DOCUMENT') }.should raise_error(Grammar::ParseError)
       
     end
     
-    specify 'ParseErrors should contain information about the location of the problem' do
+    it 'ParseErrors should contain information about the location of the problem' do
       
       # error at beginning of string (unknown directive)
       begin
@@ -1408,7 +1408,7 @@ THERE_DOCUMENT') }.should raise_error(Grammar::ParseError)
       
     end
     
-    specify 'produced AST nodes should contain information about their location in the source file' do
+    it 'produced AST nodes should contain information about their location in the source file' do
       
     end
     

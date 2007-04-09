@@ -12,21 +12,21 @@ require 'walrus/parser' # ensure that WalrusGrammar is defined before continuing
 module Walrus
   class WalrusGrammar
     
-    context 'compiling a comment instance' do
+    describe 'compiling a comment instance' do
       
-      specify 'comments should produce no meaningful output' do
+      it 'comments should produce no meaningful output' do
         eval(Comment.new(' hello world').compile).should == nil
       end
       
     end
     
-    context 'producing a Document containing Comment' do
+    describe 'producing a Document containing Comment' do
       
       setup do
         @parser = Parser.new
       end
       
-      specify 'should produce no output' do
+      it 'should produce no output' do
         comment = @parser.compile('## hello world', :class_name => :CommentSpec)
         self.class.class_eval(comment).should == ''
       end

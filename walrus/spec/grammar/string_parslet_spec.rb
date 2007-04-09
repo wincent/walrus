@@ -11,34 +11,34 @@ require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 module Walrus
   class Grammar
     
-    context 'using a string parslet' do
+    describe 'using a string parslet' do
       
       setup do
         @parslet = StringParslet.new('HELLO')
       end
       
-      specify 'should raise an ArgumentError if initialized with nil' do
+      it 'should raise an ArgumentError if initialized with nil' do
         lambda { StringParslet.new(nil) }.should raise_error(ArgumentError)
       end
       
-      specify 'parse should succeed if the input string matches' do
+      it 'parse should succeed if the input string matches' do
         lambda { @parslet.parse('HELLO') }.should_not raise_error
       end
       
-      specify 'parse should succeed if the input string matches, even if it continues after the match' do
+      it 'parse should succeed if the input string matches, even if it continues after the match' do
         lambda { @parslet.parse('HELLO...') }.should_not raise_error
       end
       
-      specify 'parse should return parsed string' do
+      it 'parse should return parsed string' do
         @parslet.parse('HELLO').should == 'HELLO'
         @parslet.parse('HELLO...').should == 'HELLO'
       end
       
-      specify 'parse should raise an ArgumentError if passed nil' do
+      it 'parse should raise an ArgumentError if passed nil' do
         lambda { @parslet.parse(nil) }.should raise_error(ArgumentError)
       end
       
-      specify 'parse should raise a ParseError if the input string does not match' do
+      it 'parse should raise a ParseError if the input string does not match' do
         lambda { @parslet.parse('GOODBYE') }.should raise_error(ParseError)        # total mismatch
         lambda { @parslet.parse('GOODBYE, HELLO') }.should raise_error(ParseError) # eventually would match, but too late
         lambda { @parslet.parse('HELL...') }.should raise_error(ParseError)        # starts well, but fails
@@ -46,20 +46,20 @@ module Walrus
         lambda { @parslet.parse('') }.should raise_error(ParseError)               # empty strings can't match
       end
       
-      specify 'parse exceptions should include a detailed error message' do
+      it 'parse exceptions should include a detailed error message' do
         # TODO: catch the raised exception and compare the message
         lambda { @parslet.parse('HELL...') }.should raise_error(ParseError)
         lambda { @parslet.parse('HELL') }.should raise_error(ParseError)
       end
       
-      specify 'should be able to compare string parslets for equality' do
+      it 'should be able to compare string parslets for equality' do
         'foo'.to_parseable.should eql('foo'.to_parseable)           # equal
         'foo'.to_parseable.should_not eql('bar'.to_parseable)       # different
         'foo'.to_parseable.should_not eql('Foo'.to_parseable)       # differing only in case
         'foo'.to_parseable.should_not eql(/foo/)                    # totally different classes
       end
       
-      specify 'should accurately pack line and column ends into whatever is returned by "parse"' do
+      it 'should accurately pack line and column ends into whatever is returned by "parse"' do
         
         # single word
         parslet = 'hello'.to_parseable
@@ -105,7 +105,7 @@ module Walrus
         
       end
       
-      specify 'line and column end should reflect last succesfully scanned position prior to failure' do
+      it 'line and column end should reflect last succesfully scanned position prior to failure' do
         
         # fail right at start
         parslet = "hello\r\nworld".to_parseable

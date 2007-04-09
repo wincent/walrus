@@ -11,9 +11,9 @@ require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 module Walrus
   class Grammar
     
-    context 'creating a continuation wrapper exception' do
+    describe 'creating a continuation wrapper exception' do
       
-      specify 'should complain if initialized with nil' do
+      it 'should complain if initialized with nil' do
         lambda { ContinuationWrapperException.new(nil) }.should raise_error(ArgumentError)
       end
       

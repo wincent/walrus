@@ -11,9 +11,9 @@ require File.join(File.dirname(__FILE__), 'spec_helper.rb')
 module Walrus
   class Grammar
     
-    context 'defining a grammar subclass' do
+    describe 'defining a grammar subclass' do
       
-      specify 'should be able to create new Grammar subclasses on the fly' do
+      it 'should be able to create new Grammar subclasses on the fly' do
         
         # first create a new subclass and make sure the returned instance is non-nil
         Grammar.subclass('MyGrammar').should_not be_nil
@@ -23,16 +23,16 @@ module Walrus
       
       end
       
-      specify 'should complain if an attempt is made to create the same subclass twice' do
+      it 'should complain if an attempt is made to create the same subclass twice' do
         lambda { Grammar.subclass('FooGrammar') }.should_not raise_error
         lambda { Grammar.subclass('FooGrammar') }.should raise_error
       end
       
-      specify 'should complain if subclass name is nil' do
+      it 'should complain if subclass name is nil' do
         lambda { Grammar.subclass(nil) }.should raise_error(ArgumentError)
       end
       
-      specify 'should be able to pass a block while defining a new subclass' do
+      it 'should be able to pass a block while defining a new subclass' do
         
         instance = Grammar.subclass('TestGrammar') do
           starting_symbol :foo
@@ -43,15 +43,15 @@ module Walrus
       
     end
     
-    context 'defining rules in a grammar' do
+    describe 'defining rules in a grammar' do
       
-      specify '"rules" method should complain if either parameter is nil' do
+      it '"rules" method should complain if either parameter is nil' do
         lambda { Grammar.subclass('AxeGrammar') { rule nil, 'expression' } }.should raise_error(ArgumentError)
         lambda { Grammar.subclass('BoneGrammar') { rule :my_rule, nil } }.should raise_error(ArgumentError)
         lambda { Grammar.subclass('CatGrammar') { rule nil, nil } }.should raise_error(ArgumentError)
       end
       
-      specify '"rules" method should complain if an attempt is made to define a rule a second time' do
+      it '"rules" method should complain if an attempt is made to define a rule a second time' do
         lambda do
           Grammar.subclass('DogGrammar') do
             rule :my_rule, 'foo'
@@ -60,21 +60,21 @@ module Walrus
         end.should raise_error(ArgumentError)
       end
       
-      specify 'should be able to define rules in the block using the "rule" method' do
+      it 'should be able to define rules in the block using the "rule" method' do
         
       end
       
     end
     
-    context 'defining productions in a grammar' do
+    describe 'defining productions in a grammar' do
       
-      specify '"node" method should complain if new class name is nil' do
+      it '"node" method should complain if new class name is nil' do
         lambda do
           Grammar.subclass('NodeComplainingGrammar') { node nil }
         end.should raise_error(ArgumentError)
       end
       
-      specify 'should be able to define a simple Node subclass using the "node" function' do
+      it 'should be able to define a simple Node subclass using the "node" function' do
         
         Grammar.subclass('NodeGrammar1') do
           node      :my_node_subclass
@@ -94,7 +94,7 @@ module Walrus
         
       end
       
-      specify 'should be able to use the "build" method to define production subclasses on the fly' do
+      it 'should be able to use the "build" method to define production subclasses on the fly' do
         
         Grammar.subclass('HeMeansJavaRuntimeAPIs') do
           rule        :foobar, 'foo' & 'bar'
@@ -114,7 +114,7 @@ module Walrus
         
       end
       
-      specify 'should complain if an attempt is made to create the same production class twice' do
+      it 'should complain if an attempt is made to create the same production class twice' do
         lambda do
           Grammar.subclass('HowToGetControlOfJavaAwayFromSun') do
             rule        :foo, 'foo'
@@ -124,7 +124,7 @@ module Walrus
         end.should raise_error(ArgumentError)
       end
       
-      specify 'should complain if an attempt is made to create a production for a rule that does not exist yet' do
+      it 'should complain if an attempt is made to create a production for a rule that does not exist yet' do
         lambda do
           Grammar.subclass('GettingControlOfJavaAwayFromSun') { production :foo }
         end.should raise_error(ArgumentError)
@@ -132,17 +132,17 @@ module Walrus
       
     end
     
-    context 'parsing using a grammar' do
+    describe 'parsing using a grammar' do
       
-      specify 'should complain if asked to parse a nil string' do
+      it 'should complain if asked to parse a nil string' do
         lambda { Grammar.subclass('BobGrammar').parse(nil) }.should raise_error(ArgumentError)
       end
       
-      specify 'should complain if trying to parse without first defining a start symbol' do
+      it 'should complain if trying to parse without first defining a start symbol' do
         lambda { Grammar.subclass('RoyalGrammar').parse('foo') }.should raise_error
       end
       
-      specify 'should parse starting with the start symbol' do
+      it 'should parse starting with the start symbol' do
         grammar = Grammar.subclass('AliceGrammar') do
           rule            :expr, /\w+/
           starting_symbol :expr
@@ -153,12 +153,12 @@ module Walrus
         
       end
       
-      specify 'should complain if reference is made to an undefined symbol' do
+      it 'should complain if reference is made to an undefined symbol' do
         grammar = Grammar.subclass('RoyGrammar') { starting_symbol :expr } # :expr is not defined
         lambda { grammar.parse('foo') }.should raise_error
       end
       
-      specify 'should be able to parse using a simple grammar (one rule)' do
+      it 'should be able to parse using a simple grammar (one rule)' do
         grammar = Grammar.subclass('SimpleGrammar') do
           starting_symbol :foo
           rule            :foo, 'foo!'
@@ -167,7 +167,7 @@ module Walrus
         lambda { grammar.parse('---') }.should raise_error(ParseError)
       end
       
-      specify 'should be able to parse using a simple grammar (two rules)' do
+      it 'should be able to parse using a simple grammar (two rules)' do
         grammar = Grammar.subclass('AlmostAsSimpleGrammar') do
           starting_symbol :foo
           rule            :foo, 'foo!' | :bar
@@ -178,7 +178,7 @@ module Walrus
         lambda { grammar.parse('---') }.should raise_error(ParseError)
       end
       
-      specify 'should be able to parse using a simple grammar (three rules)' do
+      it 'should be able to parse using a simple grammar (three rules)' do
         
         # a basic version written using intermediary parslets (really two parslets and one rule)
         grammar = Grammar.subclass('MacGrammar') do
@@ -207,7 +207,7 @@ module Walrus
         lambda { grammar.parse('foobar') }.should raise_error(ParseError)
       end
       
-      specify 'should be able to parse using recursive rules (nested parentheses)' do
+      it 'should be able to parse using recursive rules (nested parentheses)' do
         
         # basic example
         grammar = Grammar.subclass('NestedGrammar') do
@@ -277,7 +277,7 @@ module Walrus
         
       end
       
-      specify 'should be able to parse using recursive rules (nested comments)' do
+      it 'should be able to parse using recursive rules (nested comments)' do
         grammar = Grammar.subclass('NestedCommentsGrammar') do
           starting_symbol :comment
           rule            :comment_start,       '/*'
@@ -291,7 +291,7 @@ module Walrus
         lambda { grammar.parse('/*') }.should raise_error(ParseError)
       end
       
-      specify 'should be able to write a grammar that produces an AST for a simple language that supports addition and assignment' do
+      it 'should be able to write a grammar that produces an AST for a simple language that supports addition and assignment' do
         
         grammar = Grammar.subclass('SimpleASTLanguage') do
           
@@ -361,7 +361,7 @@ module Walrus
         
       end
       
-      specify 'should be able to write a grammar that complains if all the input is not consumed' do
+      it 'should be able to write a grammar that complains if all the input is not consumed' do
         grammar = Grammar.subclass('ComplainingGrammar') do
           starting_symbol :translation_unit
           rule            :translation_unit,  :word_list & :end_of_string.and? | :end_of_string
@@ -381,7 +381,7 @@ module Walrus
         
       end
       
-      specify 'should be able to define a default parslet for intertoken skipping' do
+      it 'should be able to define a default parslet for intertoken skipping' do
         
         # simple example
         grammar = Grammar.subclass('SkippingGrammar') do
@@ -432,7 +432,7 @@ module Walrus
         
       end
       
-      specify 'should complain if trying to set default skipping parslet more than once' do
+      it 'should complain if trying to set default skipping parslet more than once' do
         lambda do
           Grammar.subclass('SetSkipperTwice') do
             skipping :first   # fine
@@ -441,13 +441,13 @@ module Walrus
         end.should raise_error
       end
       
-      specify 'should complain if passed nil' do
+      it 'should complain if passed nil' do
         lambda do
           Grammar.subclass('PassNilToSkipping') { skipping nil }
         end.should raise_error(ArgumentError)
       end
       
-      specify 'should be able to override default skipping parslet on a per-rule basis' do
+      it 'should be able to override default skipping parslet on a per-rule basis' do
         
         # the example grammar parses word lists and number lists
         grammar = Grammar.subclass('OverrideDefaultSkippingParslet') do
@@ -489,7 +489,7 @@ module Walrus
         
       end
       
-      specify 'should complain if trying to override the default for the same rule twice' do
+      it 'should complain if trying to override the default for the same rule twice' do
         lambda do
           Grammar.subclass('OverrideSameRuleTwice') do
             rule      :the_rule, 'foo'
@@ -499,13 +499,13 @@ module Walrus
         end.should raise_error(ArgumentError)
       end
       
-      specify "should complain if trying to set an override for a rule that hasn't been defined yet" do
+      it "should complain if trying to set an override for a rule that hasn't been defined yet" do
         lambda do
           Grammar.subclass('OverrideUndefinedRule') { skipping :non_existent_rule, :the_override }
         end.should raise_error(ArgumentError)
       end
       
-      specify 'use of the "skipping" directive should play nicely with predicates' do
+      it 'use of the "skipping" directive should play nicely with predicates' do
         
         # example 1: word + predicate
         grammar = Grammar.subclass('NicePlayer') do

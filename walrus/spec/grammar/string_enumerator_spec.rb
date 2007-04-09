@@ -11,13 +11,13 @@ require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 module Walrus
   class Grammar
     
-    context 'using a string enumerator' do
+    describe 'using a string enumerator' do
       
-      specify 'should raise an ArgumentError if initialized with nil' do
+      it 'should raise an ArgumentError if initialized with nil' do
         lambda { StringEnumerator.new(nil) }.should raise_error(ArgumentError)
       end
       
-      specify 'should return characters one by one until end of string, then return nil' do
+      it 'should return characters one by one until end of string, then return nil' do
         enumerator = StringEnumerator.new('hello')
         enumerator.next.should == 'h'
         enumerator.next.should == 'e'
@@ -27,7 +27,7 @@ module Walrus
         enumerator.next.should be_nil
       end
       
-      specify 'enumerators should be Unicode-aware (UTF-8)' do
+      it 'enumerators should be Unicode-aware (UTF-8)' do
         enumerator = StringEnumerator.new('€ cañon')
         enumerator.next.should == '€'
         enumerator.next.should == ' '
@@ -40,7 +40,7 @@ module Walrus
       end
       
       # this was a bug
-      specify 'enumerators should continue past newlines' do
+      it 'enumerators should continue past newlines' do
         enumerator = StringEnumerator.new("hello\nworld")
         enumerator.next.should == 'h'
         enumerator.next.should == 'e'
@@ -55,7 +55,7 @@ module Walrus
         enumerator.next.should == 'd'
       end
       
-      specify 'should be able to peek at the next character without actually enumerating' do
+      it 'should be able to peek at the next character without actually enumerating' do
         enumerator = StringEnumerator.new('h€llo')
         enumerator.peek.should == 'h' # peek but don't advance
         enumerator.next.should == 'h' # advance
@@ -70,7 +70,7 @@ module Walrus
         enumerator.next.should == nil # nothing left to scan
       end
       
-      specify 'should be able to recall the last character using the "last" method' do
+      it 'should be able to recall the last character using the "last" method' do
         enumerator = StringEnumerator.new('h€llo')
         enumerator.last.should == nil # nothing scanned yet
         enumerator.next.should == 'h' # advance

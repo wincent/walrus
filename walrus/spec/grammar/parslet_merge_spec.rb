@@ -11,14 +11,14 @@ require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 module Walrus
   class Grammar
     
-    context 'using a Parslet Merge' do
+    describe 'using a Parslet Merge' do
       
-      specify 'should be able to compare for equality' do
+      it 'should be able to compare for equality' do
         ParsletMerge.new('foo', 'bar').should eql(ParsletMerge.new('foo', 'bar'))
         ParsletMerge.new('foo', 'bar').should_not eql(ParsletOmission.new('foo')) # wrong class
       end
       
-      specify 'ParsletMerge and ParsletSequence hashs should not match even if created using the same parseable instances' do
+      it 'ParsletMerge and ParsletSequence hashs should not match even if created using the same parseable instances' do
         parseable1 = 'foo'.to_parseable
         parseable2 = 'bar'.to_parseable
         p1 = ParsletMerge.new(parseable1, parseable2)

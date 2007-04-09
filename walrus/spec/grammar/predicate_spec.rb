@@ -14,22 +14,22 @@ module Walrus
     autoload(:AndPredicate, 'walrus/grammar/and_predicate')
     autoload(:NotPredicate, 'walrus/grammar/not_predicate')
     
-    context 'using a predicate' do
+    describe 'using a predicate' do
       
-      specify 'should raise an ArgumentError if initialized with nil' do
+      it 'should raise an ArgumentError if initialized with nil' do
         lambda { Predicate.new(nil) }.should raise_error(ArgumentError)
       end
       
-      specify 'should complain if sent "parse" message (Predicate abstract superclass, "parse" is the responsibility of the subclasses)' do
+      it 'should complain if sent "parse" message (Predicate abstract superclass, "parse" is the responsibility of the subclasses)' do
         lambda { Predicate.new('foo').parse('bar') }.should raise_error(NotImplementedError)
       end
       
-      specify 'should be able to compare predicates for equality' do
+      it 'should be able to compare predicates for equality' do
         Predicate.new('foo').should eql(Predicate.new('foo'))
         Predicate.new('foo').should_not eql(Predicate.new('bar'))
       end
       
-      specify '"and" and "not" predicates should yield different hashes even if initialized with the same "parseable"' do
+      it '"and" and "not" predicates should yield different hashes even if initialized with the same "parseable"' do
         
         parseable = 'foo'.to_parseable
         p1 = Predicate.new(parseable)

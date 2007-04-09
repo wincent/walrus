@@ -11,9 +11,9 @@ require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 module Walrus
   class Grammar
     
-    context 'using shorthand operators to combine String, Symbol and Regexp parsers' do
+    describe 'using shorthand operators to combine String, Symbol and Regexp parsers' do
       
-      specify 'should be able to chain a String and a Regexp together' do
+      it 'should be able to chain a String and a Regexp together' do
         
         # try in one order
         sequence = 'foo' & /\d+/
@@ -31,7 +31,7 @@ module Walrus
         
       end
       
-      specify 'should be able to choose between a String and a Regexp' do
+      it 'should be able to choose between a String and a Regexp' do
         
         # try in one order
         sequence = 'foo' | /\d+/
@@ -47,7 +47,7 @@ module Walrus
         
       end
       
-      specify 'should be able to freely intermix String and Regexp objects when chaining and choosing' do
+      it 'should be able to freely intermix String and Regexp objects when chaining and choosing' do
         
         sequence = 'foo' & /\d+/ | 'bar' & /[XYZ]{3}/
         sequence.parse('foo123').should == ['foo', '123']
@@ -60,7 +60,7 @@ module Walrus
         
       end
       
-      specify 'should be able to specify minimum and maximum repetition using shorthand methods' do
+      it 'should be able to specify minimum and maximum repetition using shorthand methods' do
         
         # optional (same as "?" in regular expressions)
         sequence = 'foo'.optional
@@ -96,13 +96,13 @@ module Walrus
         
       end
       
-      specify 'should be able to apply repetitions to other combinations wrapped in parentheses' do
+      it 'should be able to apply repetitions to other combinations wrapped in parentheses' do
         sequence = ('foo' & 'bar').one_or_more
         sequence.parse('foobar').should == ['foo', 'bar']
         sequence.parse('foobarfoobar').should == [['foo', 'bar'], ['foo', 'bar']] # fails: just returns ['foo', 'bar']
       end
       
-      specify 'should be able to combine use of repetition shorthand methods with other shorthand methods' do
+      it 'should be able to combine use of repetition shorthand methods with other shorthand methods' do
         
         # first we test with chaining
         sequence = 'foo'.optional & 'bar' & 'abc'.one_or_more
@@ -126,20 +126,20 @@ module Walrus
         
       end
       
-      specify 'should be able to chain a "not predicate"' do
+      it 'should be able to chain a "not predicate"' do
         sequence = 'foo' & 'bar'.not!
         sequence.parse('foo').should == 'foo' # fails with ['foo'] because that's the way ParserState works...
         sequence.parse('foo...').should == 'foo' # same
         lambda { sequence.parse('foobar') }.should raise_error(ParseError)
       end
       
-      specify 'an isolated "not predicate" should return a zero-width match' do
+      it 'an isolated "not predicate" should return a zero-width match' do
         sequence = 'foo'.not!
         lambda { sequence.parse('foo') }.should raise_error(ParseError)
         lambda { sequence.parse('bar') }.should throw_symbol(:NotPredicateSuccess)
       end
       
-      specify 'two "not predicates" chained together should act like a union' do
+      it 'two "not predicates" chained together should act like a union' do
         
         # this means "not followed by 'foo' and not followed by 'bar'"
         sequence = 'foo'.not! & 'bar'.not!
@@ -149,20 +149,20 @@ module Walrus
         
       end
       
-      specify 'should be able to chain an "and predicate"' do
+      it 'should be able to chain an "and predicate"' do
         sequence = 'foo' & 'bar'.and?
         sequence.parse('foobar').should == 'foo' # same problem, returns ['foo']
         lambda { sequence.parse('foo...') }.should raise_error(ParseError)
         lambda { sequence.parse('foo') }.should raise_error(ParseError)
       end
       
-      specify 'an isolated "and predicate" should return a zero-width match' do
+      it 'an isolated "and predicate" should return a zero-width match' do
         sequence = 'foo'.and?
         lambda { sequence.parse('bar') }.should raise_error(ParseError)
         lambda { sequence.parse('foo') }.should throw_symbol(:AndPredicateSuccess)
       end
       
-      specify 'should be able to follow an "and predicate" with other parslets or combinations' do
+      it 'should be able to follow an "and predicate" with other parslets or combinations' do
         
         # this is equivalent to "foo" if followed by "bar", or any three characters
         sequence = 'foo' & 'bar'.and? | /.../
@@ -174,7 +174,7 @@ module Walrus
         
       end
       
-      specify 'should be able to follow a "not predicate" with other parslets or combinations' do
+      it 'should be able to follow a "not predicate" with other parslets or combinations' do
         
         # this is equivalent to "foo" followed by any three characters other than "bar"
         sequence = 'foo' & 'bar'.not! & /.../
@@ -185,7 +185,7 @@ module Walrus
         
       end
       
-      specify 'should be able to include a "not predicate" when using a repetition operator' do
+      it 'should be able to include a "not predicate" when using a repetition operator' do
         
         # basic example
         sequence = ('foo' & 'bar'.not!).one_or_more
@@ -203,7 +203,7 @@ module Walrus
         
       end
       
-      specify 'should be able to use regular expression shortcuts in conjunction with predicates' do
+      it 'should be able to use regular expression shortcuts in conjunction with predicates' do
         
         # match "foo" as long as it's not followed by a digit 
         sequence = 'foo' & /\d/.not!
@@ -220,21 +220,21 @@ module Walrus
       
     end
     
-    context 'omitting tokens from the output using the "skip" method' do
+    describe 'omitting tokens from the output using the "skip" method' do
       
-      specify 'should be able to skip quotation marks delimiting a string' do
+      it 'should be able to skip quotation marks delimiting a string' do
         sequence = '"'.skip & /[^"]+/ & '"'.skip
         sequence.parse('"hello world"').should == 'hello world' # note this is returning a ParserState object
       end
       
-      specify 'should be able to skip within a repetition expression' do
+      it 'should be able to skip within a repetition expression' do
         sequence = ('foo'.skip & /\d+/).one_or_more
         sequence.parse('foo1...').should == '1'        
         sequence.parse('foo1foo2...').should == ['1', '2'] # only returns 1
         sequence.parse('foo1foo2foo3...').should == ['1', '2', '3'] # only returns 1
       end
       
-      specify 'should be able to skip commas separating a list' do
+      it 'should be able to skip commas separating a list' do
         
         # closer to real-world use: a comma-separated list
         sequence = /\w+/ & (/\s*,\s*/.skip & /\w+/).zero_or_more
@@ -254,9 +254,9 @@ module Walrus
       
     end
     
-    context 'using the shorthand ">>" pseudo-operator' do
+    describe 'using the shorthand ">>" pseudo-operator' do
       
-      specify 'should be able to chain the operator multiple times' do
+      it 'should be able to chain the operator multiple times' do
         
         # comma-separated words followed by comma-separated digits
         sequence = /[a-zA-Z]+/ >> (/\s*,\s*/.skip & /[a-zA-Z]+/).zero_or_more >> (/\s*,\s*/.skip & /\d+/).one_or_more

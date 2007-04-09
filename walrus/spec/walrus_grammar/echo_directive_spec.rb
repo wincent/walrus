@@ -22,9 +22,9 @@ module Walrus
       end
     end
     
-    context 'compiling an EchoDirective instance' do
+    describe 'compiling an EchoDirective instance' do
       
-      specify 'should be able to round trip' do
+      it 'should be able to round trip' do
         string              = StringResult.new('hello world')
         string.source_text  = "'hello world'"
         @accumulator        = EchoDirectiveAccumulator.new
@@ -34,13 +34,13 @@ module Walrus
       
     end
     
-    context 'producing a Document containing an EchoDirective' do
+    describe 'producing a Document containing an EchoDirective' do
       
       setup do
         @parser = Parser.new
       end
       
-      specify 'should be able to round trip' do
+      it 'should be able to round trip' do
         
         # simple example
         compiled = @parser.compile("#echo 'foo'", :class_name => :EchoDirectiveSpecAlpha)

@@ -11,29 +11,29 @@ require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 module Walrus
   class Grammar
     
-    context 'using a Parslet Choice' do
+    describe 'using a Parslet Choice' do
       
       setup do
         @p1 = 'foo'.to_parseable
         @p2 = 'bar'.to_parseable
       end
       
-      specify 'hashes should be the same if initialized with the same parseables' do
+      it 'hashes should be the same if initialized with the same parseables' do
         ParsletChoice.new(@p1, @p2).hash.should == ParsletChoice.new(@p1, @p2).hash
         ParsletChoice.new(@p1, @p2).should eql(ParsletChoice.new(@p1, @p2))
       end
       
-      specify 'hashes should (ideally) be different if initialized with different parseables' do
+      it 'hashes should (ideally) be different if initialized with different parseables' do
         ParsletChoice.new(@p1, @p2).hash.should_not == ParsletChoice.new('baz'.to_parseable, 'abc'.to_parseable).hash
         ParsletChoice.new(@p1, @p2).should_not eql(ParsletChoice.new('baz'.to_parseable, 'abc'.to_parseable))
       end
       
-      specify 'hashes should be different compared to other similar classes even if initialized with the same parseables' do
+      it 'hashes should be different compared to other similar classes even if initialized with the same parseables' do
         ParsletChoice.new(@p1, @p2).hash.should_not == ParsletSequence.new(@p1, @p2).hash
         ParsletChoice.new(@p1, @p2).should_not eql(ParsletSequence.new(@p1, @p2))
       end
       
-      specify 'should be able to use Parslet Choice instances as keys in a hash' do
+      it 'should be able to use Parslet Choice instances as keys in a hash' do
         hash = {}
         key1 = ParsletChoice.new(@p1, @p2)
         key2 = ParsletChoice.new('baz'.to_parseable, 'abc'.to_parseable)
