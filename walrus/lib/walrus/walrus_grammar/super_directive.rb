@@ -16,7 +16,7 @@ module Walrus
       def compile(options = {})
         
         # basic case, no explicit parameters
-        'super # Super directive'
+        "super # Super directive\n"
         
       end
       
