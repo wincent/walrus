@@ -41,7 +41,7 @@ module Walrus
     
     def lookup_and_return_placeholder(placeholder, *params)
       # if exists a method responding to placeholder, call it
-      if self.respond_to? placeholder
+      if respond_to? placeholder
         @accumulators << nil                            # push new accumulator onto the stack
         output = send(placeholder, *params)             # call method
         accumulated = @accumulators.pop                 # pop last accumulator from the stack
@@ -73,13 +73,13 @@ module Walrus
     # Fills (executes) the template body of the receiver and returns the result.
     def fill
       @accumulators = [nil]         # reset accumulators stack
-      self.template_body
+      template_body
       @accumulators.last or ""
     end
     
     # Prints to standard out the result of filling the receiver. Note that no trailing newline is printed. As a result, if running a template from the terminal be aware that the last line may not be visible or may be partly obscured by the command prompt that is drawn (starting at the first column) after execution completes.
     def run
-      printf('%s', self.fill)
+      printf('%s', fill)
       $stdout.flush
     end
     
