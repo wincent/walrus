@@ -98,9 +98,7 @@ module Walrus
 
 #{@outside_body.join}    
       if __FILE__ == $0   # when run from the command line the default action is to call 'run'
-        self.new.run
-      else                # in other cases, evaluate 'fill' (if run inside an eval, will return filled content)
-        self.new.fill
+        new.run
       end
 
     end \# #{@class_name}
