@@ -47,7 +47,7 @@ module Walrus
           end
         end
         
-        external << "end\n"
+        external << "end\n\n"
         
         if nested
           external << nested[1]
