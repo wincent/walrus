@@ -39,8 +39,11 @@ module Walrus
             external << inner if inner
             nested[1] << "\n" + outer
           else
-            # again, may wish to forget the per-line indenting here if it breaks sensitive directive types (#ruby blocks for example, which might have here documents)
-            element.compile(options).each { |line| external << '  ' + line }
+            # again, may wish to forget the per-line indenting here if it breaks sensitive directive types
+            # (#ruby blocks for example, which might have here documents)
+            element.compile(options).each do |lines| # may return a single line or an array of lines
+              lines.each { |line| external << '  ' + line }
+            end
           end
         end
         
