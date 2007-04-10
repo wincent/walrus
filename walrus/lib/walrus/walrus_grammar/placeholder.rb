@@ -15,14 +15,20 @@ module Walrus
       
       def compile(options = {})
         
-        # TODO: special case when placeholder is not used as part of literal text; return the value rather than accumulating
+        if options[:nest_placeholders] == true
+          method_name = "lookup_and_return_placeholder"     # placeholder nested inside another placeholder
+        else
+          method_name = "lookup_and_accumulate_placeholder" # placeholder used in a literal text stream
+        end
         
         if @params == []
-          "lookup_and_accumulate_placeholder(#{@name.to_s.to_sym.inspect})\n"
+          "#{method_name}(#{@name.to_s.to_sym.inspect})\n"
         else
+          options = options.clone
+          options[:nest_placeholders] = true
           params      = (@params.kind_of? Array) ? @params : [@params]
-          param_list  = params.collect { |param| param.compile }.join(', ')
-          "lookup_and_accumulate_placeholder(#{@name.to_s.to_sym.inspect}, #{param_list})\n"
+          param_list  = params.collect { |param| param.compile(options) }.join(', ').chomp
+          "#{method_name}(#{@name.to_s.to_sym.inspect}, #{param_list})\n"
         end
         
       end
