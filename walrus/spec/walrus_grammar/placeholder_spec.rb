@@ -19,12 +19,9 @@ module Walrus
       end
       
       it 'should be substituted into the output' do
-        placeholder = @parser.compile( <<-HERE
-#set $foo = 'bar'
-$foo
-        HERE
-        )
-        self.class.class_eval(placeholder).should == "bar\n"
+        placeholder = @parser.compile("#set $foo = 'bar'\n$foo", :class_name => :PlaceholderSpecAlpha)
+        self.class.class_eval(placeholder)
+        self.class::Walrus::WalrusGrammar::PlaceholderSpecAlpha.new.fill.should == 'bar'
       end
             
     end
@@ -36,14 +33,12 @@ $foo
       end
       
       it 'should be substituted into the output' do
-        placeholder = @parser.compile( <<-HERE
-#def foo(string)
+        placeholder = @parser.compile( %q{#def foo(string)
 #echo string.downcase
 #end
-$foo("HELLO WORLD")
-        HERE
-        )
-        self.class.class_eval(placeholder).should == "hello world\n"
+$foo("HELLO WORLD")}, :class_name => :PlaceholderSpecBeta)
+        self.class.class_eval(placeholder)
+        self.class::Walrus::WalrusGrammar::PlaceholderSpecBeta.new.fill.should == "hello world"
       end
       
     end

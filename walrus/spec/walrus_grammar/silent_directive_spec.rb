@@ -22,7 +22,8 @@ module Walrus
         
         # simple example
         compiled = @parser.compile("#silent 'foo'", :class_name => :SilentDirectiveSpecAlpha)
-        self.class.class_eval(compiled).should == ''
+        self.class.class_eval(compiled)
+        self.class::Walrus::WalrusGrammar::SilentDirectiveSpecAlpha.new.fill.should == ''
         
       end
       

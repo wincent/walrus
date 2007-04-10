@@ -58,19 +58,23 @@ module Walrus
         
         # single $
         sequence = @parser.compile('\\$', :class_name => :EscapeSequenceSpecAlpha)
-        self.class.class_eval(sequence).should == '$'
+        self.class.class_eval(sequence)
+        self.class::Walrus::WalrusGrammar::EscapeSequenceSpecAlpha.new.fill.should == '$'
         
         # single #
         sequence = @parser.compile('\\#', :class_name => :EscapeSequenceSpecBeta)
-        self.class.class_eval(sequence).should == '#'
+        self.class.class_eval(sequence)
+        self.class::Walrus::WalrusGrammar::EscapeSequenceSpecBeta.new.fill.should == '#'
         
         # single \
         sequence = @parser.compile('\\\\', :class_name => :EscapeSequenceSpecDelta)
-        self.class.class_eval(sequence).should == '\\'
+        self.class.class_eval(sequence)
+        self.class::Walrus::WalrusGrammar::EscapeSequenceSpecDelta.new.fill.should == '\\'
         
         # multiple escape markers
         sequence = @parser.compile('\\\\\\#\\$', :class_name => :EscapeSequenceSpecGamma)
-        self.class.class_eval(sequence).should == '\\#$'
+        self.class.class_eval(sequence)
+        self.class::Walrus::WalrusGrammar::EscapeSequenceSpecGamma.new.fill.should == '\\#$'
         
       end
       

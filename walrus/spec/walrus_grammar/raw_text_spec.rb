@@ -43,15 +43,18 @@ module Walrus
         
         # simple example
         raw_text = @parser.compile('hello world', :class_name => :RawTextSpecAlpha)
-        self.class.class_eval(raw_text).should == 'hello world'
+        self.class.class_eval(raw_text)
+        self.class::Walrus::WalrusGrammar::RawTextSpecAlpha.new.fill.should == 'hello world'
         
         # containing single quotes
         raw_text = @parser.compile("hello 'world'", :class_name => :RawTextSpecBeta)
-        self.class.class_eval(raw_text).should == "hello 'world'"
+        self.class.class_eval(raw_text)
+        self.class::Walrus::WalrusGrammar::RawTextSpecBeta.new.fill.should == "hello 'world'"
         
         # containing a newline
         raw_text = @parser.compile("hello\nworld", :class_name => :RawTextSpecDelta)
-        self.class.class_eval(raw_text).should == "hello\nworld"
+        self.class.class_eval(raw_text)
+        self.class::Walrus::WalrusGrammar::RawTextSpecDelta.new.fill.should == "hello\nworld"
         
       end
       

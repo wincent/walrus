@@ -51,7 +51,8 @@ module Walrus
         
         # simple example
         compiled = @parser.compile("#echo 'foo'", :class_name => :EchoDirectiveSpecAlpha)
-        self.class.class_eval(compiled).should == 'foo'
+        self.class.class_eval(compiled)
+        self.class::Walrus::WalrusGrammar::EchoDirectiveSpecAlpha.new.fill.should == 'foo'
         
       end
       

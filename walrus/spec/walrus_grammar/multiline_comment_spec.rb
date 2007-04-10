@@ -31,19 +31,23 @@ module Walrus
         
         # simple multiline comment
         comment = @parser.compile("#* hello\n   world *#", :class_name => :MultilineCommentSpecAlpha)
-        self.class.class_eval(comment).should == ''
+        self.class.class_eval(comment)
+        self.class::Walrus::WalrusGrammar::MultilineCommentSpecAlpha.new.fill.should == ''
         
         # nested singleline comment
         comment = @parser.compile("#* hello ## <-- first line\n   world *#", :class_name => :MultilineCommentSpecBeta)
-        self.class.class_eval(comment).should == ''
+        self.class.class_eval(comment)
+        self.class::Walrus::WalrusGrammar::MultilineCommentSpecBeta.new.fill.should == ''
         
         # nested multiline comment
         comment = @parser.compile("#* hello ## <-- first line\n   world #* <-- second line *# *#", :class_name => :MultilineCommentSpecDelta)
-        self.class.class_eval(comment).should == ''
+        self.class.class_eval(comment)
+        self.class::Walrus::WalrusGrammar::MultilineCommentSpecDelta.new.fill.should == ''
         
         # multiple comments
         comment = @parser.compile("#* hello *##* world *#", :class_name => :MultilineCommentSpecGamma)
-        self.class.class_eval(comment).should == ''
+        self.class.class_eval(comment)
+        self.class::Walrus::WalrusGrammar::MultilineCommentSpecGamma.new.fill.should == ''
         
       end
       

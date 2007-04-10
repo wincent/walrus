@@ -28,7 +28,8 @@ module Walrus
       
       it 'should produce no output' do
         comment = @parser.compile('## hello world', :class_name => :CommentSpec)
-        self.class.class_eval(comment).should == ''
+        self.class.class_eval(comment)
+        self.class::Walrus::WalrusGrammar::CommentSpec.new.fill.should == ''
       end
       
     end

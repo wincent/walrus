@@ -43,29 +43,34 @@ module Walrus
         
         # simple example
         raw = @parser.compile("#raw\nhello world\n#end", :class_name => :RawDirectiveSpecAlpha)
-        self.class.class_eval(raw).should == "hello world\n"
+        self.class.class_eval(raw)
+        self.class::Walrus::WalrusGrammar::RawDirectiveSpecAlpha.new.fill.should == "hello world\n"
         
         # containing single quotes
         raw = @parser.compile("#raw\nhello 'world'\n#end", :class_name => :RawDirectiveSpecBeta)
-        self.class.class_eval(raw).should == "hello 'world'\n"
+        self.class.class_eval(raw)
+        self.class::Walrus::WalrusGrammar::RawDirectiveSpecBeta.new.fill.should == "hello 'world'\n"
         
         # containing a newline
         raw = @parser.compile("#raw\nhello\nworld\n#end", :class_name => :RawDirectiveSpecDelta)
-        self.class.class_eval(raw).should == "hello\nworld\n"
+        self.class.class_eval(raw)
+        self.class::Walrus::WalrusGrammar::RawDirectiveSpecDelta.new.fill.should == "hello\nworld\n"
         
         # using a "here document"
         raw = @parser.compile("#raw <<HERE
 hello world
 literal #end with no effect
 HERE", :class_name => :RawDirectiveSpecGamma)
-        self.class.class_eval(raw).should == "hello world\nliteral #end with no effect\n"
+        self.class.class_eval(raw)
+        self.class::Walrus::WalrusGrammar::RawDirectiveSpecGamma.new.fill.should == "hello world\nliteral #end with no effect\n"
         
         # "here document", alternative syntax
         raw = @parser.compile("#raw <<-HERE
 hello world
 literal #end with no effect
         HERE", :class_name => :RawDirectiveSpecIota)
-        self.class.class_eval(raw).should == "hello world\nliteral #end with no effect\n"
+        self.class.class_eval(raw)
+        self.class::Walrus::WalrusGrammar::RawDirectiveSpecIota.new.fill.should == "hello world\nliteral #end with no effect\n"
         
       end
       

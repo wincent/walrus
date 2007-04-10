@@ -23,7 +23,8 @@ module Walrus
         
         # note that trailing newline is eaten when the comment is the only thing on the newline
         compiled = @parser.compile("## hello world\nhere's some raw text", :class_name => :CompilerSpecAlpha)
-        self.class.module_eval(compiled).should == "here's some raw text"
+        self.class.module_eval(compiled)
+        self.class::Walrus::WalrusGrammar::CompilerSpecAlpha.new.fill.should == "here's some raw text"
         
       end
       
@@ -31,15 +32,18 @@ module Walrus
         
         # on the same line (note that trailing newline is not eaten)
         compiled = @parser.compile("here's some raw text## hello world\n", :class_name => :CompilerSpecBeta)
-        self.class.module_eval(compiled).should == "here's some raw text\n"
+        self.class.module_eval(compiled)
+        self.class::Walrus::WalrusGrammar::CompilerSpecBeta.new.fill.should == "here's some raw text\n"
         
         # on two separate lines (note that second trailing newline gets eaten)
         compiled = @parser.compile("here's some raw text\n## hello world\n", :class_name => :CompilerSpecDelta)
-        self.class.module_eval(compiled).should == "here's some raw text\n"
+        self.class.module_eval(compiled)
+        self.class::Walrus::WalrusGrammar::CompilerSpecDelta.new.fill.should == "here's some raw text\n"
         
         # same but with no trailing newline
         compiled = @parser.compile("here's some raw text\n## hello world", :class_name => :CompilerSpecGamma)
-        self.class.module_eval(compiled).should == "here's some raw text\n"
+        self.class.module_eval(compiled)
+        self.class::Walrus::WalrusGrammar::CompilerSpecGamma.new.fill.should == "here's some raw text\n"
         
       end
       
