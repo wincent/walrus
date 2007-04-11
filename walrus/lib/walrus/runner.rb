@@ -177,19 +177,20 @@ module Walrus
       compile(input, false)
     end
     
-    # TODO: don't just check that the compiled path exists:
-    # check if the compiled mod date is older than the source mod date
-    # write a compiled_path_older_than_source_path? method or similar
-    # or compiled_path_out_of_date_for_source_path?
     def compiled_path_older_than_source_path(compiled_path, source_path)
-      return true if not compiled_path.exist?
-      # etc...
+      begin
+        compiled  = File.mtime(compiled_path)
+        source    = File.mtime(source_path)
+      rescue SystemCallError # perhaps one of them doesn't exist
+        return true
+      end
+      compiled < source
     end
     
     def compile(input, force = true)
       template_source_path  = template_source_path_for_input(input)
       compiled_path         = compiled_source_path_for_input(input)
-      if force or not compiled_path.exist?
+      if force or not compiled_path.exist? or compiled_path_older_than_source_path(compiled_path, template_source_path)
         begin
           template = Template.new(template_source_path)
         rescue Exception => e
