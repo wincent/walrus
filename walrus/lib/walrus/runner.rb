@@ -8,6 +8,7 @@
 
 require 'walrus'
 require 'fileutils'
+require 'open3'
 require 'optparse'
 require 'ostruct'
 require 'pathname'
@@ -215,7 +216,10 @@ module Walrus
       if @options.dry
         "(no output: dry run)\n"
       else
-        `#{compiled_source_path_for_input(input).realpath}`
+        # backticks choke if there is a space in the path
+        Open3.popen3([compiled_source_path_for_input(input).realpath, '']) do |stdin, stdout, stderr|
+          return stdout.read
+        end
       end
     end
     

@@ -9,7 +9,6 @@
 require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 require 'walrus/parser' # ensure that WalrusGrammar is defined before continuing
 require 'mkdtemp'
-require 'open3'
 
 module Walrus
   
