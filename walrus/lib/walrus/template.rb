@@ -57,8 +57,17 @@ module Walrus
         @class_name
       else
         if @origin.nil? : @class_name = Compiler::DEFAULT_CLASS # "DocumentSubclass"
-        else              @class_name = File.basename(@origin, File.extname(@origin)).to_class_name
+        else              @class_name = strip_extensions(@origin).to_class_name
         end
+      end
+    end
+    
+    def strip_extensions(path)
+      extension = File.extname(path)
+      if extension != ""  # recurse
+        strip_extensions File.basename(path, extension) 
+      else                # no more extensions
+        path
       end
     end
     
