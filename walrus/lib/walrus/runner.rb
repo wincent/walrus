@@ -54,7 +54,7 @@ module Walrus
         o.separator '          run     -- runs compiled templates, printing output to standard output'
         o.separator ''
         
-        o.on('-o', '--output-dir DIR', 'Output directory (must already exist)', 'defaults to same directory as input file') do |opt|
+        o.on('-o', '--output-dir DIR', 'Output directory (when filling)', 'defaults to same directory as input file') do |opt|
           @options.output_dir = Pathname.new(opt)
         end
         
@@ -290,8 +290,7 @@ module Walrus
       
       # add rb as an extension
       dir, base = input.split
-      adjusted_output_path(dir + "#{base.to_s}.rb")
-      
+      dir + "#{base.to_s}.rb"
     end
     
     def filled_output_path_for_input(input)
