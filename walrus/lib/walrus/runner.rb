@@ -12,7 +12,7 @@ require 'optparse'
 require 'ostruct'
 require 'pathname'
 require 'rubygems'
-require 'open4'
+require 'wopen3'
 
 module Walrus
   
@@ -225,9 +225,9 @@ module Walrus
       if @options.dry
         "(no output: dry run)\n"
       else
-        # use Open4 (backticks choke if there is a space in the path, open3 throws away the exit status)
+        # use Wopen3 (backticks choke if there is a space in the path, open3 throws away the exit status)
         output = ''
-        Open4.popen4([compiled_source_path_for_input(input).realpath, '']) do |stdin, stdout, stderr|
+        Wopen3.popen3([compiled_source_path_for_input(input).realpath, '']) do |stdin, stdout, stderr|
           threads = []
           threads << Thread.new(stdout) do |out|
             out.each { |line| output << line }
