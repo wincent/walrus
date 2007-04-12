@@ -29,6 +29,7 @@ module Walrus
       @options.output_extension   = 'html'
       @options.recurse            = false
       @options.backup             = true
+      @options.force              = false
       @options.debug              = false
       @options.halt               = false
       @options.dry                = false
@@ -72,6 +73,10 @@ module Walrus
         
         o.on('-b', '--[no-]backup', 'Make backups before overwriting', 'default: on') do |opt|
           @options.backup = opt
+        end
+        
+        o.on('-f', '--force', 'Force a recompile (when filling)', 'default: off (files only recompiled if source newer than output)') do |opt|
+          @options.force = opt
         end
         
         o.on('--halt', 'Halts on encountering an error (even a non-fatal error)', 'default: off') do |opt|
@@ -191,7 +196,7 @@ module Walrus
     def compile(input, force = true)
       template_source_path  = template_source_path_for_input(input)
       compiled_path         = compiled_source_path_for_input(input)
-      if force or not compiled_path.exist? or compiled_path_older_than_source_path(compiled_path, template_source_path)
+      if force or @options.force or not compiled_path.exist? or compiled_path_older_than_source_path(compiled_path, template_source_path)
         begin
           template = Template.new(template_source_path)
         rescue Exception => e
