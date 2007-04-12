@@ -83,6 +83,7 @@ SPEC = Gem::Specification.new do |s|
   s.files         = FileList['{bin,lib,spec}/**/*', 'ext/**/*.rb', 'ext/**/*.c'].to_a # TODO: add 'docs' subdirectory, 'README.txt' when they're done
   s.extensions    = ['ext/jindex/extconf.rb', 'ext/mkdtemp/extconf.rb']
   s.executables   = ['walrus']
+  s.add_dependency('wopen3', '>= 0.1') 
 end
 
 Rake::GemPackageTask.new(SPEC) do |t|
