@@ -32,20 +32,20 @@ Spec::Rake::SpecTask.new('specdoc') do |t|
 end
 
 SPEC = Gem::Specification.new do |s|
-  s.name          = 'open4'
+  s.name          = 'wopen3'
   s.version       = '0.1'
   s.author        = 'Wincent Colaiuta'
   s.email         = 'win@wincent.com'
-  s.homepage      = 'http://wincent.com/a/products/walrus/open4/'
+  s.homepage      = 'http://wincent.com/a/products/walrus/wopen3/'
   s.platform      = Gem::Platform::RUBY
-  s.summary       = 'Open4 is a simple replacement for Open3.'
+  s.summary       = 'Wopen3 is a simple replacement for Open3.'
   s.description   = <<-ENDDESC
-    Unlike Open3, Open4 does not throw away the exit code of the executed
+    Unlike Open3, Wopen3 does not throw away the exit code of the executed
     (grandchild) process. Only a child process is spawned and the exit 
     status is returned in $? as normal.
   ENDDESC
   s.require_paths = ['lib']
-  s.autorequire   = 'open4'
+  s.autorequire   = 'wopen3'
   s.has_rdoc      = false
   s.files         = FileList['{lib,spec}/**/*'].to_a
 end

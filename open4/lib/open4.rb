@@ -1,15 +1,15 @@
 # Copyright 2007 Wincent Colaiuta
 # $Id$
 
-# Open4 is a replacement for Open3.
+# Wopen3 is a replacement for Open3.
 #
-# Unlike Open3, Open4 does not throw away the exit code of the executed (grandchild) process.
+# Unlike Open3, Wopen3 does not throw away the exit code of the executed (grandchild) process.
 # Only a child process is spawned and the exit status is returned in $? as normal.
 #
 # Usage example:
 #
 #   result, errors = '', ''
-#   Open4.popen4('svn', 'log') do |stdin, stdout, stderr|
+#   Wopen3.popen3('svn', 'log') do |stdin, stdout, stderr|
 #     threads = []
 #     threads << Thread.new(stdout) do |out|
 #       out.each { |line| result << line }
@@ -23,7 +23,7 @@
 #   raise "Non-zero exit status #{status}" if status != 0
 #
 #
-module Open4
+module Wopen3
   
   class Opener
     
@@ -82,8 +82,8 @@ module Open4
     
   end
   
-  def self.popen4(*cmd, &block)
+  def self.popen3(*cmd, &block)
     Opener.new(*cmd, &block)
   end
   
-end # module Open4
+end # module Wopen3
