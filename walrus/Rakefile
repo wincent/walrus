@@ -33,15 +33,6 @@ RCov::VerifyTask.new(:verify => :spec) do |t|
   t.index_html  = 'coverage/index.html'
 end
 
-# http://blog.nicksieger.com/articles/2007/01/30/rspec-autotest-for-standalone-projects
-desc 'Start autotest'
-namespace :spec do
-  task :autotest do
-    require './spec/rspec_autotest'
-    RspecAutotest.run
-  end
-end
-
 desc 'Generate specdocs for inclusions in RDoc'
 Spec::Rake::SpecTask.new('specdoc') do |t|
   t.spec_files  = FileList['spec/**/*_spec.rb']

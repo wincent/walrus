@@ -11,6 +11,9 @@ require 'pathname'
 
 module Walrus
   
+  # The parser is currently quite slow, although perfectly usable.
+  # The quickest route to optimizing it may be to replace it with a C parser inside a Ruby extension,
+  # possibly generated using Ragel: http://www.cs.queensu.ca/~thurston/ragel/
   class Parser
     
     def parse(string, options = {})

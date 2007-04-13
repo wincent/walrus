@@ -88,7 +88,7 @@ class RspecAutotest < Autotest
     end
 
     partial.each do |klass, methods|
-      methods.each { |meth| cmds << "#{spec_command} -s #{meth.inspect} #{klass}" }
+      methods.each { |meth| cmds << "#{spec_command} -e #{meth.inspect} #{klass}" }
     end
 
     return cmds.join('; ')
