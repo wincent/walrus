@@ -76,6 +76,9 @@ module Walrus
             rescue LeftRecursionException => e
               left_recursion  = true
               continuation    = nil
+              
+              # Ruby 1.9/2.0 will almost certainly not support continuations so need to come up with an alternative
+              # for handling left recursion here
               value           = callcc { |c| continuation = c }         
               if value == continuation                    # first time that we're here
                 e.continuation = continuation             # pack continuation into exception

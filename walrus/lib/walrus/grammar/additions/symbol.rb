@@ -25,6 +25,7 @@ class Symbol
   def build(superclass, *params)    
     
     # first use the continuation trick to find out what grammar (namespace) receiver is being messaged in
+    # Ruby 1.9/2.0 will not support continuations, so may need to come up with an alternative
     continuation  = nil
     value         = callcc { |c| continuation = c }         
     if value == continuation                                # first time that we're here
