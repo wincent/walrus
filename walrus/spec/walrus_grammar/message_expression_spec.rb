@@ -14,7 +14,7 @@ module Walrus
     
     describe 'calling source_text on a message expression inside an echo directive' do
       
-      setup do
+      before(:each) do
         @parser = Parser.new
       end
       

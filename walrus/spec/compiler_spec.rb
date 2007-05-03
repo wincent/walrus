@@ -15,7 +15,7 @@ module Walrus
     
     describe 'using the Compiler class' do
       
-      context_setup do
+      before(:all) do
         @parser = Parser.new
       end
       

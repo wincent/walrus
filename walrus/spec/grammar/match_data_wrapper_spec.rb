@@ -13,7 +13,7 @@ module Walrus
     
     describe 'using a match data object' do
       
-      setup do
+      before(:each) do
         'hello agent' =~ /(\w+)(\s+)(\w+)/
         @match        = MatchDataWrapper.new($~)
       end

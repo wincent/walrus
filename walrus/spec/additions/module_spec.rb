@@ -22,7 +22,7 @@ module Walrus
   
   describe 'using "by copy" accessors' do
     
-    setup do
+    before(:each) do
       @instance = ByCopyAccessDemo.new
     end
     

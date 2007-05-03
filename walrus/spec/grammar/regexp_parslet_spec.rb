@@ -13,7 +13,7 @@ module Walrus
     
     describe 'using a regexp parslet' do
       
-      setup do
+      before(:each) do
         @parslet = RegexpParslet.new(/[a-zA-Z_][a-zA-Z0-9_]*/)
       end
       

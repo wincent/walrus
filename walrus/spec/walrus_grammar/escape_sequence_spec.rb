@@ -24,7 +24,7 @@ module Walrus
     
     describe 'compiling an EscapeSequence instance' do
       
-      setup do
+      before(:each) do
         @accumulator  = EscapeSequenceAccumulator.new
       end
       
@@ -50,7 +50,7 @@ module Walrus
     
     describe 'producing a Document containing an EscapeSequence' do
       
-      setup do
+      before(:each) do
         @parser = Parser.new
       end
       

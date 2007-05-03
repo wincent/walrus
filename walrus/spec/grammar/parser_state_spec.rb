@@ -13,7 +13,7 @@ module Walrus
     
     describe 'using a parser state object' do
       
-      setup do
+      before(:each) do
         @base_string = 'this is the string to be parsed'
         @state = ParserState.new(@base_string)
       end

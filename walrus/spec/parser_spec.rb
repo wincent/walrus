@@ -12,7 +12,7 @@ module Walrus
   
   describe 'parsing raw text, escape markers and comments' do
     
-    context_setup do
+    before(:all) do
       @parser = Parser.new()
     end
     
@@ -183,7 +183,7 @@ module Walrus
     
   describe 'parsing directives' do
     
-    context_setup do
+    before(:all) do
       @parser = Parser.new()
     end
     

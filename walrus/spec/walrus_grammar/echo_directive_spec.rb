@@ -43,7 +43,7 @@ module Walrus
     
     describe 'producing a Document containing an EchoDirective' do
       
-      setup do
+      before(:each) do
         @parser = Parser.new
       end
       

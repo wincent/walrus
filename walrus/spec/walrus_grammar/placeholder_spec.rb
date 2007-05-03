@@ -14,7 +14,7 @@ module Walrus
     
     describe 'a placeholder with no parameters' do
     
-      setup do
+      before(:each) do
         @parser = Parser.new
       end
       
@@ -28,7 +28,7 @@ module Walrus
     
     describe 'a placeholder that accepts one parameter' do
       
-      setup do
+      before(:each) do
         @parser = Parser.new
       end
       

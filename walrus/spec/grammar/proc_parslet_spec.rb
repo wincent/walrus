@@ -13,7 +13,7 @@ module Walrus
     
     describe 'using a ProcParslet' do
       
-      setup do
+      before(:each) do
         @parslet = lambda do |string, options|
           if string == 'foobar' : string
           else                    raise ParseError.new('expected foobar by got "%s"' + string.to_s)

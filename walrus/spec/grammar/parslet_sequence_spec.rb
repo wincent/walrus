@@ -13,7 +13,7 @@ module Walrus
     
     describe 'using a Parslet Sequence' do
       
-      setup do
+      before(:each) do
         @p1 = 'foo'.to_parseable
         @p2 = 'bar'.to_parseable
       end

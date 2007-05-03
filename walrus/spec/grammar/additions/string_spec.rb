@@ -35,7 +35,7 @@ module Walrus
     
     describe 'working with Unicode strings' do
       
-      setup do
+      before(:each) do
         @string = 'Unicode €!' # € (Euro) is a three-byte UTF-8 glyph: "\342\202\254"
       end
       

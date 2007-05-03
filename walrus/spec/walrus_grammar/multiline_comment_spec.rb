@@ -23,7 +23,7 @@ module Walrus
     
     describe 'producing a Document containing Comment' do
       
-      setup do
+      before(:each) do
         @parser = Parser.new
       end
       

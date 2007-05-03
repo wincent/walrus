@@ -14,7 +14,7 @@ module Walrus
     
     describe 'producing a Document containing a SilentDirective' do
       
-      setup do
+      before(:each) do
         @parser = Parser.new
       end
       

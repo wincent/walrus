@@ -13,7 +13,7 @@ module Walrus
     
     describe 'using a string parslet' do
       
-      setup do
+      before(:each) do
         @parslet = StringParslet.new('HELLO')
       end
       
