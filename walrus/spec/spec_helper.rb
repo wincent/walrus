@@ -15,13 +15,14 @@ require 'spec'
 module Walrus
   module SpecHelper
     
-    if not const_defined? "LIBDIR"
+    if not const_defined? 'LIBDIR'
       # will append the local "lib" and "ext" directories to search path if not already present
       base    = File.join(File.dirname(__FILE__), '..')
       LIBDIR  = Pathname.new(File.join(base, 'lib')).realpath
       EXTDIR  = Pathname.new(File.join(base, 'ext')).realpath
       TOOL    = Pathname.new(File.join(base, 'bin', 'walrus')).realpath
-      # normalize all paths in the load path (use "rescue" because "realpath" will raise if lstat(2) fails for the path: non-existent paths, relative paths etc)
+      
+      # normalize all paths in the load path
       normalized = $:.collect { |path| Pathname.new(path).realpath rescue path }
       
       # only add the directories if they do not appear to be present already
