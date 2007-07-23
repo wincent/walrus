@@ -1,0 +1,3 @@
+This example features an include file which itself contains a variety of directives.
+This is the included file.
+Final paragraph, referencing an instance variable defined in the included file: hello, world!

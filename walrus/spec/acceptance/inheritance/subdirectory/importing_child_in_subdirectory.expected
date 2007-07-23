@@ -1,0 +1,7 @@
+We have to use a different form of the #import directive when working
+within a subdirectory. Instead of providing a class name we pass a
+quoted string literal with relative path information. In this way Walrus
+knows where to find the parent template.
+
+Here we'll call in the parent's footer:
+This is the footer for the base template.

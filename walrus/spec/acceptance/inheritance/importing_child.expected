@@ -1,0 +1,7 @@
+This time we use an #import directive rather than an #extends.
+
+This means that we have access to all of the methods defined in the parent,
+but the main "template_body" is not explicitly called.
+
+Here we'll call in the parent's footer:
+This is the footer for the base template.

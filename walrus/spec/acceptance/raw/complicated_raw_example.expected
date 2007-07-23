@@ -1,0 +1,57 @@
+This example demonstrates a number of different uses of the #raw directive.
+In this paragraph if I want to use characters that have a special meaning for
+Walrus then I have to escape them (example, a $placeholder, a #directive, an
+\$ escape sequence).
+
+But this paragraph is different, it is inside a #raw block.
+I can do anything at all in the #raw block without having to escape it.
+For example, use Walrus directives:
+	#super, #set a = b
+Use placeholders:
+	$a, $b, $c
+Use backslashes:
+	\n, \t, \m, \n, \o
+
+This paragraph is another example where the closing marker is not
+on a new line of it's own...
+This is an example where I use an explicit directive-closing marker (#) so that
+I can start my #raw content on the same line as the opening directive. I can do the
+same trick with the closing directive so that my text can continue on on the same
+line... See?
+
+This paragraph uses a "here document". That means I can include a literal #end directive
+in it without it causing the block to come to an end. Here we see the block continuing
+and I can still use $placeholders and #directives without them having any special meaning.
+The end marker (in this case "HERE") must be the first and last thing on the line in order
+for it to be detected. All other uses of the end marker go through literally with no
+special meaning.
+
+There is no way to include a literal end directive in a #raw block without the help of
+a "here document". You can't escape the end directive for example, because the escape
+character (\) has no special meaning in a #raw block. Notice that if I try it it won't
+work:\
+I am now outside the #raw block because the #end directive was interpreted as an end marker
+despite my attempt to escape it.
+
+This is an example of an alternative "here document" syntax. The hyphen means that you can
+precede the end marker with whitespace. Note that if the marker (in this case "THERE") is
+preceded by non-whitespace characters on the same line then it has no special meaning: THERE
+Likewise, if it is followed by such characters then it has no meaning either....
+THERE... we keep going because "THERE" wasn't the last thing on the line.
+
+Trailing whitespace is acceptable after the end marker, but it is not included in the output.
+
+The same is true when using the alternative syntax.
+
+In fact, trailing whitespace is acceptable when first opening the here document too, but it
+is ignored
+
+THe same is true for the alternate syntax.
+
+Note that when using the alternative "here document" syntax the optional whitespace before the
+end marker truly is optional; that is, the end marker can be the first thing on the line if
+you want it to. (Although if that's the case you may as well use the first syntax.)
+
+In this example I am going to use some multi-byte characters:
+€áéíóú
+àèìòù

@@ -1,0 +1,17 @@
+#def body
+The key distinction between the \#block and \#def directives is that
+the former automatically produces output in the template whereas the
+latter only produces output if explicitly caused to do so (via a
+placeholder).
+
+Basically, a \#def directive defines a chunk of material that can be
+used in a template or overridden or customized in an inheriting
+template. The chunk is defined but no output is included by default.
+
+A \#block directive, on the other hand, both defines a chunk and
+automatically emits its contents in the template at the point it was
+defined.
+
+As such, this sample file will produce no output, although it will
+cause a method to be added to the compiled version of the template.
+#end

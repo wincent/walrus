@@ -1,0 +1,44 @@
+#!/usr/bin/env ruby
+# Copyright 2007 Wincent Colaiuta
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# in the accompanying file, "LICENSE.txt", for more details.
+#
+# $Id: diff.rb 89 2007-02-26 15:35:56Z wincent $
+
+module Walrus
+  
+  EXIT_LOAD_ERROR     = 1
+  EXIT_ARGUMENT_ERROR = 2
+  EXIT_OTHER_ERROR    = 3
+  
+  begin
+    require 'walrus/runner'
+  rescue LoadError => e
+    $stderr.puts <<-HERE
+Error: load error (#{e.to_s})
+
+If you are trying to run Walrus but have not yet installed it, it may be that
+Ruby cannot find the Walrus files. You can help Ruby to find the Walrus "lib"
+and "ext" directories by adding them to the RUBYLIB environment variable. For
+example, you could do the following if you are using the Bash shell,
+substituting absolute paths for "lib" and "ext":
+
+  export RUBYLIB="${RUBYLIB}:lib:ext"
+
+    HERE
+    exit EXIT_LOAD_ERROR
+  end
+  
+  begin  
+    Runner.new.run
+  rescue Runner::ArgumentError => e
+    $stderr.puts "Error: #{e.to_s}", "For usage information type: #{$0} --help"
+    exit EXIT_ARGUMENT_ERROR
+  rescue Runner::Error => e
+    $stderr.puts "Error: #{e.to_s}"
+    exit EXIT_OTHER_ERROR
+  end
+  
+end # module Walrus

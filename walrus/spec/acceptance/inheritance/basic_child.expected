@@ -1,0 +1,9 @@
+This is the base template which subclasses will inherit.
+
+This is the overridden footer. Note that in the overridden version of the footer
+I'm using a #def block rather than a #block like in the parent template. The
+reason for this is that #block calls automatically in-line their contents at
+the point where they are declared.
+
+Given that this template #extends the parent, the parent will *already* be
+in-lining the footer, so there is no need to in-line it again.
