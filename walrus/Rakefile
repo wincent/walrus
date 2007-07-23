@@ -1,5 +1,4 @@
 # Copyright 2007 Wincent Colaiuta
-# $Id: Rakefile 188 2007-04-13 14:13:42Z wincent $
 
 require 'rake'
 require 'rake/gempackagetask'

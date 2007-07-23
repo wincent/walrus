@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# $Id: walruscloth_spec.rb 166 2007-04-09 15:04:40Z wincent $
 
 require 'rubygems'
 require 'spec'

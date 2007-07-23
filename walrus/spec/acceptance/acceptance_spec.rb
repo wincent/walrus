@@ -11,8 +11,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# $Id: acceptance_spec.rb 180 2007-04-11 17:09:13Z wincent $
 
 require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 require 'walrus/parser' # ensure that WalrusGrammar is defined before continuing

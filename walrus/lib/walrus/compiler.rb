@@ -11,8 +11,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# $Id: compiler.rb 173 2007-04-10 05:38:46Z wincent $
 
 require 'walrus'
 require 'pathname'

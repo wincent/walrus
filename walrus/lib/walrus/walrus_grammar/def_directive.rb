@@ -11,8 +11,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# $Id: def_directive.rb 175 2007-04-10 15:00:33Z wincent $
 
 require 'walrus/parser.rb' # make sure that RawText class has been defined prior to extending it
 

@@ -13,8 +13,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# $Id: document.rb 172 2007-04-10 05:38:35Z wincent $
 
 require 'walrus'
 require 'pathname'

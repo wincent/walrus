@@ -12,8 +12,6 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-$Id: jindex.c 154 2007-03-26 19:03:21Z wincent $
 */
 
 #include <ruby.h>

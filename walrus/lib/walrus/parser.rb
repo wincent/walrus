@@ -11,8 +11,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# $Id: parser.rb 188 2007-04-13 14:13:42Z wincent $
 
 require 'walrus'
 require 'pathname'

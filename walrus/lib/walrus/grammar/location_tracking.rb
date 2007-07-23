@@ -11,8 +11,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# $Id: location_tracking.rb 168 2007-04-09 18:30:00Z wincent $
 
 require 'walrus'
 

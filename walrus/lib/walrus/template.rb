@@ -11,8 +11,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# $Id: template.rb 178 2007-04-11 13:48:51Z wincent $
 
 require 'walrus'
 

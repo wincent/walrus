@@ -11,7 +11,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-# $Id: error_collector.rb 92 2007-02-26 17:01:41Z wincent $
 
 require 'walrus'
 

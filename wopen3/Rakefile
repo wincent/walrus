@@ -1,5 +1,5 @@
 # Copyright 2007 Wincent Colaiuta
-# $Id: /mirrors/Walrus/trunk/Rakefile 2021 2007-03-08T19:21:05.044318Z wincent  $
+
 
 require 'rake'
 require 'rake/gempackagetask'

@@ -11,8 +11,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# $Id: symbol_parslet.rb 154 2007-03-26 19:03:21Z wincent $
 
 require 'walrus'
 

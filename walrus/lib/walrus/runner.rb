@@ -11,8 +11,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# $Id: runner.rb 185 2007-04-12 16:56:29Z wincent $
 
 require 'walrus'
 require 'fileutils'

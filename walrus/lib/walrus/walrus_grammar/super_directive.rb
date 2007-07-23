@@ -11,8 +11,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# $Id: super_directive.rb 171 2007-04-09 18:59:29Z wincent $
 
 require 'walrus/parser.rb' # make sure that the class has been defined prior to extending it
 

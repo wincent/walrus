@@ -11,8 +11,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# $Id: spec_helper.rb 193 2007-07-20 12:56:07Z wincent $
 
 # Individual spec files that require this helper file can be run individually from the commandline.
 

@@ -11,7 +11,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-# $Id: wopen3.rb 185 2007-04-12 16:56:29Z wincent $
 
 # Wopen3 is a replacement for Open3.
 #

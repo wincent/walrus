@@ -11,8 +11,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# $Id: regexp_parslet_spec.rb 192 2007-05-03 09:27:35Z wincent $
 
 require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 

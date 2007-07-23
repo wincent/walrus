@@ -11,8 +11,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# $Id: parslet_sequence.rb 191 2007-04-26 15:26:26Z wincent $
 
 require 'walrus'
 
