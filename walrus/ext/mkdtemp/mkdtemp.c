@@ -10,6 +10,7 @@ $Id: mkdtemp.c 154 2007-03-26 19:03:21Z wincent $
 
 #include <ruby.h>
 #include <errno.h>
+#include <unistd.h>
 
 /*
 
