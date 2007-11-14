@@ -56,12 +56,12 @@ task :make => [:jindex, :mkdtemp]
 
 desc 'Build jindex extension'
 task :jindex do |t|
-  system %{cd ext/jindex && ruby ./extconf.rb && make && cp jindex.bundle ../ && cd -}
+  system %{cd ext/jindex && ruby ./extconf.rb && make && cp jindex.#{Config::CONFIG['DLEXT']} ../ && cd -}
 end
 
 desc 'Build mkdtemp extension'
 task :mkdtemp do |t|
-  system %{cd ext/mkdtemp && ruby ./extconf.rb && make && cp mkdtemp.bundle ../ && cd -}
+  system %{cd ext/mkdtemp && ruby ./extconf.rb && make && cp mkdtemp.#{Config::CONFIG['DLEXT']} ../ && cd -}
 end
 
 SPEC = Gem::Specification.new do |s|
