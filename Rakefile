@@ -1,4 +1,4 @@
-# Copyright 2007 Wincent Colaiuta
+# Copyright 2007-2008 Wincent Colaiuta
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -65,26 +65,28 @@ task :mkdtemp do |t|
 end
 
 SPEC = Gem::Specification.new do |s|
-  s.name          = 'walrus'
-  s.version       = '0.2'
-  s.author        = 'Wincent Colaiuta'
-  s.email         = 'win@wincent.com'
-  s.homepage      = 'http://walrus.wincent.com/'
-  s.platform      = Gem::Platform::RUBY
-  s.summary       = 'Object-oriented templating system'
-  s.description   = <<-ENDDESC
+  s.name              = 'walrus'
+  s.version           = '0.2'
+  s.author            = 'Wincent Colaiuta'
+  s.email             = 'win@wincent.com'
+  s.homepage          = 'http://walrus.wincent.com/'
+  s.rubyforge_project = 'walrus'
+  s.platform          = Gem::Platform::RUBY
+  s.summary           = 'Object-oriented templating system'
+  s.description       = <<-ENDDESC
     Walrus is an object-oriented templating system inspired by and similar
     to the Cheetah Python-powered template engine. It includes a Parser
     Expression Grammar (PEG) parser generator capable of generating an
     integrated lexer, "packrat" parser, and Abstract Syntax Tree (AST)
     builder.
   ENDDESC
-  s.require_paths = ['lib', 'ext']
-  s.autorequire   = 'walrus'
-  s.has_rdoc      = true
-  s.files         = FileList['{bin,lib,spec}/**/*', 'ext/**/*.rb', 'ext/**/*.c'].to_a # TODO: add 'docs' subdirectory, 'README.txt' when they're done
-  s.extensions    = ['ext/jindex/extconf.rb', 'ext/mkdtemp/extconf.rb']
-  s.executables   = ['walrus']
+  s.require_paths     = ['lib', 'ext']
+  s.has_rdoc          = true
+
+  # TODO: add 'docs' subdirectory, 'README.txt' when they're done
+  s.files             = FileList['{bin,lib,spec}/**/*', 'ext/**/*.rb', 'ext/**/*.c'].to_a
+  s.extensions        = ['ext/jindex/extconf.rb', 'ext/mkdtemp/extconf.rb']
+  s.executables       = ['walrus']
   s.add_dependency('wopen3', '>= 0.1') 
 end
 
