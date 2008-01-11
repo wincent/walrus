@@ -17,7 +17,7 @@ $KCODE  = 'U'     # UTF-8 (necessary for Unicode support)
 
 module Walrus
   
-  VERSION = '0.1'
+  VERSION = '0.2'
   
   autoload(:CompileError,                 'walrus/compile_error')
   autoload(:Compiler,                     'walrus/compiler')
