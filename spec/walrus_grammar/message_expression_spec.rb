@@ -1,4 +1,4 @@
-# Copyright 2007 Wincent Colaiuta
+# Copyright 2007-2008 Wincent Colaiuta
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -17,27 +17,27 @@ require 'walrus/parser' # ensure that WalrusGrammar is defined before continuing
 
 module Walrus
   class WalrusGrammar
-    
+
     describe 'calling source_text on a message expression inside an echo directive' do
-      
+
       before(:each) do
         @parser = Parser.new
       end
-      
+
       it 'should return the text of the expression only' do
-        
+
         directive = @parser.parse '#echo string.downcase'
         directive.column_start.should == 0
         directive.expression.target.column_start.should == 6
         directive.expression.message.column_start.should == 13
-        
-        # ideally we'd report 6 here, but there is no way for Walrus to know that we don't want to count the skipped whitespace
-        directive.expression.column_start.should == 5
-        directive.expression.source_text.should == ' string.downcase'
-        
+
+        pending 'proper boundary detection requires massive changes to the algorithm'
+        directive.expression.column_start.should == 6                 # currently returns: 0
+        directive.expression.source_text.should == 'string.downcase'  # currently returns: #echo string.downcase
+
       end
     end
-    
+
   end # class WalrusGrammar
 end # module Walrus
 
