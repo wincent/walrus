@@ -40,15 +40,14 @@ substituting absolute paths for "lib" and "ext":
 
   begin
     Runner.new.run
+  rescue SystemExit => e
+    # normally raised for "--version" or "--help" switches
   rescue Runner::ArgumentError => e
     $stderr.puts ":: error: #{e.to_s}", "For usage information type: #{$0} --help"
     exit EXIT_ARGUMENT_ERROR
   rescue Runner::Error => e
     $stderr.puts ":: error: #{e.to_s}"
     exit EXIT_OTHER_ERROR
-  rescue LoadError => e
-    $stderr.puts ":: error: #{e.to_s}"
-    exit EXIT_LOAD_ERROR
   rescue Exception => e
     $stderr.puts ":: error: #{e.to_s}"
     exit EXIT_UNKNOWN_ERROR
