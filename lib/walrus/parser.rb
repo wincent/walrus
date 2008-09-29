@@ -194,7 +194,7 @@ module Walrus
           sub_result  = Parser.new.parse(content, sub_options)
         end
         
-        # want to insert a bunch of nodes (a subtree) into the parse tree without advance the location counters
+        # want to insert a bunch of nodes (a subtree) into the parse tree without advancing the location counters
         sub_tree = Grammar::ArrayResult.new [ file_name, sub_result ? sub_result : [] ]
         sub_tree.start  = file_name.start
         sub_tree.end    = file_name.end
