@@ -1,4 +1,4 @@
-# Copyright 2007-2008 Wincent Colaiuta
+# Copyright 2007-2009 Wincent Colaiuta
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -52,16 +52,11 @@ Spec::Rake::SpecTask.new('specdoc') do |t|
 end
 
 desc 'Build C extensions'
-task :make => [:jindex, :mkdtemp]
+task :make => :jindex
 
 desc 'Build jindex extension'
 task :jindex do |t|
   system %{cd ext/jindex && ruby ./extconf.rb && make && cp jindex.#{Config::CONFIG['DLEXT']} ../ && cd -}
-end
-
-desc 'Build mkdtemp extension'
-task :mkdtemp do |t|
-  system %{cd ext/mkdtemp && ruby ./extconf.rb && make && cp mkdtemp.#{Config::CONFIG['DLEXT']} ../ && cd -}
 end
 
 SPEC = Gem::Specification.new do |s|
@@ -85,9 +80,10 @@ SPEC = Gem::Specification.new do |s|
 
   # TODO: add 'docs' subdirectory, 'README.txt' when they're done
   s.files             = FileList['{bin,lib,spec}/**/*', 'ext/**/*.rb', 'ext/**/*.c'].to_a
-  s.extensions        = ['ext/jindex/extconf.rb', 'ext/mkdtemp/extconf.rb']
+  s.extensions        = ['ext/jindex/extconf.rb']
   s.executables       = ['walrus']
-  s.add_dependency('wopen3', '>= 0.1') 
+  s.add_runtime_dependency('wopen3', '>= 0.1')
+  s.add_development_dependency('mkdtemp', '>= 1.0')
 end
 
 Rake::GemPackageTask.new(SPEC) do |t|
