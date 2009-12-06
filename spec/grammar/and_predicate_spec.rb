@@ -1,4 +1,4 @@
-# Copyright 2007 Wincent Colaiuta
+# Copyright 2007-2009 Wincent Colaiuta
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -14,22 +14,16 @@
 
 require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 
-module Walrus
-  class Grammar
-    
-    describe 'using an "and predicate"' do
-      
-      it 'should complain on trying to parse a nil string' do
-        lambda { AndPredicate.new('irrelevant').parse(nil) }.should raise_error(ArgumentError)
-      end
-      
-      it 'should be able to compare for equality' do
-        AndPredicate.new('foo').should eql(AndPredicate.new('foo'))      # same
-        AndPredicate.new('foo').should_not eql(AndPredicate.new('bar'))  # different
-        AndPredicate.new('foo').should_not eql(Predicate.new('foo'))     # same, but different classes
-      end
-      
-    end
-    
-  end # class Grammar
-end # module Walrus
+describe Walrus::Grammar::AndPredicate do
+  subject { Walrus::Grammar::AndPredicate.new('foo') }
+
+  it 'should complain on trying to parse a nil string' do
+    lambda { subject.parse(nil) }.should raise_error(ArgumentError)
+  end
+
+  it 'should be able to compare for equality' do
+    should eql(Walrus::Grammar::AndPredicate.new('foo'))      # same
+    should_not eql(Walrus::Grammar::AndPredicate.new('bar'))  # different
+    should_not eql(Walrus::Grammar::Predicate.new('foo'))     # same, but different classes
+  end
+end
