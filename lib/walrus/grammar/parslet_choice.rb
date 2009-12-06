@@ -80,8 +80,10 @@ module Walrus
             # the question is, is it more complicated than the other ways of getting right-associativity into Walrus-generated parsers?
             
           rescue ParseError => e
-            if error.nil?   :   error = e
-            else                error = e unless error.rightmost?(e)
+            if error.nil?
+              error = e
+            else
+              error = e unless error.rightmost?(e)
             end
           end
         end

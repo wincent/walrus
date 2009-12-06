@@ -1,4 +1,4 @@
-# Copyright 2007 Wincent Colaiuta
+# Copyright 2007-2009 Wincent Colaiuta
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-require 'jcode'   # jlength method
+begin
+  require 'jcode'   # jlength method
+rescue LoadError
+  class String
+    def jlength
+      self.gsub(/[^\Wa-zA-Z_\d]/, ' ').length
+    end
+  end
+end
 $KCODE  = 'U'     # UTF-8 (necessary for Unicode support)
 
 module Walrus

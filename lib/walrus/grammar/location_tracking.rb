@@ -98,10 +98,14 @@ module Walrus
       # Given another object that responds to column_end and line_end, returns true if the receiver is rightmost or equal.
       # If the other object is farther to the right returns false.
       def rightmost?(other)
-        if self.line_end > other.line_end         : true
-        elsif other.line_end > self.line_end      : false
-        elsif self.column_end >= other.column_end : true
-        else                                        false
+        if self.line_end > other.line_end
+          true
+        elsif other.line_end > self.line_end
+          false
+        elsif self.column_end >= other.column_end
+          true
+        else
+          false
         end
       end
       

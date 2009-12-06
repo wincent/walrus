@@ -41,7 +41,9 @@ module Walrus
       # Take a peek at the next character without actually consuming it. Returns nil if there is no next character.
       # TODO: consider deleting this method as it's not currently used.
       def peek
-        if char = self.next : @scanner.unscan; end
+        if char = self.next
+          @scanner.unscan
+        end
         char
       end
       
