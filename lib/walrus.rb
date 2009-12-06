@@ -21,10 +21,13 @@ rescue LoadError
     end
   end
 end
-$KCODE  = 'U'     # UTF-8 (necessary for Unicode support)
 
 module Walrus
-  
+  major, minor = RUBY_VERSION.split '.'
+  if major == '1' and minor == '8'
+    $KCODE  = 'U' # UTF-8 (necessary for Unicode support)
+  end
+
   VERSION = '0.2'
   
   autoload(:CompileError,                 'walrus/compile_error')
