@@ -1,4 +1,4 @@
-# Copyright 2007-2008 Wincent Colaiuta
+# Copyright 2007-2009 Wincent Colaiuta
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -21,15 +21,12 @@ require 'rubygems'
 require 'wopen3'
 
 module Walrus
-
   class Runner
-
     class Error < Exception ; end
 
     class ArgumentError < Error ; end
 
     def initialize
-
       @options = OpenStruct.new
       @options.output_dir         = nil
       @options.input_extension    = 'tmpl'
@@ -45,7 +42,6 @@ module Walrus
       @command  = nil # "compile", "fill" (saves to disk), "run" (prints to standard out)
       @inputs   = []  # list of input files and/or directories
       parser    = OptionParser.new do |o|
-
         o.banner  = "Usage: #{o.program_name} command input-file(s)-or-directory/ies [options]"
         o.separator ''
         o.separator '   _____________'
@@ -113,7 +109,6 @@ module Walrus
           $stderr.puts 'Walrus ' + Walrus::VERSION
           exit
         end
-
       end
 
       begin
@@ -123,8 +118,10 @@ module Walrus
       end
 
       parser.order! do |item|
-        if @command.nil? :  @command = item               # get command first ("compile", "fill" or "run")
-        else                @inputs << Pathname.new(item) # all others (and there must be at least one) are file or directory names
+        if @command.nil?
+          @command = item               # get command first ("compile", "fill" or "run")
+        else
+          @inputs << Pathname.new(item) # all others (and there must be at least one) are file or directory names
         end
       end
 
@@ -222,9 +219,7 @@ module Walrus
         end
 
         write_string_to_path(compiled, compiled_path, true)
-
       end
-
     end
 
     def get_output(input)
@@ -250,11 +245,9 @@ module Walrus
     end
 
     def write_string_to_path(string, path, executable = false)
-
       if @options.dry
         log "Would write '#{path}' (dry run)."
       else
-
         unless path.dirname.exist?
           begin
             log "Creating directory '#{path.dirname}'."
@@ -307,7 +300,6 @@ module Walrus
     end
 
     def compiled_source_path_for_input(input)
-
       # remove input extension if present
       if input.extname == ".#{@options.input_extension}" and @options.input_extension.length > 0
         dir, base = input.split
@@ -320,7 +312,6 @@ module Walrus
     end
 
     def filled_output_path_for_input(input)
-
       # remove input extension if present
       if input.extname == ".#{@options.input_extension}" and @options.input_extension.length > 0
         dir, base = input.split
@@ -334,7 +325,6 @@ module Walrus
       else
         adjusted_output_path(input)
       end
-
     end
 
   private
@@ -355,9 +345,5 @@ module Walrus
         $stderr.puts ":: error: #{message}"
       end
     end
-
-
   end # class Runner
-
 end # module Walrus
-

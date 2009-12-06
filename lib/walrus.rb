@@ -22,6 +22,11 @@ rescue LoadError
   end
 end
 
+if not respond_to?(:callcc)
+  require 'continuation'
+end
+
+
 module Walrus
   major, minor = RUBY_VERSION.split '.'
   if major == '1' and minor == '8'

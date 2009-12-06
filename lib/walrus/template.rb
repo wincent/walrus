@@ -62,8 +62,10 @@ module Walrus
       if @class_name
         @class_name
       else
-        if @origin.nil? : @class_name = Compiler::DEFAULT_CLASS # "DocumentSubclass"
-        else              @class_name = strip_extensions(@origin).to_class_name
+        if @origin.nil?
+          @class_name = Compiler::DEFAULT_CLASS # "DocumentSubclass"
+        else
+          @class_name = strip_extensions(@origin).to_class_name
         end
       end
     end

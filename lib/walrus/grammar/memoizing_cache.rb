@@ -1,4 +1,4 @@
-# Copyright 2007 Wincent Colaiuta
+# Copyright 2007-2009 Wincent Colaiuta
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -54,9 +54,12 @@ module Walrus
         identifier << options[:skipping_override] if options.has_key? :skipping_override
         
         if (result = @cache[identifier]) != NoValueForKey.instance
-          if result.kind_of? Symbol       : throw result
-          elsif result.kind_of? Exception : raise result
-          else                              return result
+          if result.kind_of? Symbol
+            throw result
+          elsif result.kind_of? Exception
+            raise result
+          else
+            return result
           end
         else    # first time for this parseable/location/skipping_override (etc) combination, capture result and propagate
           catch :NotPredicateSuccess do

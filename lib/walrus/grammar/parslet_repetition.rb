@@ -41,9 +41,12 @@ module Walrus
             rescue SkippedSubstringException => e
               state.skipped(e)
             rescue ParseError => e # failed, will try to skip; save original error in case skipping fails
-              if options.has_key?(:skipping_override) : skipping_parslet = options[:skipping_override]
-              elsif options.has_key?(:skipping)       : skipping_parslet = options[:skipping]
-              else                                      skipping_parslet = nil
+              if options.has_key?(:skipping_override)
+                skipping_parslet = options[:skipping_override]
+              elsif options.has_key?(:skipping)
+                skipping_parslet = options[:skipping]
+              else
+                skipping_parslet = nil
               end
               break if skipping_parslet.nil?
               begin

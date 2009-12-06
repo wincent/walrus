@@ -21,8 +21,10 @@ module Walrus
       
       before(:each) do
         @parslet = lambda do |string, options|
-          if string == 'foobar' : string
-          else                    raise ParseError.new('expected foobar by got "%s"' + string.to_s)
+          if string == 'foobar'
+            string
+          else
+            raise ParseError.new('expected foobar by got "%s"' + string.to_s)
           end
         end.to_parseable
       end
