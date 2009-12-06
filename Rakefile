@@ -84,6 +84,7 @@ SPEC = Gem::Specification.new do |s|
   s.executables       = ['walrus']
   s.add_runtime_dependency('wopen3', '>= 0.1')
   s.add_development_dependency('mkdtemp', '>= 1.0')
+  s.add_development_dependency('rspec', '>= 1.2.9')
 end
 
 Rake::GemPackageTask.new(SPEC) do |t|
