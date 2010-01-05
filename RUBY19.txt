@@ -1,0 +1,11 @@
+To test under Ruby 1.9:
+
+  OLD_PATH=$PATH
+  export PATH=~/.multiruby/install/1.9.2-preview1/bin:$PATH
+  rake spec
+  export PATH=$OLD_PATH
+
+Depends on ZenTest:
+
+  sudo gem install ZenTest
+  multiruby -e 'true' # trying to execute anything will trigger initial setup
