@@ -1,4 +1,4 @@
-# Copyright 2007-2009 Wincent Colaiuta
+# Copyright 2007-2010 Wincent Colaiuta
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -22,10 +22,7 @@ rescue LoadError
   end
 end
 
-if not respond_to?(:callcc)
-  require 'continuation'
-end
-
+require 'continuation' unless Kernel.respond_to?(:callcc)
 
 module Walrus
   major, minor = RUBY_VERSION.split '.'
@@ -34,16 +31,15 @@ module Walrus
   end
 
   VERSION = '0.2'
-  
+
   autoload(:CompileError,                 'walrus/compile_error')
   autoload(:Compiler,                     'walrus/compiler')
   autoload(:Grammar,                      'walrus/grammar')
   autoload(:Parser,                       'walrus/parser')
   autoload(:NoParameterMarker,            'walrus/no_parameter_marker')
   autoload(:Template,                     'walrus/template')
-  
+
   class Grammar
-    
     autoload(:AndPredicate,                 'walrus/grammar/and_predicate')
     autoload(:ArrayResult,                  'walrus/grammar/array_result')
     autoload(:ContinuationWrapperException, 'walrus/grammar/continuation_wrapper_exception')
@@ -73,9 +69,7 @@ module Walrus
     autoload(:StringParslet,                'walrus/grammar/string_parslet')
     autoload(:StringResult,                 'walrus/grammar/string_result')
     autoload(:SymbolParslet,                'walrus/grammar/symbol_parslet')
-    
   end
-  
 end # module Walrus
 
 require 'walrus/additions/module'
