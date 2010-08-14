@@ -32,6 +32,7 @@ module Walrus
 
   autoload(:CompileError,                 'walrus/compile_error')
   autoload(:Compiler,                     'walrus/compiler')
+  autoload :COPYRIGHT,                    'walrus/version'
   autoload(:Grammar,                      'walrus/grammar')
   autoload(:Parser,                       'walrus/parser')
   autoload(:NoParameterMarker,            'walrus/no_parameter_marker')

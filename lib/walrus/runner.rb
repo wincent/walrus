@@ -1,4 +1,4 @@
-# Copyright 2007-2009 Wincent Colaiuta
+# Copyright 2007-2010 Wincent Colaiuta
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -48,7 +48,7 @@ module Walrus
         o.separator '  /             \\'
         o.separator " /     o   o     \\  #{o.program_name}"
         o.separator ' |       b       |  Command-line front-end for the Walrus templating system'
-        o.separator '  \\   ~-----~   /   Copyright 2007 Wincent Colaiuta'
+        o.separator "  \\   ~-----~   /   #{Walrus::COPYRIGHT}"
         o.separator '   \\ / /   \\ \\ /'
         o.separator '    / /-----\\ \\'
         o.separator '   |_/       \\_|'
