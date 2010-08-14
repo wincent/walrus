@@ -26,8 +26,8 @@ Spec::Rake::SpecTask.new('coverage') do |t|
 end
 
 desc 'Run specs'
-Spec::Rake::SpecTask.new('spec') do |t|
-  t.spec_files  = FileList['spec/**/*_spec.rb']
+task :spec do
+  sh 'bin/spec spec'
 end
 
 desc 'Verify that test coverage is above minimum threshold'
