@@ -1,4 +1,4 @@
-# Copyright 2007 Wincent Colaiuta
+# Copyright 2007-2010 Wincent Colaiuta
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -16,12 +16,12 @@ require 'walrus'
 
 module Walrus
   class Template
-    
     attr_reader   :base_text
-    
-    # If initialized using a Pathname or File, returns the pathname. Otherwise returns nil.
+
+    # If initialized using a Pathname or File, returns the pathname.
+    # Otherwise returns nil.
     attr_reader   :origin
-    
+
     # Accepts input of class String, Pathname or File
     def initialize(input)
       raise ArgumentError if input.nil?
@@ -32,32 +32,33 @@ module Walrus
         @base_text  = input.to_s.clone
       end
     end
-    
-    # The fill method returns a string containing the output produced when executing the compiled template.
+
+    # The fill method returns a string containing the output produced when
+    # executing the compiled template.
     def fill
       @filled ||= instance_eval(compiled)
     end
-    
+
     def filled
       fill
     end
-    
+
     # Parses template, returning compiled input (suitable for writing to disk).
     def compile
       @parser   ||= Parser.new
       @compiled ||= @parser.compile(@base_text, :class_name => class_name, :origin => @origin)
     end
-    
+
     # Returns the compiled text of the receiver
     def compiled
       compile
     end
-    
+
     # Prints output obtained by running the compiled template.
     def run
       p fill
     end
-    
+
     def class_name
       if @class_name
         @class_name
@@ -69,7 +70,7 @@ module Walrus
         end
       end
     end
-    
+
     def strip_extensions(path)
       extension = File.extname(path)
       if extension != ""  # recurse
@@ -78,6 +79,5 @@ module Walrus
         path
       end
     end
-    
   end # class Template
 end # module Walrus
