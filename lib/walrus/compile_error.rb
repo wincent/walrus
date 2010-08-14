@@ -1,4 +1,4 @@
-# Copyright 2007 Wincent Colaiuta
+# Copyright 2007-2010 Wincent Colaiuta
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -16,9 +16,7 @@ require 'walrus'
 
 module Walrus
   class Grammar
-    
     class CompileError < Exception
-      
       # take an optional hash (for packing extra info into exception?)
       # position in AST/source file
       # line number, column number
@@ -26,9 +24,6 @@ module Walrus
       def initialize(message, info = {})
         super message
       end
-      
     end # class CompileError
-    
   end # class Grammar
 end # module Walrus
-
