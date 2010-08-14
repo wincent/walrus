@@ -1,4 +1,4 @@
-# Copyright 2007-2009 Wincent Colaiuta
+# Copyright 2007-2010 Wincent Colaiuta
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -84,7 +84,7 @@ SPEC = Gem::Specification.new do |s|
   s.executables       = ['walrus']
   s.add_runtime_dependency('wopen3', '>= 0.1')
   s.add_development_dependency('mkdtemp', '>= 1.0')
-  s.add_development_dependency('rspec', '>= 1.2.9')
+  s.add_development_dependency('rspec', '1.3.0')
 end
 
 Rake::GemPackageTask.new(SPEC) do |t|
