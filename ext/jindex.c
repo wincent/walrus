@@ -42,7 +42,7 @@ static VALUE walrus_str_index_common(ID func, int argc, VALUE *argv, VALUE str)
     {
         VALUE packing_format    = rb_str_new2("C*");
         VALUE unpacked          = rb_funcall(str, rb_intern("unpack"), 1, packing_format);              /* unpack('C*') */
-        VALUE range             = rb_funcall(rb_cRange, rb_intern("new"), 3, INT2FIX(0), index, Qtrue);        
+        VALUE range             = rb_funcall(rb_cRange, rb_intern("new"), 3, INT2FIX(0), index, Qtrue);
         VALUE slice             = rb_funcall(unpacked, rb_intern("slice"), 1, range);                   /* [0...idx] */
         VALUE packed            = rb_funcall(slice, rb_intern("pack"), 1, packing_format);              /* pack('C*') */
         jindex                  = rb_funcall(packed, rb_intern("jlength"), 0);                          /* jlength */

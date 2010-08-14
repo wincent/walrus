@@ -43,20 +43,20 @@ Spec::Rake::SpecTask.new('specdoc') do |t|
   t.out         = 'specdoc.rd'
 end
 
-desc 'Build C extensions'
+desc 'Build C extension'
 task :make => :jindex
 
-file 'ext/jindex/Makefile' => 'ext/jindex/extconf.rb' do
-  Dir.chrdir 'ext/jindex' do
+file 'ext/Makefile' => 'ext/extconf.rb' do
+  Dir.chrdir 'ext' do
     ruby 'extconf.rb'
   end
 end
 
-EXT_FILE_DEPENDENCIES = Dir['ext/jindex/Makefile', 'ext/jindex/*.{rb,c}']
+EXT_FILE_DEPENDENCIES = Dir['ext/Makefile', 'ext/*.{rb,c}']
 EXT_FILE = "ext/jindex.#{Config::CONFIG['DLEXT']}"
 file EXT_FILE => EXT_FILE_DEPENDENCIES do
-  Dir.chdir 'ext/jindex' do
-    sh "make && cp jindex.#{Config::CONFIG['DLEXT']} ../"
+  Dir.chdir 'ext' do
+    sh 'make'
   end
 end
 
@@ -65,6 +65,7 @@ task :jindex => EXT_FILE
 
 BUILT_GEM_DEPENDENCIES = Dir[
   EXT_FILE,
+  'bin/walrus',
   'lib/**/*.rb'
 ]
 
