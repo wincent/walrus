@@ -46,7 +46,7 @@ module Walrus
         o.separator ''
         o.separator '   _____________'
         o.separator '  /             \\'
-        o.separator " /     o   o     \\  #{o.program_name}"
+        o.separator " /     o   o     \\  #{o.program_name} version #{Walrus::VERSION}"
         o.separator ' |       b       |  Command-line front-end for the Walrus templating system'
         o.separator "  \\   ~-----~   /   #{Walrus::COPYRIGHT}"
         o.separator '   \\ / /   \\ \\ /'
