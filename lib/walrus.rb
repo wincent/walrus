@@ -72,7 +72,6 @@ module Walrus
   end
 end # module Walrus
 
-require 'walrus/additions/module'
 require 'walrus/additions/string'
 require 'walrus/grammar/additions/proc'
 require 'walrus/grammar/additions/regexp'
