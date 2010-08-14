@@ -47,12 +47,12 @@ desc 'Build C extension'
 task :make => :jindex
 
 file 'ext/Makefile' => 'ext/extconf.rb' do
-  Dir.chrdir 'ext' do
+  Dir.chdir 'ext' do
     ruby 'extconf.rb'
   end
 end
 
-EXT_FILE_DEPENDENCIES = Dir['ext/Makefile', 'ext/*.{rb,c}']
+EXT_FILE_DEPENDENCIES = Dir['ext/*.{rb,c}'] + ['ext/Makefile']
 EXT_FILE = "ext/jindex.#{Config::CONFIG['DLEXT']}"
 file EXT_FILE => EXT_FILE_DEPENDENCIES do
   Dir.chdir 'ext' do
@@ -65,10 +65,9 @@ task :jindex => EXT_FILE
 
 BUILT_GEM_DEPENDENCIES = Dir[
   'walrus.gemspec',
-  EXT_FILE,
   'bin/walrus',
   'lib/**/*.rb'
-]
+] + [EXT_FILE]
 
 BUILT_GEM = "walrus-#{Walrus::VERSION}.gem"
 file BUILT_GEM => BUILT_GEM_DEPENDENCIES do
