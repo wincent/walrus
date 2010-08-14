@@ -13,7 +13,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 require 'rake'
-require 'rake/gempackagetask'
 require 'rubygems'
 require 'spec/rake/spectask'
 require 'spec/rake/verify_rcov'
@@ -54,6 +53,7 @@ task :jindex do |t|
   system %{cd ext/jindex && ruby ./extconf.rb && make && cp jindex.#{Config::CONFIG['DLEXT']} ../ && cd -}
 end
 
-Rake::GemPackageTask.new(SPEC) do |t|
-  t.need_tar      = true
+desc 'Build gem'
+task :build do
+  sh 'gem build walrus.gemspec'
 end
