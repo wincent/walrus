@@ -16,6 +16,7 @@ require 'rake'
 require 'rubygems'
 require 'spec/rake/spectask'
 require 'spec/rake/verify_rcov'
+require File.expand_path('lib/walrus/version', File.dirname(__FILE__))
 
 desc 'Prepare release'
 task :release => [:changelog, :gem]
@@ -48,17 +49,37 @@ end
 desc 'Build C extensions'
 task :make => :jindex
 
-desc 'Build jindex extension'
-task :jindex do |t|
-  system %{cd ext/jindex && ruby ./extconf.rb && make && cp jindex.#{Config::CONFIG['DLEXT']} ../ && cd -}
+file 'ext/jindex/Makefile' => 'ext/jindex/extconf.rb' do
+  Dir.chrdir 'ext/jindex' do
+    ruby 'extconf.rb'
+  end
 end
 
-desc 'Build gem ("gem build")'
-task :build do
+EXT_FILE_DEPENDENCIES = Dir['ext/jindex/Makefile', 'ext/jindex/*.{rb,c}']
+EXT_FILE = "ext/jindex.#{Config::CONFIG['DLEXT']}"
+file EXT_FILE => EXT_FILE_DEPENDENCIES do
+  Dir.chdir 'ext/jindex' do
+    sh "make && cp jindex.#{Config::CONFIG['DLEXT']} ../"
+  end
+end
+
+desc 'Build jindex extension'
+task :jindex => EXT_FILE
+
+BUILT_GEM_DEPENDENCIES = Dir[
+  EXT_FILE,
+  'lib/**/*.rb'
+]
+
+BUILT_GEM = "walrus-#{Walrus::VERSION}.gem"
+file BUILT_GEM => BUILT_GEM_DEPENDENCIES do
   sh 'gem build walrus.gemspec'
 end
 
+desc 'Build gem ("gem build")'
+task :build => BUILT_GEM
+
 desc 'Publish gem ("gem push")'
 task :push => :build do
-  sh "gem push walrus-#{Walrus::VERSION}.gem"
+  sh "gem push #{BUILT_GEM}"
 end
