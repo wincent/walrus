@@ -53,7 +53,12 @@ task :jindex do |t|
   system %{cd ext/jindex && ruby ./extconf.rb && make && cp jindex.#{Config::CONFIG['DLEXT']} ../ && cd -}
 end
 
-desc 'Build gem'
+desc 'Build gem ("gem build")'
 task :build do
   sh 'gem build walrus.gemspec'
+end
+
+desc 'Publish gem ("gem push")'
+task :push => :build do
+  sh "gem push walrus-#{Walrus::VERSION}.gem"
 end
