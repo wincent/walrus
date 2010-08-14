@@ -18,9 +18,6 @@ require 'spec/rake/spectask'
 require 'spec/rake/verify_rcov'
 require File.expand_path('lib/walrus/version', File.dirname(__FILE__))
 
-desc 'Prepare release'
-task :release => [:changelog, :gem]
-
 desc 'Run specs with coverage'
 Spec::Rake::SpecTask.new('coverage') do |t|
   t.spec_files  = FileList['spec/**/*_spec.rb']
