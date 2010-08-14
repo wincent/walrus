@@ -64,6 +64,7 @@ desc 'Build jindex extension'
 task :jindex => EXT_FILE
 
 BUILT_GEM_DEPENDENCIES = Dir[
+  'walrus.gemspec',
   EXT_FILE,
   'bin/walrus',
   'lib/**/*.rb'
