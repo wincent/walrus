@@ -21,11 +21,6 @@ require 'spec/rake/verify_rcov'
 desc 'Prepare release'
 task :release => [:changelog, :gem]
 
-desc 'Update changelog'
-task :changelog do |t|
-  system %{svn log svn://svn.wincent.com/Walrus/trunk > CHANGELOG.txt}
-end
-
 desc 'Run specs with coverage'
 Spec::Rake::SpecTask.new('coverage') do |t|
   t.spec_files  = FileList['spec/**/*_spec.rb']
