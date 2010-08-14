@@ -1,5 +1,5 @@
-/* 
-Copyright 2007 Wincent Colaiuta
+/*
+Copyright 2007-2010 Wincent Colaiuta
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
@@ -18,11 +18,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /*
 
-Common code used by almost identical "jindex" and "jrindex" methods. A C extension is necessary here because with direct access to the rb_backref_get and rb_backref_set API there is no way to propagate $~ back to the caller after invoking the "index" and "rindex" methods. The code is basically equivalent to the following Ruby code:
+Common code used by almost identical "jindex" and "jrindex" methods. A C
+extension is necessary here because with direct access to the rb_backref_get
+and rb_backref_set API there is no way to propagate $~ back to the caller after
+invoking the "index" and "rindex" methods. The code is basically equivalent to
+the following Ruby code:
 
 def index arg1, optional_arg
   index = super                                     # plus code here for deciding whether or not to pass optional argument
-  match = ($~ ? $~.clone : nil)                     
+  match = ($~ ? $~.clone : nil)
   index unpack('C*')[0...index].pack('C*').jlength  # jlength clobbers $~ as a side effect, should consider rewriting it
   $~ = match                                        # in pure Ruby setting $~ here has only a local effect (not seen by caller)
   index
@@ -54,7 +58,9 @@ call-seq:
     str.jindex(fixnum [, offset])       -> Fixnum or nil
     str.jindex(regexp [, offset])       -> Fixnum or nil
 
-Multibyte-friendly equivalent of the String#index method. If $KCODE is appropriately set will return an accurate index based on character count rather than byte counts.
+Multibyte-friendly equivalent of the String#index method. If $KCODE is
+appropriately set will return an accurate index based on character count rather
+than byte counts.
 
 */
 static VALUE walrus_str_jindex_m(int argc, VALUE *argv, VALUE str)
@@ -69,7 +75,9 @@ call-seq:
     str.jrindex(fixnum [, offset])      -> Fixnum or nil
     str.jrindex(regexp [, offset])      -> Fixnum or nil
 
-Multibyte-friendly equivalent of the String#rindex method. If $KCODE is appropriately set will return an accurate index based on character count rather than byte counts.
+Multibyte-friendly equivalent of the String#rindex method. If $KCODE is
+appropriately set will return an accurate index based on character count rather
+than byte counts.
 
 */
 static VALUE walrus_str_jrindex_m(int argc, VALUE *argv, VALUE str)
@@ -82,4 +90,3 @@ void Init_jindex()
     rb_define_method(rb_cString, "jindex", walrus_str_jindex_m, -1);
     rb_define_method(rb_cString, "jrindex", walrus_str_jrindex_m, -1);
 }
-
