@@ -44,14 +44,14 @@ module Walrus
       parser    = OptionParser.new do |o|
         o.banner  = "Usage: #{o.program_name} command input-file(s)-or-directory/ies [options]"
         o.separator ''
-        o.separator '   _____________'
-        o.separator '  /             \\'
-        o.separator " /     o   o     \\  #{o.program_name} version #{Walrus::VERSION}"
-        o.separator ' |       b       |  Command-line front-end for the Walrus templating system'
-        o.separator "  \\   ~-----~   /   #{Walrus::COPYRIGHT}"
+        o.separator '    ___________'
+        o.separator '   /           \\'
+        o.separator "  /    9   9    \\  #{o.program_name} version #{Walrus::VERSION}"
+        o.separator '  |      a      |  Command-line front-end for the Walrus templating system'
+        o.separator "  |   (::(::)   |   #{Walrus::COPYRIGHT}"
         o.separator '   \\ / /   \\ \\ /'
         o.separator '    / /-----\\ \\'
-        o.separator '   |_/       \\_|'
+        o.separator '    |/       \\|'
         o.separator ''
         o.separator 'Commands: compile -- compile templates to Ruby code'
         o.separator '          fill    -- runs compiled templates, writing output to disk'
