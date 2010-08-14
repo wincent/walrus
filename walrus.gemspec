@@ -1,6 +1,8 @@
+require File.expand_path('lib/walrus/version.rb', File.dirname(__FILE__))
+
 Gem::Specification.new do |s|
   s.name              = 'walrus'
-  s.version           = '0.2'
+  s.version           = Walrus::VERSION
   s.author            = 'Wincent Colaiuta'
   s.email             = 'win@wincent.com'
   s.homepage          = 'https://wincent.com/products/walrus'

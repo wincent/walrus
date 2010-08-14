@@ -30,14 +30,13 @@ module Walrus
     $KCODE  = 'U' # UTF-8 (necessary for Unicode support)
   end
 
-  VERSION = '0.2'
-
   autoload(:CompileError,                 'walrus/compile_error')
   autoload(:Compiler,                     'walrus/compiler')
   autoload(:Grammar,                      'walrus/grammar')
   autoload(:Parser,                       'walrus/parser')
   autoload(:NoParameterMarker,            'walrus/no_parameter_marker')
   autoload(:Template,                     'walrus/template')
+  autoload :VERSION,                      'walrus/version'
 
   class Grammar
     autoload(:AndPredicate,                 'walrus/grammar/and_predicate')
