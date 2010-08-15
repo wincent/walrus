@@ -12,10 +12,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-class String
-  # Returns a copy of the receiver with occurrences of \ replaced with \\, and
-  # occurrences of ' replaced with \'
-  def to_source_string
-    gsub(/[\\']/, '\\\\\&')
+require 'walrat'
+
+class Regexp
+  require 'walrat/parslet_combining'
+  include Walrat::ParsletCombining
+
+  # Returns a RegexpParslet based on the receiver
+  def to_parseable
+    Walrat::RegexpParslet.new self
   end
-end # class String
+end # class Regexp

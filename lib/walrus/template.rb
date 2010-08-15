@@ -13,6 +13,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 require 'walrus'
+require 'walrat/additions/string.rb'
 
 module Walrus
   class Template
@@ -23,7 +24,7 @@ module Walrus
     attr_reader   :origin
 
     # Accepts input of class String, Pathname or File
-    def initialize(input)
+    def initialize input
       raise ArgumentError if input.nil?
       if input.respond_to? :read # should work with Pathname or File
         @base_text  = input.read

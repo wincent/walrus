@@ -55,5 +55,4 @@ substituting absolute paths for "lib" and "ext":
     $stderr.puts ":: error: #{e.to_s}"
     exit EXIT_UNKNOWN_ERROR
   end
-
 end # module Walrus

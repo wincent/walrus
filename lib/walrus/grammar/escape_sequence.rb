@@ -12,10 +12,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-class String
-  # Returns a copy of the receiver with occurrences of \ replaced with \\, and
-  # occurrences of ' replaced with \'
-  def to_source_string
-    gsub(/[\\']/, '\\\\\&')
-  end
-end # class String
+require 'walrus/grammar.rb'
+
+module Walrus
+  class Grammar
+    class EscapeSequence < Walrat::Node
+      def compile options = {}
+        "accumulate(%s) \# EscapeSequence\n" % @lexeme.to_s.dump
+      end
+    end
+  end # class Grammar
+end # Walrus

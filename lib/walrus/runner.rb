@@ -24,6 +24,8 @@ module Walrus
   class Runner
     class Error < Exception ; end
 
+    # This is different from the standard ::ArgumentError; it is specifically
+    # used to signal errors in the command-line arguments passed to the runner.
     class ArgumentError < Error ; end
 
     def initialize
@@ -220,7 +222,7 @@ module Walrus
 
         begin
           compiled = template.compile
-        rescue Grammar::ParseError => e
+        rescue Walrat::ParseError => e
           handle_error("failed to compile input template '#{template_source_path}' (#{e.to_s})")
           return
         end

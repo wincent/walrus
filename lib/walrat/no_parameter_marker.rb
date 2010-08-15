@@ -12,10 +12,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-class String
-  # Returns a copy of the receiver with occurrences of \ replaced with \\, and
-  # occurrences of ' replaced with \'
-  def to_source_string
-    gsub(/[\\']/, '\\\\\&')
-  end
-end # class String
+require 'walrat'
+
+module Walrat
+  class NoParameterMarker
+    require 'singleton'
+    include Singleton
+  end # class NoParameterMarker
+end # module Walrat

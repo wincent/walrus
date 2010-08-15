@@ -1,5 +1,5 @@
 # encoding: utf-8
-# Copyright 2007-2009 Wincent Colaiuta
+# Copyright 2007-2010 Wincent Colaiuta
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -61,22 +61,7 @@ module Walrus
         enumerator.next.should == 'l'
         enumerator.next.should == 'd'
       end
-      
-      it 'should be able to peek at the next character without actually enumerating' do
-        enumerator = StringEnumerator.new('h€llo')
-        enumerator.peek.should == 'h' # peek but don't advance
-        enumerator.next.should == 'h' # advance
-        enumerator.peek.should == '€' # peek a multi-byte character
-        enumerator.next.should == '€' # advance a multi-byte character
-        enumerator.peek.should == 'l' # peek
-        enumerator.peek.should == 'l' # peek the same character again
-        enumerator.next.should == 'l' # advance
-        enumerator.next.should == 'l' # advance
-        enumerator.next.should == 'o' # advance
-        enumerator.peek.should == nil # at end should return nil
-        enumerator.next.should == nil # nothing left to scan
-      end
-      
+
       it 'should be able to recall the last character using the "last" method' do
         enumerator = StringEnumerator.new('h€llo')
         enumerator.last.should == nil # nothing scanned yet

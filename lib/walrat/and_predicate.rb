@@ -12,25 +12,30 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-require 'walrus'
-require 'pathname'
+require 'walrat'
 
-module Walrus
-  # The parser is currently quite slow, although perfectly usable.
-  # The quickest route to optimizing it may be to replace it with a C parser
-  # inside a Ruby extension, possibly generated using Ragel
-  class Parser
+module Walrat
+  class AndPredicate < Predicate
     def parse string, options = {}
-      Grammar.new.parse string, options
+      raise ArgumentError if string.nil?
+      catch :ZeroWidthParseSuccess do
+        begin
+          parsed = @parseable.memoizing_parse string, options
+        rescue ParseError
+          raise ParseError.new('predicate not satisfied (expected "%s") while parsing "%s"' % [@parseable.to_s, string],
+                               :line_end => options[:line_start],
+                               :column_end => options[:column_start])
+        end
+      end
+
+      # getting this far means that parsing succeeded
+      throw :AndPredicateSuccess
     end
 
-    def compile string, options = {}
-      @@compiler ||= Compiler.new
-      parsed = []
-      catch :AndPredicateSuccess do # catch here because empty files throw
-        parsed = parse string, options
-      end
-      @@compiler.compile parsed, options
+  private
+
+    def hash_offset
+      12
     end
-  end # class Parser
-end # module Walrus
+  end
+end # module Walrat

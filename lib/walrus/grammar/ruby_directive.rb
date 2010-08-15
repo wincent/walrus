@@ -12,25 +12,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-require 'walrus'
-require 'pathname'
+require 'walrus/grammar.rb'
 
 module Walrus
-  # The parser is currently quite slow, although perfectly usable.
-  # The quickest route to optimizing it may be to replace it with a C parser
-  # inside a Ruby extension, possibly generated using Ragel
-  class Parser
-    def parse string, options = {}
-      Grammar.new.parse string, options
-    end
-
-    def compile string, options = {}
-      @@compiler ||= Compiler.new
-      parsed = []
-      catch :AndPredicateSuccess do # catch here because empty files throw
-        parsed = parse string, options
+  class Grammar
+    class RubyDirective < Directive
+      # TODO: could make a #rubyecho method that did an "accumulate do" instead
+      # of instance_eval
+      def compile options = {}
+        # possible problem here is that the compiler will indent each line for
+        # us, possibly breaking here docs etc
+        # seeing as it is going to be indented anyway, I add some additional
+        # indenting here for pretty printing purposes
+        compiled = "instance_eval do # Ruby directive\n"
+        @content.to_s.each { |line| compiled << '  ' + line }
+        compiled << "end\n"
       end
-      @@compiler.compile parsed, options
-    end
-  end # class Parser
-end # module Walrus
+    end # class RawDirective
+  end # class Grammar
+end # Walrus

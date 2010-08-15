@@ -12,10 +12,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-class String
-  # Returns a copy of the receiver with occurrences of \ replaced with \\, and
-  # occurrences of ' replaced with \'
-  def to_source_string
-    gsub(/[\\']/, '\\\\\&')
-  end
-end # class String
+require 'walrus/grammar.rb'
+
+module Walrus
+  class Grammar
+    class SlurpDirective < Directive
+      # The slurp directive produces no meaningful output; but we leave a
+      # comment in the compiled template so that the location of the directive
+      # is visible in the source.
+      def compile options = {}
+        "# Slurp directive\n"
+      end
+    end # class SlurpDirective
+  end # class Grammar
+end # Walrus

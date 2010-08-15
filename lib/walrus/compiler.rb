@@ -37,25 +37,25 @@ module Walrus
         subtree = [subtree] unless subtree.respond_to? :each
         options = { :compiler_instance => self } # reset
         subtree.each do |element|
-          if element.kind_of? WalrusGrammar::DefDirective or
-             element.kind_of? WalrusGrammar::IncludeDirective
+          if element.kind_of? Walrus::Grammar::DefDirective or
+             element.kind_of? Walrus::Grammar::IncludeDirective
             # def/block and include directives may return two items
             inner, outer = element.compile(options)
             outer.each { |line| outside_body << OUTSIDE_INDENT + line } if outer
             inner.each { |line| template_body << BODY_INDENT + line } if inner
-          elsif element.instance_of? WalrusGrammar::ExtendsDirective
+          elsif element.instance_of? Walrus::Grammar::ExtendsDirective
             # defines superclass and automatically invoke #super (super) at the
             # head of the template_body
             raise CompileError.new('#extends may be used only once per template') if @extends_directive
             raise CompileError.new('illegal #extends (#import already used in this template)') if @import_directive
             @extends_directive = element.compile(options)
-          elsif element.instance_of? WalrusGrammar::ImportDirective
+          elsif element.instance_of? Walrus::Grammar::ImportDirective
             # defines superclass with no automatic invocation of #super on the
             # template_body
             raise CompileError.new('#import may be used only once per template') if @import_directive
             raise CompileError.new('illegal #import (#extends already used in this template)') if @extends_directive
             @import_directive = element.compile(options)
-          elsif element.kind_of? WalrusGrammar::Comment and
+          elsif element.kind_of? Walrus::Grammar::Comment and
                 element.column_start == 0
             # special case if comment is only thing on input line
             template_body << BODY_INDENT + element.compile(options)
@@ -104,7 +104,7 @@ end
 #{require_line}
 
 module Walrus
-  class WalrusGrammar
+  class Grammar
     class #{@class_name} < #{superclass_name}
       def template_body
 #{@template_body.join}
@@ -115,7 +115,7 @@ module Walrus
         new.run           # same as "walrus run __FILE__"
       end
     end \# #{@class_name}
-  end \# WalrusGrammar
+  end \# Grammar
 end \# Walrus
         RETURN
       end

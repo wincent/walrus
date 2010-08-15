@@ -1,4 +1,4 @@
-# Copyright 2007 Wincent Colaiuta
+# Copyright 2007-2010 Wincent Colaiuta
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -12,165 +12,460 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+require 'walrat/grammar'
 require 'walrus'
+require 'pathname'
 
 module Walrus
-  class Grammar
-    
-    attr_accessor :memoizing
-    attr_reader   :rules
-    attr_reader   :skipping_overrides
-    
-    # Creates a Grammar subclass named according to subclass_name and instantiates an instance of the new class, returning it after evaluating the optional block in the context of the newly created instance. The advantage of working inside a new subclass is that any constants defined in the new grammar will be in a separate namespace.
-    # The subclass_name parameter should be a String.
-    def self.subclass(subclass_name, &block)
-      raise ArgumentError if subclass_name.nil?
-      raise ArgumentError if Walrus::const_defined?(subclass_name)
-      Walrus::const_set(subclass_name, Class.new(Grammar))
-      subclass = Walrus::module_eval(subclass_name)
-      begin
-        subclass.new(&block)
-      rescue ContinuationWrapperException => c # a Symbol in a production rule wants to know what namespace its being used in
-        c.continuation.call(subclass)
-      end
-    end
-    
-    def initialize(&block)
-      @rules              = Hash.new { |hash, key| raise StandardError.new('no rule for key "%s"' % key.to_s) }
-      @productions        = Hash.new { |hash, key| raise StandardError.new('no production for key "%s"' % key.to_s) }
-      @skipping_overrides = Hash.new { |hash, key| raise StandardError.new('no skipping override for key "%s"' % key.to_s) }
-      @memoizing          = true
-      self.instance_eval(&block) if block_given?
-    end
-    
-    # TODO: consider making grammars copiable (could be used in threaded context then)
-    #def initialize_copy(from); end
-    #def clone; end
-    #def dupe; end
-    
-    # Starts with starting_symbol.
-    def parse(string, options = {})
-      raise ArgumentError if string.nil?
-      raise StandardError if @starting_symbol.nil?
-      options[:grammar]       = self
-      options[:rule_name]     = @starting_symbol
-      options[:skipping]      = @skipping
-      options[:line_start]    = 0 # "richer" information (more human-friendly) than that provided in "location"
-      options[:column_start]  = 0 # "richer" information (more human-friendly) than that provided in "location"
-      options[:memoizer]      = MemoizingCache.new if @memoizing
-      @starting_symbol.to_parseable.memoizing_parse(string, options)
-    end
-    
-    # Defines a rule and stores it 
-    # Expects an object that responds to the parse message, such as a Parslet or ParsletCombination.
-    # As this is intended to work with Parsing Expression Grammars, each rule may only be defined once. Defining a rule more than once will raise an ArgumentError.
-    def rule(symbol, parseable)
-      raise ArgumentError if symbol.nil?
-      raise ArgumentError if parseable.nil?
-      raise ArgumentError if @rules.has_key?(symbol)
-      @rules[symbol] = parseable
-    end
-    
-    # Dynamically creates a Node subclass inside the namespace of the current grammar. If parent_class is nil, Node is assumed.
-    # new_class_name must not be nil.
-    def node(new_class_name, parent_class = nil, *attributes)
-      raise ArgumentError if new_class_name.nil?
-      new_class_name = new_class_name.to_s.to_class_name # camel-case
-      if parent_class.nil?
-        Node.subclass(new_class_name, self.class, *attributes)
+  # The parser is currently quite slow, although perfectly usable.
+  # The quickest route to optimizing it may be to replace it with a C parser
+  # inside a Ruby extension, possibly generated using Ragel
+  class Grammar < Walrat::Grammar
+    autoload :AssignmentExpression, 'walrus/grammar/assignment_expression'
+    autoload :BlockDirective,       'walrus/grammar/block_directive'
+    autoload :Comment,              'walrus/grammar/comment'
+    autoload :DefDirective,         'walrus/grammar/def_directive'
+    autoload :EchoDirective,        'walrus/grammar/echo_directive'
+    autoload :EscapeSequence,       'walrus/grammar/escape_sequence'
+    autoload :ImportDirective,      'walrus/grammar/import_directive'
+    autoload :IncludeDirective,     'walrus/grammar/include_directive'
+    autoload :InstanceVariable,     'walrus/grammar/instance_variable'
+    autoload :Literal,              'walrus/grammar/literal'
+    autoload :MessageExpression,    'walrus/grammar/message_expression'
+    autoload :MultilineComment,     'walrus/grammar/multiline_comment'
+    autoload :Placeholder,          'walrus/grammar/placeholder'
+    autoload :RawDirective,         'walrus/grammar/raw_directive'
+    autoload :RawText,              'walrus/grammar/raw_text'
+    autoload :RubyDirective,        'walrus/grammar/ruby_directive'
+    autoload :RubyExpression,       'walrus/grammar/ruby_expression'
+    autoload :SetDirective,         'walrus/grammar/set_directive'
+    autoload :SilentDirective,      'walrus/grammar/silent_directive'
+    autoload :SlurpDirective,       'walrus/grammar/slurp_directive'
+    autoload :SuperDirective,       'walrus/grammar/super_directive'
+
+    starting_symbol :template
+    skipping    :whitespace_or_newlines
+    rule        :whitespace_or_newlines,
+                /\s+/
+
+    # only spaces and tabs, not newlines
+    rule        :whitespace,
+                /[ \t\v]+/
+    rule        :newline,
+                /(\r\n|\r|\n)/
+
+    # optional whitespace (tabs and spaces only) followed by a
+    # backslash/newline (note: this is not escape-aware)
+    rule        :line_continuation,
+                /[ \t\v]*\\\n/
+    rule        :end_of_input,
+                /\z/
+
+    rule        :template,
+                :template_element.zero_or_more &
+                :end_of_input.and?
+    rule        :template_element,
+                :raw_text |
+                :comment |
+                :multiline_comment |
+                :directive |
+                :placeholder |
+                :escape_sequence
+
+    # anything at all other than the three characters which have special
+    # meaning in Walrus: $, \ and #
+    rule        :raw_text,  /[^\$\\#]+/
+    production  :raw_text
+
+    rule        :string_literal,
+                :single_quoted_string_literal |
+                :double_quoted_string_literal
+    skipping    :string_literal, nil
+    node        :string_literal, :literal
+
+    rule        :single_quoted_string_literal,
+                "'".skip &
+                :single_quoted_string_content.optional &
+                "'".skip
+    node        :single_quoted_string_literal,
+                :string_literal
+    production  :single_quoted_string_literal
+    rule        :single_quoted_string_content,
+                /(\\(?!').|\\'|[^'\\]+)+/
+    rule        :double_quoted_string_literal,
+                '"'.skip &
+                :double_quoted_string_content.optional &
+                '"'.skip
+    node        :double_quoted_string_literal, :string_literal
+    production  :double_quoted_string_literal
+    rule        :double_quoted_string_content,
+                /(\\(?!").|\\"|[^"\\]+)+/
+
+    # TODO: support 1_000_000 syntax for numeric_literals
+    rule            :numeric_literal,                     /\d+\.\d+|\d+(?!\.)/
+    node            :numeric_literal, :literal
+    production      :numeric_literal
+
+    # this matches both "foo" and "Foo::bar"
+    rule            :identifier,                          /([A-Z][a-zA-Z0-9_]*::)*[a-z_][a-zA-Z0-9_]*/
+    node            :identifier, :literal
+    production      :identifier
+
+    # this matches both "Foo" and "Foo::Bar"
+    rule            :constant,                            /([A-Z][a-zA-Z0-9_]*::)*[A-Z][a-zA-Z0-9_]*/
+    node            :constant, :literal
+    production      :constant
+
+    rule            :symbol_literal,                      /:[a-zA-Z_][a-zA-Z0-9_]*/
+    node            :symbol_literal, :literal
+    production      :symbol_literal
+
+    rule            :escape_sequence,                     '\\'.skip & /[\$\\#]/
+    production      :escape_sequence
+
+    rule            :comment,                             '##'.skip & /.*$/
+    production      :comment
+
+    # nested multiline comments
+    rule            :multiline_comment,                   '#*'.skip & :comment_content.zero_or_more('') & '*#'.skip
+    skipping        :multiline_comment, nil
+    production      :multiline_comment, :content
+
+    rule            :comment_content,                     (:comment & :newline.skip)  | 
+                                                          :multiline_comment          |
+                                                          /(                # three possibilities:
+                                                            [^*#]+      |   # 1. any run of characters other than # or *
+                                                            \#(?!\#|\*) |   # 2. any # not followed by another # or a *
+                                                            \*(?!\#)        # 3. any * not followed by a #
+                                                           )+               # match the three possibilities repeatedly
+                                                          /x
+
+    rule            :directive,                           :block_directive        |
+                                                          :def_directive          |
+                                                          :echo_directive         |
+                                                          :extends_directive      |
+                                                          :import_directive       |
+                                                          :include_directive      |
+                                                          :raw_directive          |
+                                                          :ruby_directive         |
+                                                          :set_directive          |
+                                                          :silent_directive       |
+                                                          :slurp_directive        |
+                                                          :super_directive
+
+    node            :directive
+
+    # directives may span multiple lines if and only if the last character on
+    # the line is a backslash \
+    skipping        :directive,                           :whitespace | :line_continuation
+
+    # "Directive tags can be closed explicitly with #, or implicitly with the
+    # end of the line"
+    # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/language.directives.closures.html
+    # This means that to follow a directive by a comment on the same line you
+    # must explicitly close the directive first (otherwise the grammar would
+    # be ambiguous).
+    # Note that "skipping" the end_of_input here is harmless as it isn't
+    # actually consumed.
+    rule            :directive_end,                       ( /#/ | :newline | :end_of_input ).skip
+
+    rule            :block_directive,                     '#block'.skip & :identifier & :def_parameter_list.optional([]) & :directive_end &
+                                                          :template_element.zero_or_more([]) &
+                                                          '#end'.skip & :directive_end
+    production      :block_directive, :identifier, :params, :content
+
+    rule            :def_directive,                       '#def'.skip & :identifier & :def_parameter_list.optional([]) & :directive_end &
+                                                          :template_element.zero_or_more([]) &
+                                                          '#end'.skip & :directive_end
+    production      :def_directive, :identifier, :params, :content
+
+    # "The #echo directive is used to echo the output from expressions that
+    # can't be written as simple $placeholders."
+    # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.echo.html
+    #
+    # Convenient alternative short syntax for the #echo directive, similar to
+    # ERB (http://www.ruby-doc.org/stdlib/libdoc/erb/rdoc/):
+    #
+    #   #= expression(s) #
+    #
+    # Is a shortcut equivalent to:
+    #
+    #   #echo expression(s) #
+    #
+    # This is similar to the ERB syntax, but even more concise:
+    #
+    #   <%= expression(s) =>
+    #
+    # See also the #silent directive, which also has a shortcut syntax.
+    #
+    rule            :echo_directive,                      '#echo'.skip & :ruby_expression_list & :directive_end | # long form
+                                                          '#='.skip & :ruby_expression_list & '#'.skip            # short form
+    production      :echo_directive, :expression
+
+    rule            :import_directive,                    '#import'.skip & :string_literal & :directive_end
+    production      :import_directive, :class_name
+
+    rule            :extends_directive,                   '#extends'.skip & :string_literal & :directive_end
+    node            :extends_directive, :import_directive
+    production      :extends_directive, :class_name
+
+    rule            :include_directive,                   '#include'.skip & :include_subparslet
+    production      :include_directive, :file_name, :subtree
+
+    rule            :include_subparslet,                  lambda { |string, options|
+
+      # scans a string literal
+      parslet   = :string_literal & :directive_end
+      file_name = parslet.parse(string, options)
+
+      # if options contains non-nil "origin" then try to construct relative
+      # path; otherwise just look in current working directory
+      if options[:origin]
+        current_location  = Pathname.new(options[:origin]).dirname
+        include_target    = current_location + file_name.to_s
       else
-        # convert parent_class to string, then camel case, then back to Symbol, then lookup the constant
-        self.class.const_get(parent_class.to_s.to_class_name.to_s).subclass(new_class_name, self.class, *attributes)
+        include_target    = Pathname.new file_name.to_s
       end
-    end
-    
-    # Specifies the Node subclass that will be used to encapsulate results for the rule identified by the symbol, rule_name.
-    # class_symbol, if present, will be converted to camel-case and explicitly names the class to be used. If class_symbol is not specified then a camel-cased version of the rule_name itself is used.
-    # rule_name must not be nil.
+
+      # read file into string
+      content = include_target.read
+
+      # try to parse string in sub-parser
+      sub_options = { :origin => include_target.to_s }
+      sub_result  = nil
+      catch :AndPredicateSuccess do
+        sub_result  = Parser.new.parse(content, sub_options)
+      end
+
+      # want to insert a bunch of nodes (a subtree) into the parse tree
+      # without advancing the location counters
+      sub_tree = Walrat::ArrayResult.new [ file_name, sub_result ? sub_result : [] ]
+      sub_tree.start  = file_name.start
+      sub_tree.end    = file_name.end
+      sub_tree
+    }
+
+    # "Any section of a template definition that is inside a #raw ... #end
+    # raw tag pair will be printed verbatim without any parsing of
+    # $placeholders or other directives."
+    # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.raw.html
+    # Unlike Cheetah, Walrus uses a bare "#end" marker and not an "#end raw"
+    # to mark the end of the raw block.
+    # The presence of a literal #end within a raw block is made possible by
+    # using an optional "here doc"-style delimiter:
     #
-    # Example; specifying that the results of rule "string_literal" should be encapsulated in a "StringLiteral" instance:
+    # #raw <<END_MARKER
+    #     content goes here
+    # END_MARKER
     #
-    #   production :string_literal
+    # Here the opening "END_MARKER" must be the last thing on the line
+    # (trailing whitespace up to and including the newline is allowed but it
+    # is not considered to be part of the quoted text). The final
+    # "END_MARKER" must be the very first and last thing on the line, or it
+    # will not be considered to be an end marker at all and will be
+    # considered part of the quoted text. The newline immediately prior to
+    # the end marker is included in the quoted text.
     #
-    # Example; specifying that the results of the rule "numeric_literal" should be encapsulated into a "RawToken" instance:
+    # Or, if the end marker is to be indented:
     #
-    #   production :numeric_literal, :raw_token
+    # #raw <<-END_MARKER
+    #     content
+    #      END_MARKER
     #
-    # Example; using the "build" method to dynamically define an "AssigmentExpression" class with superclass "Expression" and assign the created class as the AST production class for the rule "assignment_expression":
-    #
-    #   production :assignment_expression.build(:expression, :target, :value)
-    #
-    def production(rule_name, class_symbol = nil)
-      raise ArgumentError if rule_name.nil?
-      raise ArgumentError if @productions.has_key?(rule_name)
-      raise ArgumentError unless @rules.has_key?(rule_name)
-      class_symbol = rule_name if class_symbol.nil?
-      @productions[rule_name] = class_symbol
-    end
-    
-    def wrap(result, rule_name)
-      if @productions.has_key?(rule_name.to_sym)    # figure out arity of "initialize" method and wrap results in AST node
-        node_class  = self.class.const_get(@productions[rule_name.to_sym].to_s.to_class_name)
-        param_count = node_class.instance_method(:initialize).arity
-        raise if param_count < 1
-        
-        # dynamically build up a message send
-        if param_count == 1
-          params = 'result'
-        else
-          params = 'result[0]'
-          for i in 1..(param_count - 1)
-            params << ", result[#{i.to_s}]"
-          end
+    # Here "END_MARKER" may be preceeded by whitespace (and whitespace only)
+    # but it must be the last thing on the line. The preceding whitespace is
+    # not considered to be part of the quoted text.
+    rule            :raw_directive,                       '#raw'.skip &
+                                                          ((:directive_end & /([^#]+|#(?!end)+)*/ & '#end'.skip & :directive_end) | :here_document)
+    production      :raw_directive, :content
+
+    # In order to parse "here documents" we adopt a model similar to the one
+    # proposed in this message to the ANTLR interest list:
+    # http://www.antlr.org:8080/pipermail/antlr-interest/2005-September/013673.html
+    rule            :here_document,                       lambda { |string, options|
+
+      # for the time-being, not sure if there is much benefit in calling
+      # memoizing_parse here
+      state     = Walrat::ParserState.new(string, options)
+      parsed    = /<<(-?)([a-zA-Z0-9_]+)[ \t\v]*\n/.to_parseable.parse(state.remainder, state.options)
+      state.skipped(parsed)
+      marker    = parsed.match_data
+      indenting = (marker[1] == '') ? false : true
+
+      if indenting # whitespace allowed before end marker
+        end_marker = /^[ \t\v]*#{marker[2]}[ \t\v]*(\n|\z)/.to_parseable # will eat trailing newline
+      else         # no whitespace allowed before end marker
+        end_marker = /^#{marker[2]}[ \t\v]*(\n|\z)/.to_parseable         # will eat trailing newline
+      end
+
+      line = /^.*\n/.to_parseable # for gobbling a line
+
+      while true do
+        begin
+          skipped = end_marker.parse(state.remainder, state.options)
+          state.skipped(skipped)   # found end marker, skip it
+          break                    # all done
+        rescue Walrat::ParseError  # didn't find end marker yet, consume a line
+          parsed = line.parse(state.remainder, state.options)
+          state.parsed(parsed)
         end
-        
-        node                = node_class.class_eval('new(%s)' % params)
-        node.start          = (result.outer_start or result.start)              # propagate the start information
-        node.end            = (result.outer_end or result.end)                  # and the end information
-        node.source_text    = (result.outer_source_text or result.source_text)  # and the original source text
-        node
-      else
-        result.start        = result.outer_start if result.outer_start
-        result.end          = result.outer_end if result.outer_end
-        result.source_text  = result.source_text if result.outer_source_text
-        result
       end
-    end
-    
-    # Sets the starting symbol.
-    # symbol must refer to a rule.
-    def starting_symbol(symbol)
-      @starting_symbol = symbol
-    end
-    
-    # Sets the default parslet that is used for skipping inter-token whitespace, and can be used to override the default on a rule-by-rule basis.
-    # This allows for simpler grammars which do not need to explicitly put optional whitespace parslets (or any other kind of parslet) between elements.
+
+      # caller will want a String, not an Array
+      results         = state.results
+      document        = Walrat::StringResult.new(results.to_s)
+      document.start  = results.start
+      document.end    = results.end
+      document
+    }
+
+    rule            :ruby_directive,                      '#ruby'.skip & ((:directive_end & /([^#]+|#(?!end)+)*/ & '#end'.skip & :directive_end) | :here_document)
+    production      :ruby_directive, :content
+
+    # Unlike a normal Ruby assignement expression, the lvalue of a "#set"
+    # directive is an identifier preceded by a dollar sign.
+    rule            :set_directive,                       '#set'.skip & /\$(?![ \r\n\t\v])/.skip & :placeholder_name & '='.skip & (:addition_expression | :unary_expression) & :directive_end
+    production      :set_directive, :placeholder, :expression
+
+    # "#silent is the opposite of #echo. It executes an expression but
+    # discards the output."
+    # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.silent.html
     #
-    # There are two modes of operation for this method. In the first mode (when only one parameter is passed) the rule_or_parslet parameter is used to define the default parslet for inter-token skipping. rule_or_parslet must refer to a rule which itself is a Parslet or ParsletCombination and which is responsible for skipping. Note that the ability to pass an arbitrary parslet means that the notion of what consitutes the "whitespace" that should be skipped is completely flexible. Raises if a default skipping parslet has already been set.
+    # Like the #echo directive, a convienient shorthand syntax is available:
     #
-    # In the second mode of operation (when two parameters are passed) the rule_or_parslet parameter is interpreted to be the rule to which an override should be applied, where the parslet parameter specifies the parslet to be used in this case. If nil is explicitly passed then this overrides the default parslet; no parslet will be used for the purposes of inter-token skipping. Raises if an override has already been set for the named rule.
+    #   # expressions(s) #
     #
-    # The inter-token parslet is passed inside the "options" hash when invoking the "parse" methods. Any parser which fails will retry after giving this inter-token parslet a chance to consume and discard intervening whitespace.
-    # The initial, conservative implementation only performs this fallback skipping for ParsletSequence and ParsletRepetition combinations.
+    # Equivalent to the long form:
     #
-    # Raises if rule_or_parslet is nil.
-    def skipping(rule_or_parslet, parslet = NoParameterMarker.instance)
-      raise ArgumentError if rule_or_parslet.nil?
-      if parslet == NoParameterMarker.instance  # first mode of operation: set default parslet
-        raise if @skipping                      # should not set a default skipping parslet twice
-        @skipping = rule_or_parslet
-      else                                      # second mode of operation: override default case
-        raise ArgumentError if @skipping_overrides.has_key?(rule_or_parslet)
-        raise ArgumentError unless @rules.has_key?(rule_or_parslet)
-        @skipping_overrides[rule_or_parslet] = parslet
-      end
-    end
-    
-    # TODO: pretty print method?
-    
+    #   #silent expressions(s) #
+    #
+    # And similar to but more concise than the ERB syntax:
+    #
+    #   <% expressions(s) %>
+    #
+    # Note that the space between the opening hash character and the
+    # expression(s) is required in order for Walrus to distinguish the
+    # shorthand for the #silent directive from the other directives. That is,
+    # the following is not legal:
+    #
+    #   #expressions(s) #
+    #
+    rule            :silent_directive,                    '#silent'.skip & :ruby_expression_list & :directive_end | # long form
+                                                          '# '.skip & :ruby_expression_list & '#'.skip              # short form
+    production      :silent_directive, :expression
+
+    # Accept multiple expressions separated by a semi-colon.
+    rule            :ruby_expression_list,                :ruby_expression >> (';'.skip & :ruby_expression ).zero_or_more
+
+    # "The #slurp directive eats up the trailing newline on the line it
+    # appears in, joining the following line onto the current line."
+    # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.slurp.html
+    # The "slurp" directive must be the last thing on the line (not followed
+    # by a comment or directive end marker)
+    rule            :slurp_directive,                     '#slurp' & :whitespace.optional.skip & :newline.skip
+    production      :slurp_directive
+
+    rule            :super_directive,                     :super_with_parentheses | :super_without_parentheses
+    rule            :super_with_parentheses,              '#super'.skip & :parameter_list.optional & :directive_end
+    node            :super_with_parentheses, :super_directive
+    production      :super_with_parentheses, :params
+    rule            :super_without_parentheses,           '#super'.skip & :parameter_list_without_parentheses & :directive_end
+    node            :super_without_parentheses, :super_directive
+    production      :super_without_parentheses, :params
+
+    # The "def_parameter_list" is a special case of parameter list which
+    # disallows interpolated placeholders.
+    rule            :def_parameter_list,                  '('.skip & ( :def_parameter >> ( ','.skip & :def_parameter ).zero_or_more ).optional & ')'.skip
+    rule            :def_parameter,                       :assignment_expression | :identifier
+
+    rule            :parameter_list,                      '('.skip & ( :parameter >> ( ','.skip & :parameter ).zero_or_more ).optional & ')'.skip
+    rule            :parameter_list_without_parentheses,  :parameter >> ( ','.skip & :parameter ).zero_or_more
+    rule            :parameter,                           :placeholder | :ruby_expression
+
+    # placeholders may be in long form (${foo}) or short form ($foo)
+    rule            :placeholder,                         :long_placeholder | :short_placeholder
+
+    # No whitespace allowed between the "$" and the opening "{"
+    rule            :long_placeholder,                    '${'.skip & :placeholder_name & :placeholder_parameters.optional([]) & '}'.skip
+    node            :long_placeholder, :placeholder
+    production      :long_placeholder, :name, :params
+
+    # No whitespace allowed between the "$" and the placeholder_name
+    rule            :short_placeholder,                   /\$(?![ \r\n\t\v])/.skip & :placeholder_name & :placeholder_parameters.optional([])
+    node            :short_placeholder, :placeholder
+    production      :short_placeholder, :name, :params
+
+    rule            :placeholder_name,                    :identifier
+    rule            :placeholder_parameters,              '('.skip & (:placeholder_parameter >> (','.skip & :placeholder_parameter).zero_or_more).optional & ')'.skip
+    rule            :placeholder_parameter,               :placeholder | :ruby_expression
+
+    # simplified Ruby subset
+    rule            :ruby_expression,                     :assignment_expression | :addition_expression | :unary_expression
+
+    rule            :literal_expression,                  :string_literal     |
+                                                          :numeric_literal    |
+                                                          :array_literal      |
+                                                          :hash_literal       |
+                                                          :lvalue             |
+                                                          :symbol_literal
+    rule            :unary_expression,                    :message_expression | :literal_expression
+
+    rule            :lvalue,                              :class_variable | :instance_variable | :identifier | :constant
+
+    rule            :array_literal,                       '['.skip & ( :ruby_expression >> (','.skip & :ruby_expression ).zero_or_more ).optional & ']'.skip
+    node            :array_literal, :ruby_expression
+    production      :array_literal, :elements
+
+    rule            :hash_literal,                        '{'.skip & ( :hash_assignment >> (','.skip & :hash_assignment ).zero_or_more ).optional & '}'.skip
+    node            :hash_literal, :ruby_expression
+    production      :hash_literal, :pairs
+
+    rule            :hash_assignment,                     :unary_expression & '=>'.skip & (:addition_expression | :unary_expression)
+    node            :hash_assignment, :ruby_expression
+    production      :hash_assignment, :lvalue, :expression
+
+    rule            :assignment_expression,               :lvalue & '='.skip & (:addition_expression | :unary_expression)
+    production      :assignment_expression, :lvalue, :expression
+
+    # addition is left-associative (left-recursive)
+    rule            :addition_expression,                 :addition_expression & '+'.skip & :unary_expression |
+                                                          :unary_expression & '+'.skip & :unary_expression
+
+    node            :addition_expression, :ruby_expression
+    production      :addition_expression, :left, :right
+
+    # message expressions are left-associative (left-recursive)
+    rule            :message_expression,                  :message_expression & '.'.skip & :method_expression |
+                                                          :literal_expression & '.'.skip & :method_expression
+    production      :message_expression, :target, :message
+
+    rule            :method_expression,                   :method_with_parentheses | :method_without_parentheses
+    node            :method_expression, :ruby_expression
+
+    rule            :method_with_parentheses,             :identifier & :method_parameter_list.optional([])
+    node            :method_with_parentheses, :method_expression
+    production      :method_with_parentheses, :name, :params
+    rule            :method_without_parentheses,          :identifier & :method_parameter_list_without_parentheses
+    node            :method_without_parentheses, :method_expression
+    production      :method_without_parentheses, :method_expression, :name, :params
+
+    rule            :method_parameter_list,               '('.skip & ( :method_parameter >> ( ','.skip & :method_parameter ).zero_or_more ).optional & ')'.skip
+    rule            :method_parameter,                    :ruby_expression
+    rule            :method_parameter_list_without_parentheses, :method_parameter >> ( ','.skip & :method_parameter ).zero_or_more
+
+    rule            :class_variable,                      '@@'.skip & :identifier
+    skipping        :class_variable, nil
+    node            :class_variable, :ruby_expression
+    production      :class_variable
+
+    rule            :instance_variable,                   '@'.skip & :identifier
+    skipping        :instance_variable, nil
+    production      :instance_variable
+
+    # TODO: regexp literal expression
+
+    # Ruby + allowing placeholders for unary expressions
+    rule            :extended_ruby_expression,            :extended_unary_expression | :ruby_expression
+    rule            :extended_unary_expression,           :placeholder | :unary_expression
   end # class Grammar
 end # module Walrus
-
-
-
-

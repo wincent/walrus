@@ -12,10 +12,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-class String
-  # Returns a copy of the receiver with occurrences of \ replaced with \\, and
-  # occurrences of ' replaced with \'
-  def to_source_string
-    gsub(/[\\']/, '\\\\\&')
-  end
-end # class String
+require 'walrat'
+
+module Walrat
+  class StringResult < String
+    include Walrat::LocationTracking
+
+    def initialize string = ""
+      self.source_text = string
+      super
+    end
+  end # class StringResult
+end # module Walrat
