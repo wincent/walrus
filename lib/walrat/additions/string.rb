@@ -25,15 +25,26 @@ class String
     chars.to_a.length
   end
 
-  def jindex arg, offset = Walrat::NoParameterMarker.instance
-    if offset == Walrat::NoParameterMarker.instance
-      i = index arg
-    else
-      i = index arg, offset
+  # NOTE: this is a totally Walrat-specific implementation that is
+  # unlikely to be of use anywhere else. It is used in only 1 place
+  # in the codebase, and works around the fact that the MatchData
+  # made available by the index method gets clobbered by the
+  # "chars.to_a" call. The same thing happens for alternative
+  # methods of counting the chars, such as using jlength or a manual
+  # scan.
+  #
+  # One workaround is for the caller to re-perform the index call just
+  # to get the MatchData again, but that is inefficient. So here we
+  # just do the addition before returning the result to the caller.
+  def jindex_plus_length arg
+    if i = index(arg)
+      $~[0].length + unpack('C*')[0...i].pack('C*').chars.to_a.length
     end
-    i ? unpack('C*')[0...i].pack('C*').chars.to_a.length : nil
   end
 
+  # Unlike the normal rindex method, the MatchData in $~ set by the inner
+  # rindex call gets clobbered (by the "chars.to_a" call) and is not visible to
+  # the caller of this method.
   def jrindex arg, offset = Walrat::NoParameterMarker.instance
     if offset == Walrat::NoParameterMarker.instance
       i = rindex arg

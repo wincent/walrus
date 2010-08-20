@@ -172,13 +172,11 @@ module Walrat
 
       # calculate remainder
       line_delta              = @options[:line_end] - previous_line_end
-      if line_delta > 0                                               # have consumed newline(s)
-        line_delta.times do                                           # remove them from remainder
-          newline_location    = @remainder.jindex /\r\n|\r|\n/        # find the location of the next newline
-          @remainder.index /\r\n|\r|\n/
-          newline_location    += $~[0].length                         # add the actual characters used to indicate the newline
-          @scanned            << @remainder[0...newline_location]     # record scanned text
-          @remainder          = @remainder[newline_location..-1]      # strip everything up to and including the newline
+      if line_delta > 0                                                     # have consumed newline(s)
+        line_delta.times do                                                 # remove them from remainder
+          newline_location    = @remainder.jindex_plus_length /\r\n|\r|\n/  # find the location of the next newline
+          @scanned            << @remainder[0...newline_location]           # record scanned text
+          @remainder          = @remainder[newline_location..-1]            # strip everything up to and including the newline
         end
         @scanned              << @remainder[0...@options[:column_end]]
         @remainder            = @remainder[@options[:column_end]..-1] # delete up to the current column
