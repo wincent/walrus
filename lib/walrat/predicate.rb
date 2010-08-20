@@ -27,7 +27,7 @@ module Walrat
 
     # Raises if parseable is nil.
     def initialize parseable
-      raise ArgumentError if parseable.nil?
+      raise ArgumentError, 'nil parseable' if parseable.nil?
       @parseable = parseable
 
       # fixed offset to avoid collisions with @parseable objects

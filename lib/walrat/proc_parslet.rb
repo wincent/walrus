@@ -19,12 +19,12 @@ module Walrat
     attr_reader :hash
 
     def initialize proc
-      raise ArgumentError if proc.nil?
+      raise ArgumentError, 'nil proc' if proc.nil?
       self.expected_proc = proc
     end
 
     def parse string, options = {}
-      raise ArgumentError if string.nil?
+      raise ArgumentError, 'nil string' if string.nil?
       @expected_proc.call string, options
     end
 

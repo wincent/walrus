@@ -63,18 +63,4 @@ class String
   def to_class_name
     self.split('_').collect { |component| component.capitalize}.join
   end
-
-  # Converts the receiver of the form "foo_bar" to "FooBar". Specifically, the
-  # receiver is split into pieces delimited by underscores, each component is
-  # then converted to captial case (the first letter is capitalized and the
-  # remaining letters are lowercased) and finally the components are joined.
-  # Note that this method cannot recover information lost during a conversion
-  # using the to_require_name method; for example, "EOLToken", when converted
-  # to "eol_token", would be transformed back to "EolToken". Likewise,
-  # "Foo__bar" would be reduced to "foo__bar" and then in the reverse
-  # conversion would become "FooBar".
-  def to_class_name
-    self.split('_').collect { |component| component.capitalize}.join
-  end
-
 end # class String

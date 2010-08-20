@@ -21,7 +21,7 @@ module Walrat
     attr_reader :hash
 
     def initialize symbol
-      raise ArgumentError if symbol.nil?
+      raise ArgumentError, 'nil symbol' if symbol.nil?
       @symbol = symbol
 
       # fixed offset to avoid collisions with @parseable objects

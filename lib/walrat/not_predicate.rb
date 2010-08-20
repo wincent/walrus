@@ -17,7 +17,7 @@ require 'walrat'
 module Walrat
   class NotPredicate < Predicate
     def parse string, options = {}
-      raise ArgumentError if string.nil?
+      raise ArgumentError, 'nil string' if string.nil?
       catch :ZeroWidthParseSuccess do
         begin
           @parseable.memoizing_parse(string, options)

@@ -12,16 +12,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-require 'walrat'
+require File.expand_path('../spec_helper', File.dirname(__FILE__))
 
-module Walrat
-  class ContinuationWrapperException < Exception
-    attr_reader :continuation
+describe Walrat::NotPredicate do
+  it 'complains on trying to parse a nil string' do
+    expect do
+      Walrat::NotPredicate.new('irrelevant').parse nil
+    end.to raise_error(ArgumentError, /nil string/)
+  end
 
-    def initialize continuation
-      raise ArgumentError, 'nil continuation' if continuation.nil?
-      super self.class.to_s
-      @continuation = continuation
-    end
-  end # class ContinuationWrapperException
-end # module Walrat
+  it 'can be compared for equality' do
+    Walrat::NotPredicate.new('foo').
+      should eql(Walrat::NotPredicate.new('foo'))      # same
+    Walrat::NotPredicate.new('foo').
+      should_not eql(Walrat::NotPredicate.new('bar'))  # different
+    Walrat::NotPredicate.new('foo').
+      should_not eql(Walrat::Predicate.new('foo'))     # different class
+  end
+end

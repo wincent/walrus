@@ -31,7 +31,7 @@ module Walrat
 
     # Raises if data is nil.
     def initialize data
-      raise ArgumentError if data.nil?
+      raise ArgumentError, 'nil data' if data.nil?
       self.match_data = data
     end
 

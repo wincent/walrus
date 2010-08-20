@@ -40,3 +40,4 @@ module Walrus
 end # module Walrus
 
 require 'walrat/additions/string'
+require 'walrus/additions/string'

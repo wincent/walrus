@@ -431,41 +431,50 @@ module Walrus
     rule            :addition_expression,                 :addition_expression & '+'.skip & :unary_expression |
                                                           :unary_expression & '+'.skip & :unary_expression
 
-    node            :addition_expression, :ruby_expression
-    production      :addition_expression, :left, :right
+    node        :addition_expression, :ruby_expression
+    production  :addition_expression, :left, :right
 
     # message expressions are left-associative (left-recursive)
-    rule            :message_expression,                  :message_expression & '.'.skip & :method_expression |
-                                                          :literal_expression & '.'.skip & :method_expression
-    production      :message_expression, :target, :message
+    rule        :message_expression,
+                :message_expression & '.'.skip & :method_expression |
+                :literal_expression & '.'.skip & :method_expression
+    production  :message_expression, :target, :message
 
-    rule            :method_expression,                   :method_with_parentheses | :method_without_parentheses
-    node            :method_expression, :ruby_expression
+    rule        :method_expression,
+                :method_with_parentheses | :method_without_parentheses
+    node        :method_expression, :ruby_expression
 
-    rule            :method_with_parentheses,             :identifier & :method_parameter_list.optional([])
-    node            :method_with_parentheses, :method_expression
-    production      :method_with_parentheses, :name, :params
-    rule            :method_without_parentheses,          :identifier & :method_parameter_list_without_parentheses
-    node            :method_without_parentheses, :method_expression
-    production      :method_without_parentheses, :method_expression, :name, :params
+    rule        :method_with_parentheses,
+                :identifier & :method_parameter_list.optional([])
+    node        :method_with_parentheses, :method_expression
+    production  :method_with_parentheses, :name, :params
+    rule        :method_without_parentheses,
+                :identifier & :method_parameter_list_without_parentheses
+    node        :method_without_parentheses, :method_expression
+    production  :method_without_parentheses, :method_expression, :name, :params
 
-    rule            :method_parameter_list,               '('.skip & ( :method_parameter >> ( ','.skip & :method_parameter ).zero_or_more ).optional & ')'.skip
-    rule            :method_parameter,                    :ruby_expression
-    rule            :method_parameter_list_without_parentheses, :method_parameter >> ( ','.skip & :method_parameter ).zero_or_more
+    rule        :method_parameter_list,
+                '('.skip & ( :method_parameter >> ( ','.skip & :method_parameter ).zero_or_more ).optional & ')'.skip
+    rule        :method_parameter,
+                :ruby_expression
+    rule        :method_parameter_list_without_parentheses,
+                :method_parameter >> ( ','.skip & :method_parameter ).zero_or_more
 
-    rule            :class_variable,                      '@@'.skip & :identifier
-    skipping        :class_variable, nil
-    node            :class_variable, :ruby_expression
-    production      :class_variable
+    rule        :class_variable, '@@'.skip & :identifier
+    skipping    :class_variable, nil
+    node        :class_variable, :ruby_expression
+    production  :class_variable
 
-    rule            :instance_variable,                   '@'.skip & :identifier
-    skipping        :instance_variable, nil
-    production      :instance_variable
+    rule        :instance_variable, '@'.skip & :identifier
+    skipping    :instance_variable, nil
+    production  :instance_variable
 
     # TODO: regexp literal expression
 
     # Ruby + allowing placeholders for unary expressions
-    rule            :extended_ruby_expression,            :extended_unary_expression | :ruby_expression
-    rule            :extended_unary_expression,           :placeholder | :unary_expression
+    rule        :extended_ruby_expression,
+                :extended_unary_expression | :ruby_expression
+    rule        :extended_unary_expression,
+                :placeholder | :unary_expression
   end # class Grammar
 end # module Walrus

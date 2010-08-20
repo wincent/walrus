@@ -12,16 +12,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-require 'walrat'
+require File.expand_path('../spec_helper', File.dirname(__FILE__))
 
-module Walrat
-  class ContinuationWrapperException < Exception
-    attr_reader :continuation
-
-    def initialize continuation
-      raise ArgumentError, 'nil continuation' if continuation.nil?
-      super self.class.to_s
-      @continuation = continuation
-    end
-  end # class ContinuationWrapperException
-end # module Walrat
+describe 'creating a continuation wrapper exception' do
+  it 'complains if initialized with nil' do
+    expect do
+      Walrat::ContinuationWrapperException.new nil
+    end.to raise_error(ArgumentError, /nil continuation/)
+  end
+end

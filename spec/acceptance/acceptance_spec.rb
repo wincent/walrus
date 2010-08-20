@@ -1,4 +1,4 @@
-# Copyright 2007 Wincent Colaiuta
+# Copyright 2007-2010 Wincent Colaiuta
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -12,13 +12,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
-require 'walrus/parser' # ensure that WalrusGrammar is defined before continuing
+require File.expand_path('../spec_helper', File.dirname(__FILE__))
 require 'mkdtemp'
 
-# This spec performs high-level acceptance testing by running Walrus on the sample templates in the subdirectories of the "spec/acceptance/" directory and comparing them with the expected output.
+# This spec performs high-level acceptance testing by running Walrus on the
+# sample templates in the subdirectories of the "spec/acceptance/" directory
+# and comparing them with the expected output.
 describe 'processing test files with Walrus' do
-  # construct an array of absolute paths indicating the location of all testable templates.
+  # construct an array of absolute paths indicating the location of all
+  # testable templates.
   template_paths = Dir[File.join(File.dirname(__FILE__), '**/*.tmpl')].collect { |template| Pathname.new(template).realpath }
 
   # make temporary output dirs for storing compiled templates

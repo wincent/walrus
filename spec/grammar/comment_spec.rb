@@ -12,16 +12,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-require 'walrat'
+require File.expand_path('../spec_helper', File.dirname(__FILE__))
 
-module Walrat
-  class ContinuationWrapperException < Exception
-    attr_reader :continuation
-
-    def initialize continuation
-      raise ArgumentError, 'nil continuation' if continuation.nil?
-      super self.class.to_s
-      @continuation = continuation
+describe Walrus::Grammar::Comment do
+  context 'compiled' do
+    it 'produces no meaningful output' do
+      eval(Walrus::Grammar::Comment.new(' hello world').compile).should == nil
     end
-  end # class ContinuationWrapperException
-end # module Walrat
+  end
+
+  context 'in a document' do
+    before do
+      @parser = Walrus::Parser.new
+    end
+
+    it 'produces no output' do
+      eval @parser.compile('## hello world', :class_name => :CommentSpec)
+      Walrus::Grammar::CommentSpec.new.fill.should == ''
+    end
+  end
+end

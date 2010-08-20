@@ -19,12 +19,12 @@ module Walrat
     attr_reader :hash
 
     def initialize regexp
-      raise ArgumentError if regexp.nil?
+      raise ArgumentError, 'nil regexp' if regexp.nil?
       self.expected_regexp = /\A#{regexp}/ # for efficiency, anchor all regexps
     end
 
     def parse string, options = {}
-      raise ArgumentError if string.nil?
+      raise ArgumentError, 'nil string' if string.nil?
       if string =~ @expected_regexp
         wrapper = MatchDataWrapper.new $~
         match   = $~[0]

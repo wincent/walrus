@@ -96,7 +96,7 @@ module Walrat
       #
       # Raises if rule_or_parslet is nil.
       def skipping rule_or_parslet, parslet = NoParameterMarker.instance
-        raise ArgumentError if rule_or_parslet.nil?
+        raise ArgumentError, 'nil rule_or_parslet' if rule_or_parslet.nil?
         if parslet == NoParameterMarker.instance
           # first mode of operation: set default parslet
           raise 'default skipping parslet already set' if @skipping

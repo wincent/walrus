@@ -20,7 +20,7 @@ module Walrat
 
     # Raises an ArgumentError if parseable is nil.
     def initialize parseable
-      raise ArgumentError if parseable.nil?
+      raise ArgumentError, 'nil parseable' if parseable.nil?
       @parseable = parseable
 
       # fixed offset to avoid unwanted collisions with similar classes
@@ -28,7 +28,7 @@ module Walrat
     end
 
     def parse string, options = {}
-      raise ArgumentError if string.nil?
+      raise ArgumentError, 'nil string' if string.nil?
       substring = StringResult.new
       substring.start = [options[:line_start], options[:column_start]]
       substring.end   = [options[:line_start], options[:column_start]]

@@ -25,7 +25,7 @@ module Walrat
 
     # Raises an ArgumentError if string is nil.
     def initialize string, options = {}
-      raise ArgumentError if string.nil?
+      raise ArgumentError, 'nil string' if string.nil?
       self.base_string        = string
       @results                = ArrayResult.new # for accumulating results
       @remainder              = @base_string.clone

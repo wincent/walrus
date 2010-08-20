@@ -24,7 +24,7 @@ module Walrat
     attr_reader :last
 
     def initialize string
-      raise ArgumentError if string.nil?
+      raise ArgumentError, 'nil string' if string.nil?
       @scanner  = StringScanner.new string
       @current  = nil
       @last     = nil

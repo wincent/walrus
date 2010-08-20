@@ -12,16 +12,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-require 'walrat'
+require File.expand_path('../spec_helper', File.dirname(__FILE__))
 
-module Walrat
-  class ContinuationWrapperException < Exception
-    attr_reader :continuation
-
-    def initialize continuation
-      raise ArgumentError, 'nil continuation' if continuation.nil?
-      super self.class.to_s
-      @continuation = continuation
+describe Walrus::Grammar::SilentDirective do
+  context 'in a document' do
+    before do
+      @parser = Walrus::Parser.new
     end
-  end # class ContinuationWrapperException
-end # module Walrat
+
+    it 'produces no output' do
+      eval @parser.compile "#silent 'foo'",
+        :class_name => :SilentDirectiveSpecAlpha
+      Walrus::Grammar::SilentDirectiveSpecAlpha.new.fill.should == ''
+    end
+  end
+end

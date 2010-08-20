@@ -20,15 +20,15 @@ module Walrat
 
     # Raises an ArgumentError if parseable or min is nil.
     def initialize parseable, min, max = nil
-      raise ArgumentError if parseable.nil?
-      raise ArgumentError if min.nil?
+      raise ArgumentError, 'nil parseable' if parseable.nil?
+      raise ArgumentError, 'nil min' if min.nil?
       @parseable = parseable
       self.min = min
       self.max = max
     end
 
     def parse string, options = {}
-      raise ArgumentError if string.nil?
+      raise ArgumentError, 'nil string' if string.nil?
       state = ParserState.new string, options
       catch :ZeroWidthParseSuccess do             # a zero-width match is grounds for immediate abort
         while @max.nil? or state.length < @max    # try forever if max is nil; otherwise keep trying while match count < max

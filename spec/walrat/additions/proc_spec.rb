@@ -12,16 +12,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-require 'walrat'
+require File.expand_path('../../spec_helper', File.dirname(__FILE__))
 
-module Walrat
-  class ContinuationWrapperException < Exception
-    attr_reader :continuation
-
-    def initialize continuation
-      raise ArgumentError, 'nil continuation' if continuation.nil?
-      super self.class.to_s
-      @continuation = continuation
-    end
-  end # class ContinuationWrapperException
-end # module Walrat
+describe 'proc additions' do
+  it 'responds to "to_parseable", "parse" and "memoizing_parse"' do
+    proc = lambda { |string, options| 'foo' }.to_parseable
+    proc.parse('bar').should == 'foo'
+    proc.memoizing_parse('bar').should == 'foo'
+  end
+end
