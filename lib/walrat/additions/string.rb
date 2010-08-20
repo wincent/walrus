@@ -14,26 +14,40 @@
 
 require 'walrat'
 
-# multibyte-friendly implementations of String#index and String#rindex
-require 'jindex'
-
 # Additions to String class for Unicode support.
 # Parslet combining methods.
 # Convenience methods (to_parseable).
 # Conversion utility methods.
 class String
-  # Returns an array of Unicode characters.
-  def chars
-    scan /./m
+  alias old_range []
+
+  def jlength
+    chars.to_a.length
   end
 
-  alias old_range []
+  def jindex arg, offset = Walrat::NoParameterMarker.instance
+    if offset == Walrat::NoParameterMarker.instance
+      i = index arg
+    else
+      i = index arg, offset
+    end
+    i ? unpack('C*')[0...i].pack('C*').chars.to_a.length : nil
+  end
+
+  def jrindex arg, offset = Walrat::NoParameterMarker.instance
+    if offset == Walrat::NoParameterMarker.instance
+      i = rindex arg
+    else
+      i = rindex arg, offset
+    end
+    i ? unpack('C*')[0...i].pack('C*').chars.to_a.length : nil
+  end
 
   # multi-byte friendly [] implementation
   def [](range, other = Walrat::NoParameterMarker.instance)
     if other == Walrat::NoParameterMarker.instance
       if range.kind_of? Range
-        chars[range].join
+        chars.to_a[range].join
       else
         old_range range
       end

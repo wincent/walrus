@@ -60,7 +60,7 @@ describe 'working with Unicode strings' do
   end
 
   it 'the "chars" method should work with multibyte characters' do
-    @string.chars.should == ['U', 'n', 'i', 'c', 'o', 'd', 'e', ' ', '€', '!']
+    @string.chars.to_a.should == ['U', 'n', 'i', 'c', 'o', 'd', 'e', ' ', '€', '!']
   end
 
   it 'should be able to use "enumerator" convenience method to get a string enumerator' do

@@ -12,24 +12,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-begin
-  require 'jcode'   # jlength method
-rescue LoadError
-  class String
-    def jlength
-      self.gsub(/[^\Wa-zA-Z_\d]/, ' ').length
-    end
-  end
-end
-
-require 'continuation' unless Kernel.respond_to?(:callcc)
+require 'walrat'
 
 module Walrus
-  major, minor = RUBY_VERSION.split '.'
-  if major == '1' and minor == '8'
-    $KCODE  = 'U' # UTF-8 (necessary for Unicode support)
-  end
-
   autoload :CompileError, 'walrus/compile_error'
   autoload :Compiler,     'walrus/compiler'
   autoload :COPYRIGHT,    'walrus/version'
@@ -39,5 +24,4 @@ module Walrus
   autoload :VERSION,      'walrus/version'
 end # module Walrus
 
-require 'walrat/additions/string'
 require 'walrus/additions/string'

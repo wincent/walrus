@@ -16,12 +16,11 @@ Gem::Specification.new do |s|
     integrated lexer, "packrat" parser, and Abstract Syntax Tree (AST)
     builder.
   ENDDESC
-  s.require_paths     = ['lib', 'ext']
+  s.require_paths     = ['lib']
   s.has_rdoc          = true
 
   # TODO: add 'docs' subdirectory, 'README.txt' when they're done
-  s.files             = Dir['bin/walrus', 'lib/**/*.rb', 'ext/*.{c,rb}']
-  s.extensions        = ['ext/extconf.rb']
+  s.files             = Dir['bin/walrus', 'lib/**/*.rb']
   s.executables       = ['walrus']
   s.add_runtime_dependency('wopen3', '>= 0.1')
   s.add_development_dependency('mkdtemp', '>= 1.0')

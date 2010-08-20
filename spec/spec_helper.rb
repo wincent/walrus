@@ -22,16 +22,13 @@ module Walrus
     # already present
     base    = File.expand_path '..', File.dirname(__FILE__)
     LIBDIR  = Pathname.new(File.join base, 'lib').realpath
-    EXTDIR  = Pathname.new(File.join base, 'ext').realpath
     TOOL    = Pathname.new(File.join base, 'bin', 'walrus').realpath
 
     # normalize all paths in the load path
     normalized = $:.collect { |path| Pathname.new(path).realpath rescue path }
 
-    # only add the directories if they do not appear to be present already
-    [LIBDIR, EXTDIR].each do |path|
-      $:.push(path) unless normalized.include?(path)
-    end
+    # only add the directory if it does not appear to be present already
+      $:.push(LIBDIR) unless normalized.include?(LIBDIR)
   end # module SpecHelper
 end # module Walrus
 

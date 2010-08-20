@@ -27,7 +27,7 @@ describe 'processing test files with Walrus' do
   manually_compiled_templates = Pathname.new(Dir.mkdtemp('/tmp/walrus.acceptance.XXXXXX'))
   walrus_compiled_templates   = Pathname.new(Dir.mkdtemp('/tmp/walrus.acceptance.XXXXXX'))
   parser                      = Walrus::Parser.new
-  search_additions            = "#{ENV['RUBYLIB']}:#{Walrus::SpecHelper::LIBDIR}:#{Walrus::SpecHelper::EXTDIR}"
+  search_additions            = "#{ENV['RUBYLIB']}:#{Walrus::SpecHelper::LIBDIR}"
 
   template_paths.each do |path|
     template        = Walrus::Template.new(path)
@@ -47,7 +47,7 @@ describe 'processing test files with Walrus' do
     it "actual output should match expected output running compiled file in subshell (source file: #{path})" do
       target_path = manually_compiled_templates.join(path.basename(path.extname).to_s + '.rb')
       File.open(target_path, 'w+') { |file| file.puts compiled }
-      actual_output = `ruby -I#{Walrus::SpecHelper::LIBDIR} -I#{Walrus::SpecHelper::EXTDIR} #{target_path}`
+      actual_output = `ruby -I#{Walrus::SpecHelper::LIBDIR} #{target_path}`
       actual_output.should == expected_output
     end
 
@@ -68,7 +68,7 @@ describe 'processing multiple-interdependent files with Walrus' do
   output_dir      = Pathname.new(Dir.mkdtemp('/tmp/walrus.acceptance.XXXXXX'))
   parser          = Walrus::Parser.new
 
-  search_additions  = "#{ENV['RUBYLIB']}:#{Walrus::SpecHelper::LIBDIR}:#{Walrus::SpecHelper::EXTDIR}"
+  search_additions  = "#{ENV['RUBYLIB']}:#{Walrus::SpecHelper::LIBDIR}"
 
   template_paths.each do |path|
     it 'should be able to compile all the templates' do
