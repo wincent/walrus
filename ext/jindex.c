@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /*
 
 Common code used by almost identical "jindex" and "jrindex" methods. A C
-extension is necessary here because with direct access to the rb_backref_get
+extension is necessary here because without direct access to the rb_backref_get
 and rb_backref_set API there is no way to propagate $~ back to the caller after
 invoking the "index" and "rindex" methods. The code is basically equivalent to
 the following Ruby code:
