@@ -36,7 +36,7 @@ module Walrus
     normalized = $:.map { |path| Pathname.new(path).realpath rescue path }
 
     # only add the directory if it does not appear to be present already
-      $:.push(LIBDIR) unless normalized.include?(LIBDIR)
+    $:.unshift(LIBDIR) unless normalized.include?(LIBDIR)
   end # module SpecHelper
 end # module Walrus
 
