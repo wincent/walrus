@@ -31,13 +31,10 @@ Gem::Specification.new do |s|
   s.rubyforge_project = 'walrus'
   s.platform          = Gem::Platform::RUBY
   s.summary           = 'Object-oriented templating system'
-  s.description       = <<-ENDDESC
+  s.description       = <<-DESC
     Walrus is an object-oriented templating system inspired by and similar
-    to the Cheetah Python-powered template engine. It includes a Parser
-    Expression Grammar (PEG) parser generator capable of generating an
-    integrated lexer, "packrat" parser, and Abstract Syntax Tree (AST)
-    builder.
-  ENDDESC
+    to the Cheetah Python-powered template engine.
+  DESC
   s.require_paths     = ['lib']
   s.has_rdoc          = true
 
