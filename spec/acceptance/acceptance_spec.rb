@@ -29,7 +29,7 @@ require 'mkdtemp'
 describe 'processing test files with Walrus' do
   # construct an array of absolute paths indicating the location of all
   # testable templates.
-  template_paths = Dir[File.join(File.dirname(__FILE__), '**/*.tmpl')].collect { |template| Pathname.new(template).realpath }
+  template_paths = Dir[File.join(File.dirname(__FILE__), '**/*.tmpl')].map { |template| Pathname.new(template).realpath }
 
   # make temporary output dirs for storing compiled templates
   manually_compiled_templates = Pathname.new(Dir.mkdtemp('/tmp/walrus.acceptance.XXXXXX'))
@@ -72,7 +72,7 @@ end
 
 # These templates have a different extension to keep them separate from the other acceptance tests.
 describe 'processing multiple-interdependent files with Walrus' do
-  template_paths  = Dir[File.join(File.dirname(__FILE__), '**/*.complex')].collect { |template| Pathname.new(template).realpath }
+  template_paths  = Dir[File.join(File.dirname(__FILE__), '**/*.complex')].map { |template| Pathname.new(template).realpath }
   output_dir      = Pathname.new(Dir.mkdtemp('/tmp/walrus.acceptance.XXXXXX'))
   parser          = Walrus::Parser.new
 

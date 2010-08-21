@@ -34,7 +34,7 @@ module Walrus
         else
           # this will work for the simple case where params are plain identifiers
           params = (@params.kind_of? Array) ? @params : [@params]
-          param_list  = params.collect { |param| param.compile }.join(', ')
+          param_list  = params.map { |param| param.compile }.join(', ')
           external = "def #{@identifier.to_s}(#{param_list})\n"
         end
 

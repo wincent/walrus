@@ -33,7 +33,7 @@ module Walrus
     TOOL    = Pathname.new(File.join base, 'bin', 'walrus').realpath
 
     # normalize all paths in the load path
-    normalized = $:.collect { |path| Pathname.new(path).realpath rescue path }
+    normalized = $:.map { |path| Pathname.new(path).realpath rescue path }
 
     # only add the directory if it does not appear to be present already
       $:.push(LIBDIR) unless normalized.include?(LIBDIR)

@@ -38,7 +38,7 @@ module Walrus
           options = options.clone
           options[:nest_placeholders] = true
           params      = (@params.kind_of? Array) ? @params : [@params]
-          param_list  = params.collect { |param| param.compile(options) }.join(', ').chomp
+          param_list  = params.map { |param| param.compile(options) }.join(', ').chomp
           "#{method_name}(#{@name.to_s.to_sym.inspect}, #{param_list})\n"
         end
       end
