@@ -41,8 +41,9 @@ Gem::Specification.new do |s|
   # TODO: add 'docs' subdirectory, 'README.txt' when they're done
   s.files             = Dir['bin/walrus', 'lib/**/*.rb']
   s.executables       = ['walrus']
-  s.add_runtime_dependency('walrat')
-  s.add_runtime_dependency('wopen3', '>= 0.1')
-  s.add_development_dependency('mkdtemp', '>= 1.0')
-  s.add_development_dependency('rspec', '1.3.0')
+  s.add_runtime_dependency 'walrat'
+  s.add_runtime_dependency 'wopen3', '>= 0.1'
+  s.add_development_dependency 'mkdtemp', '>= 1.0'
+  s.add_development_dependency 'rspec', '1.3.0'
+  s.add_development_dependency 'yard'
 end
