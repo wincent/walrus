@@ -26,7 +26,7 @@ require 'spec'
 
 module Walrus
   module SpecHelper
-    # will append the local "lib" and "ext" directories to search path if not
+    # will append the local "lib" directory to search path if not
     # already present
     base    = File.expand_path '..', File.dirname(__FILE__)
     LIBDIR  = Pathname.new(File.join base, 'lib').realpath
