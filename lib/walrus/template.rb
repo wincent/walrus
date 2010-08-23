@@ -38,7 +38,7 @@ module Walrus
         @base_text  = input.read
         @origin     = input.to_s
       else
-        @base_text  = input.to_s.clone
+        @base_text  = input.to_s
       end
     end
 
