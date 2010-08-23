@@ -30,18 +30,17 @@ module Walrus
   begin
     require 'walrus/runner'
   rescue LoadError => e
-    $stderr.puts <<-HERE
-:: error: load error (#{e.to_s})
+    $stderr.puts <<-ERROR.gsub(/ {6}/, '')
+      :: error: load error (#{e})
 
-If you are trying to run Walrus but have not yet installed it, it may be that
-Ruby cannot find the Walrus files. You can help Ruby to find the Walrus "lib"
-directory by adding it to the RUBYLIB environment variable. For example, you
-could do the following if you are using the Bash shell, substituting the
-absolute path for "lib":
+      If you are trying to run Walrus but have not yet installed it, it may be
+      that Ruby cannot find the Walrus files. You can help Ruby to find the
+      Walrus "lib" directory by adding it to the RUBYLIB environment variable.
+      For example, you could do the following if you are using the Bash shell,
+      substituting the absolute path for "lib":
 
-  export RUBYLIB="${RUBYLIB}:lib"
-
-    HERE
+        export RUBYLIB="${RUBYLIB}:lib"
+    ERROR
     exit EXIT_LOAD_ERROR
   end
 
