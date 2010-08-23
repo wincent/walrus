@@ -56,10 +56,10 @@ module Walrus
       "For usage information type: #{$0} --help"
     exit EXIT_ARGUMENT_ERROR
   rescue Runner::Error => e
-    $stderr.puts ":: error: #{e.to_s}"
+    $stderr.puts ":: error: #{e}"
     exit EXIT_OTHER_ERROR
   rescue Exception => e
-    $stderr.puts ":: error: #{e.to_s}"
+    $stderr.puts ":: error: #{e}"
     exit EXIT_UNKNOWN_ERROR
   end
 end # module Walrus
