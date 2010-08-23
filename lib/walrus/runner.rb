@@ -44,7 +44,6 @@ module Walrus
       @options.recurse            = true
       @options.backup             = true
       @options.force              = false
-      @options.debug              = false
       @options.halt               = false
       @options.dry                = false
       @options.verbose            = false
@@ -105,10 +104,6 @@ module Walrus
 
         o.on('-t', '--test', 'Performs a "dry" (test) run', 'default: off') do |opt|
           @options.dry = opt
-        end
-
-        o.on('-d', '--debug', 'Print debugging information to standard error', 'default: off') do |opt|
-          @options.debug = opt
         end
 
         o.on('-v', '--verbose', 'Run verbosely', 'default: off') do |opt|
