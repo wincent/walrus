@@ -180,6 +180,8 @@ module Walrus
       log "Processing complete: #{Time.new.to_s}."
     end
 
+  private
+
     # Expects an array of Pathname objects.
     # Directory inputs are themselves recursively expanded if the "recurse" option is set to true; otherwise only their top-level entries are expanded.
     # Returns an expanded array of Pathname objects.
