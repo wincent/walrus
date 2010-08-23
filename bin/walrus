@@ -22,7 +22,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 module Walrus
-
   EXIT_LOAD_ERROR     = 1
   EXIT_ARGUMENT_ERROR = 2
   EXIT_OTHER_ERROR    = 3
@@ -54,7 +53,8 @@ absolute path for "lib":
     $stderr.puts ':: aborting: interrupt'
     exit EXIT_OTHER_ERROR
   rescue Runner::ArgumentError => e
-    $stderr.puts ":: error: #{e.to_s}", "For usage information type: #{$0} --help"
+    $stderr.puts ":: error: #{e}",
+      "For usage information type: #{$0} --help"
     exit EXIT_ARGUMENT_ERROR
   rescue Runner::Error => e
     $stderr.puts ":: error: #{e.to_s}"
