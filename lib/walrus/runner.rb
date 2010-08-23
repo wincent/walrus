@@ -353,7 +353,8 @@ module Walrus
       end
     end
 
-    # If the user supplied the "--halt" switch raises an Runner::Error exception based on "message".
+    # If the user supplied the "--halt" switch raises a Runner::Error exception
+    # based on "message".
     # Otherwise merely prints "message" to the standard error.
     def handle_error(message)
       if @options.halt
