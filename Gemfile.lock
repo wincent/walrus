@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    walrus (0.2.0.99)
+    walrus (0.4)
       walrat
       wopen3 (>= 0.1)
 
