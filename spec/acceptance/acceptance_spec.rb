@@ -63,7 +63,7 @@ describe 'processing test files with Walrus' do
       `env RUBYLIB='#{search_additions}' #{Walrus::SpecHelper::TOOL} fill --output-dir '#{walrus_compiled_templates}' '#{path}'`
       dir, base = path.split
       dir   = dir.to_s.sub(/\A\//, '') if dir.absolute? # and always will be absolute
-      base  = base.basename(base.extname).to_s + '.html'
+      base  = base.basename(base.extname).to_s
       actual_output = IO.read(walrus_compiled_templates + dir + base)
       actual_output.should == expected_output
     end
@@ -89,7 +89,7 @@ describe 'processing multiple-interdependent files with Walrus' do
       `env RUBYLIB='#{search_additions}' #{Walrus::SpecHelper::TOOL} fill --input-extension complex --output-dir '#{output_dir}' '#{path}'`
       dir, base = path.split
       dir   = dir.to_s.sub(/\A\//, '') if dir.absolute? # and always will be absolute
-      base  = base.basename(base.extname).to_s + '.html'
+      base  = base.basename(base.extname).to_s
       actual_output   = IO.read(output_dir + dir + base)
       expected_output = IO.read(path.to_s.sub(/\.complex\z/i, ".expected"))
       actual_output.should == expected_output

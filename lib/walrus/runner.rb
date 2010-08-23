@@ -40,7 +40,7 @@ module Walrus
       @options = OpenStruct.new
       @options.output_dir         = nil
       @options.input_extension    = 'tmpl'
-      @options.output_extension   = 'html'
+      @options.output_extension   = ''
       @options.recurse            = true
       @options.backup             = true
       @options.force              = false
@@ -83,7 +83,7 @@ module Walrus
           @options.input_extension = opt
         end
 
-        o.on('-e', '--output-extension EXT', 'Extension for output file(s) (when filling)', 'default: html') do |opt|
+        o.on('-e', '--output-extension EXT', 'Extension for output file(s) (when filling)', 'default: none') do |opt|
           @options.output_extension = opt
         end
 
