@@ -41,10 +41,10 @@ module Walrus
           info.class_name = base.to_s.to_class_name
           if dir.to_s == '.'
             # desired template is in the same directory
-            info.require_line = "require File.join(File.dirname(__FILE__), '#{base.to_s}').to_s"
+            info.require_line = "require File.expand_path('#{base}', File.dirname(__FILE__))"
           else
             # desired template is in a relative directory
-            info.require_line = "require File.join(File.dirname(__FILE__), '#{dir.to_s}', '#{base.to_s}').to_s"
+            info.require_line = "require File.expand_path('#{dir}/#{base}', File.dirname(__FILE__))"
           end
         end
         info

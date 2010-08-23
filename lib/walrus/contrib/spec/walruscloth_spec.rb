@@ -22,7 +22,7 @@
 
 require 'rubygems'
 require 'spec'
-require File.join(File.dirname(__FILE__), '..', 'walruscloth')
+require File.expand_path('../walruscloth', File.dirname(__FILE__))
 
 describe 'using WalrusCloth' do
   it 'should be able to create an unordered list' do
