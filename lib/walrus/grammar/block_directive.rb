@@ -20,7 +20,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-require 'walrus/grammar/def_directive.rb'
+require 'walrus/grammar/def_directive'
 
 module Walrus
   class Grammar

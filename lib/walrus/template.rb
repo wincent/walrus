@@ -21,7 +21,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 require 'walrus'
-require 'walrat/additions/string.rb'
+require 'walrat/additions/string'
 
 module Walrus
   class Template

@@ -20,7 +20,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-require 'walrus/grammar/comment.rb'
+require 'walrus/grammar/comment'
 
 module Walrus
   class Grammar

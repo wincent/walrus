@@ -20,7 +20,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-require File.expand_path('lib/walrus/version.rb', File.dirname(__FILE__))
+require File.expand_path('lib/walrus/version', File.dirname(__FILE__))
 
 Gem::Specification.new do |s|
   s.name              = 'walrus'

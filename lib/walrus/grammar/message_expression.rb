@@ -20,7 +20,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-require 'walrus/grammar/ruby_expression.rb'
+require 'walrus/grammar/ruby_expression'
 
 module Walrus
   class Grammar

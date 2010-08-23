@@ -20,8 +20,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-require 'walrus/grammar.rb'
-require 'walrat/additions/string.rb'
+require 'walrus/grammar'
+require 'walrat/additions/string'
 require 'ostruct'
 
 module Walrus
