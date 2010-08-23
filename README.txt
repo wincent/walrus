@@ -1,1 +1,64 @@
-See the "docs" subdirectory for full documentation.
+Walrus is an object-oriented templating system written in Ruby. Plain text
+templates are compiled down to Ruby code; final output is produced by executing
+("filling") the compiled templates. A "walrus" command line tool is included to
+make compiling and filling templates easy.
+
+Walrus was inspired by the Cheetah template engine (which is written in
+Python). It doesn't set out to be a full clone of Cheetah, but it does
+implement a very large subset of its functionality, and it employs the same
+directive syntax wherever possible.
+
+
+= Installation =
+
+  sudo gem install walrus
+
+
+= Website =
+
+  https://wincent.com/products/walrus
+
+
+= Source code =
+
+  http://git.wincent.com/Walrus.git
+
+
+= Donations =
+
+Walrus is free, open source software released under the BSD license. If you
+find it useful and would like to support further development you can make a
+donation via PayPal to win@wincent.com:
+
+  https://wincent.com/products/walrus/donations
+
+
+= Author =
+
+Walrus was written by Wincent Colaiuta <win@wincent.com>.
+
+
+= License =
+
+Copyright 2007-2010 Wincent Colaiuta. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
