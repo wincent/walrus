@@ -21,6 +21,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 module Walrus
-  VERSION   = '0.4'
+  VERSION   = '0.4.0.99'
   COPYRIGHT = 'Copyright 2007-2010 Wincent Colaiuta'
 end # module Walrus
