@@ -36,11 +36,11 @@ module Walrus
 
 If you are trying to run Walrus but have not yet installed it, it may be that
 Ruby cannot find the Walrus files. You can help Ruby to find the Walrus "lib"
-and "ext" directories by adding them to the RUBYLIB environment variable. For
-example, you could do the following if you are using the Bash shell,
-substituting absolute paths for "lib" and "ext":
+directory by adding it to the RUBYLIB environment variable. For example, you
+could do the following if you are using the Bash shell, substituting the
+absolute path for "lib":
 
-  export RUBYLIB="${RUBYLIB}:lib:ext"
+  export RUBYLIB="${RUBYLIB}:lib"
 
     HERE
     exit EXIT_LOAD_ERROR
