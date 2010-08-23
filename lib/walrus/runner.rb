@@ -41,7 +41,7 @@ module Walrus
       @options.output_dir         = nil
       @options.input_extension    = 'tmpl'
       @options.output_extension   = 'html'
-      @options.recurse            = false
+      @options.recurse            = true
       @options.backup             = true
       @options.force              = false
       @options.debug              = false
