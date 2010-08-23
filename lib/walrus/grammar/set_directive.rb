@@ -26,7 +26,7 @@ module Walrus
   class Grammar
     class SetDirective < Directive
       def compile options = {}
-        "set_value(%s, instance_eval { %s }) # Set directive \n" %
+        "set_value(%s, instance_eval { %s }) # Set directive\n" %
           [ @placeholder.to_s.dump, @expression.compile ]
       end
     end # class SetDirective
