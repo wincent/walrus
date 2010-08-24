@@ -240,21 +240,13 @@ module Walrus
       if @options.dry
         "(no output: dry run)\n"
       else
-        # use Wopen3 (backticks choke if there is a space in the path, open3 throws away the exit status)
-        output = ''
-        Wopen3.popen3([compiled_source_path_for_input(input).realpath, '']) do |stdin, stdout, stderr|
-          threads = []
-          threads << Thread.new(stdout) do |out|
-            out.each { |line| output << line }
-          end
-          threads << Thread.new(stderr) do |err|
-            err.each { |line| STDERR.puts line }
-          end
-          threads.each { |thread| thread.join }
-        end
-        status = $?.exitstatus
-        raise SystemCallError.new("non-zero exit status (#{status})") if status != 0
-        output
+        # use Wopen3 (backticks choke if there is a space in the path, open3
+        # throws away the exit status)
+        # TODO: replace this with something that works under JRuby (JRuby
+        # doesn't support fork)
+        result = Wopen3.system compiled_source_path_for_input(input).realpath
+        raise "non-zero exit status (#{result.status})" unless result.success?
+        result.stdout
       end
     end
 
