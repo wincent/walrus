@@ -29,6 +29,111 @@ require 'rubygems'
 require 'wopen3'
 
 module Walrus
+  # The {Walrus::Runner} class is instantiated from the +walrus+ executable
+  # tool. It processes command-line arguments and then compiles, fills and
+  # runs Walrus templates accordingly.
+  #
+  # = Overview
+  #
+  # The +walrus+ executable requires a command (one of +compile+, +fill+ or
+  # +run+), zero or more option switches (described below), and a list of
+  # one or more input files/directories:
+  #
+  #    !!!sh
+  #    walrus command [options] input-file-or-directory...
+  #
+  # = Commands
+  #
+  # - +compile+: compile a Walrus source template into Ruby code
+  # - +fill+: execute a compiled template, writing the output to a file
+  # - +run+: execute a compiled template, printing the output to standard
+  #   output
+  #
+  # == The +compile+ command
+  #
+  # == The +fill+ command
+  #
+  # == The +run+ command
+  #
+  # = Options
+  #
+  # == +-o+/+--output-dir DIR+
+  #
+  # Output directory (when filling).
+  #
+  # Defaults to same directory as input template.
+  #
+  # When compiling, this setting has no effect, because compiled templates
+  # always reside in the same directory as the corresponding source
+  # templates.
+  #
+  # == +-i+/+--input-extension EXT+
+  #
+  # Extension for input file(s).
+  #
+  # Defaults to +tmpl+.
+  #
+  # == +-e+/+--output-extension EXT+
+  #
+  # Extension for output file(s) (when filling)
+  #
+  # Defaults to no extension.
+  #
+  # == +-R+
+  #
+  # Search subdirectories recursively for input files. If a directory is
+  # supplied as one of the inputs then any subdirectories contained within
+  # it will be recursively explored for templates.
+  #
+  # Defaults to on.
+  #
+  # When off, if a directory is specified then only templates in its top
+  # level will be processed; subdirectories contained within will not be
+  # explored.
+  #
+  # == +-b+/+--[no-]backup+
+  #
+  # Make backups before overwriting.
+  #
+  # Defaults to on.
+  #
+  # == +-f+/+--force+
+  #
+  # Force recompile (when filling).
+  #
+  # Defaults to off (files are normally only recompiled if the source is newer
+  # than the output).
+  #
+  # == +--halt+
+  #
+  # Halts when encountering an error (even a non-fatal error). If multiple input
+  # templates were specified on the command-line any remaining templates will not
+  # be processed.
+  #
+  # Defaults to off.
+  #
+  # == +-t+/+--test+
+  #
+  # Performs a "dry" (test) run in which no modifications are made to the filesystem
+  # during execution. This, combined with the +--verbose+ switch, can be used to get
+  # a preview of what changes would be made, without actually committing any of the
+  # changes to disk.
+  #
+  # Defaults to off.
+  #
+  # == +-v+/+--verbose+
+  #
+  # Run verbosely.
+  #
+  # Defaults to off.
+  #
+  # == +-h+/+--help+
+  #
+  # Shows usage information.
+  #
+  # == +--version+
+  #
+  # Shows the Walrus version.
   class Runner
     class Error < Exception; end
 
