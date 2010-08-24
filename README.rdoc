@@ -1,6 +1,6 @@
 Walrus is an object-oriented templating system written in Ruby. Plain text
 templates are compiled down to Ruby code; final output is produced by executing
-("filling") the compiled templates. A "walrus" command line tool is included to
+("filling") the compiled templates. A +walrus+ command line tool is included to
 make compiling and filling templates easy.
 
 Walrus was inspired by the Cheetah template engine (which is written in
@@ -8,37 +8,37 @@ Python). It doesn't set out to be a full clone of Cheetah, but it does
 implement a very large subset of its functionality, and it employs the same
 directive syntax wherever possible.
 
+= Installation
 
-= Installation =
+    sudo gem install walrus
 
-  sudo gem install walrus
+= Usage
 
+See the {Walrus::Runner} documentation for a description of the +walrus+
+command-line tool, which is used for compiling, filling and running
+templates either individually or in batches.
 
-= Website =
+= Website
 
-  https://wincent.com/products/walrus
+https://wincent.com/products/walrus
 
+= Source code
 
-= Source code =
+http://git.wincent.com/Walrus.git
 
-  http://git.wincent.com/Walrus.git
-
-
-= Donations =
+= Donations
 
 Walrus is free, open source software released under the BSD license. If you
 find it useful and would like to support further development you can make a
 donation via PayPal to win@wincent.com:
 
-  https://wincent.com/products/walrus/donations
+https://wincent.com/products/walrus/donations
 
-
-= Author =
+= Author
 
 Walrus was written by Wincent Colaiuta <win@wincent.com>.
 
-
-= License =
+= License
 
 Copyright 2007-2010 Wincent Colaiuta. All rights reserved.
 
