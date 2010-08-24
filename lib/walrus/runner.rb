@@ -31,7 +31,8 @@ require 'wopen3'
 module Walrus
   # The {Walrus::Runner} class is instantiated from the +walrus+ executable
   # tool. It processes command-line arguments and then compiles, fills and
-  # runs Walrus templates accordingly.
+  # runs Walrus templates accordingly. It can process single templates or
+  # multiple templates in batches.
   #
   # = Overview
   #
@@ -42,6 +43,56 @@ module Walrus
   #    !!!sh
   #    walrus command [options] input-file-or-directory...
   #
+  # = Examples
+  #
+  # Given the following input templates:
+  #
+  # - +display.css.tmpl+
+  # - +index.html.tmpl+
+  # - +about.html.tmpl+
+  #
+  # Then running:
+  #
+  #     !!!sh
+  #     walrus compile *.tmpl
+  #
+  # will produce the following compiled templates:
+  #
+  # - +display.css.rb+
+  # - +index.html.rb+
+  # - +about.html.rb+
+  #
+  # Running:
+  #
+  #     !!!sh
+  #     walrus fill *.tmpl
+  #
+  # will produce the following filled (finalized output) templates:
+  #
+  # - +display.css+
+  # - +index.html+
+  # - +about.html+
+  #
+  # Note that it is not strictly necessary to perform a two-step
+  # compile-then-fill process, because running +walrus fill+ will
+  # compile the template automatically if required.
+  #
+  # Executing:
+  #
+  #     !!!sh
+  #     walrus run index.tmpl
+  #
+  # Will execute a compiled template (compiling it first if necessary),
+  # but instead of writing the output to a file will emit it to the
+  # standard output.
+  #
+  # Compiled templates can also be run manually, without the +walrus+
+  # tool; doing so causes them to print their filled content to standard
+  # output:
+  #
+  #     !!!sh
+  #     ./index.tmpl.rb
+  #
   # = Commands
   #
   # - +compile+: compile a Walrus source template into Ruby code
@@ -51,9 +102,32 @@ module Walrus
   #
   # == The +compile+ command
   #
+  # To compile a template Walrus reads and scans it for items which have
+  # special meaning to Walrus:
+  #
+  # - directives: keywords which provide information about the structure or
+  #   behavior of a template (examples: +#def+, +#block+ and +#set+)
+  # - placeholders: instructions to dynamically insert content at "fill" time;
+  #   placeholders look like +$foo+ or +$bar(1)+
+  # - escape sequences: characters which would otherwise have special meaning for
+  #   Walrus (+#+ and +$+) preceded by a backslash
+  # - comments: Walrus comments start with either +##+ (single-line comments) or
+  #   are delimited by +#*+ and +*#+ (multi-line comments)
+  #
+  # All other text is passed through unchanged, which means that Walrus can be
+  # used to create output files in any language.
+  #
+  # Templates are compiled to executable Ruby code.
+  #
   # == The +fill+ command
   #
+  # "Filling" a template causes the compiled template to be run, and the output
+  # is written back to a file on disk.
+  #
   # == The +run+ command
+  #
+  # "Running" a template is like filling it, except that instead of writing the
+  # output to a file on disk it is instead sent to the standard output.
   #
   # = Options
   #
@@ -73,11 +147,77 @@ module Walrus
   #
   # Defaults to +tmpl+.
   #
+  # Walrus constructs input file names in the following manner:
+  #
+  # - if the specified file name already has the right extension it is used
+  #   as-is
+  # - otherwise, if the user has specified a zero-length extension (the empty
+  #   string) via the +-i+/+--input-extension+ switch, the specified file
+  #   name is used as-is
+  # - otherwise, the extension is appended to the file name
+  #
+  # Normally Walrus expects input templates to have a +tmpl+ extension. Given
+  # a template +example.html.tmpl+, you can instruct walrus to compile it
+  # with either:
+  #
+  #     !!!sh
+  #     walrus compile example.html.tmpl
+  #
+  # or:
+  #
+  #     !!!sh
+  #     walrus compile example.html
+  #
+  # In general specifying the full file name including the +tmpl+ extension is
+  # easier because it allows you to select source templates via tab-completion
+  # or shell globs:
+  #
+  #     !!!sh
+  #     walrus compile *.tmpl
+  #
+  # If you prefer to use another extension, such as +template+, for example,
+  # you could use the +-i+/+--input-extension+ switch to process the
+  # +example.html.template+ template with either:
+  #
+  #     !!!sh
+  #     walrus compile -i template example.html.template
+  #
+  # or:
+  #
+  #     !!!sh
+  #     walrus compile -i template example.html
+  #
+  # If you prefer to use no extension at all, that is possible also by passing
+  # in an empty string for the +-i+/+--input-extension+ switch. For example,
+  # given template +example.html+, you could compile with:
+  #
+  #     !!!sh
+  #     walrus compile -i '' example.html
+  #
+  # Note that if you chose to fill such a template you will either need to add
+  # an output extension using the +-e+/+--output-extension+ switch, or specify
+  # a different output directory using the +-o+/+--output-dir+ switch, otherwise
+  # the source template will be overwritten.
+  #
   # == +-e+/+--output-extension EXT+
   #
-  # Extension for output file(s) (when filling)
+  # Extension for output file(s) (when filling).
   #
   # Defaults to no extension.
+  #
+  # Walrus constructs output file names for filled templates in the following
+  # manner:
+  #
+  # - if the input extension (default: +tmpl+) appears in the supplied input
+  #   template file-name, remove it
+  # - if an output extension was supplied via the +-e+/+--output-extension+
+  #   switch (default: no extension) add it
+  #
+  # In a typical workflow this means the following:
+  #
+  #     !!!sh
+  #     walrus compile example.html.tmpl  # => compiles to: example.html.rb
+  #     walrus fill example.html.tmpl     # => writes to:   example.html
   #
   # == +-R+
   #
@@ -93,7 +233,8 @@ module Walrus
   #
   # == +-b+/+--[no-]backup+
   #
-  # Make backups before overwriting.
+  # Make backups before overwriting. A backup of the form +original_filename.bak+
+  # will be written prior to modifying any file on disk.
   #
   # Defaults to on.
   #
