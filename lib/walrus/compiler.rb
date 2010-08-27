@@ -39,7 +39,7 @@ module Walrus
         @outside_body   = []  # accumulate outside-of-body items, joined at end
       end
 
-      def compile_subtree(subtree)
+      def compile_subtree subtree
         template_body   = [] # local variable
         outside_body    = [] # local variable
         subtree = [subtree] unless subtree.respond_to? :each
@@ -48,7 +48,7 @@ module Walrus
           if element.kind_of? Walrus::Grammar::DefDirective or
              element.kind_of? Walrus::Grammar::IncludeDirective
             # def/block and include directives may return two items
-            inner, outer = element.compile(options)
+            inner, outer = element.compile options
             outer.each { |line| outside_body << OUTSIDE_INDENT + line } if outer
             inner.each { |line| template_body << BODY_INDENT + line } if inner
           elsif element.instance_of? Walrus::Grammar::ExtendsDirective
@@ -56,13 +56,13 @@ module Walrus
             # head of the template_body
             raise CompileError.new('#extends may be used only once per template') if @extends_directive
             raise CompileError.new('illegal #extends (#import already used in this template)') if @import_directive
-            @extends_directive = element.compile(options)
+            @extends_directive = element.compile options
           elsif element.instance_of? Walrus::Grammar::ImportDirective
             # defines superclass with no automatic invocation of #super on the
             # template_body
             raise CompileError.new('#import may be used only once per template') if @import_directive
             raise CompileError.new('illegal #import (#extends already used in this template)') if @extends_directive
-            @import_directive = element.compile(options)
+            @import_directive = element.compile options
           elsif element.kind_of? Walrus::Grammar::Comment and
                 element.column_start == 0
             # special case if comment is only thing on input line
@@ -80,7 +80,7 @@ module Walrus
       end
 
       def compile(tree)
-        inner, outer = compile_subtree(tree)
+        inner, outer = compile_subtree tree
         @template_body.concat inner if inner
         @outside_body.concat outer if outer
         if @import_directive
@@ -134,7 +134,7 @@ end \# Walrus
     #
     # Returns a String that defines a Document subclass corresponding to the
     # compiled version of the tree.
-    def compile(tree, options = {})
+    def compile tree, options = {}
       Instance.new(options).compile(tree)
     end
   end # class Compiler
