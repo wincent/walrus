@@ -298,7 +298,7 @@ module Walrus
       parsed    = /<<(-?)([a-zA-Z0-9_]+)[ \t\v]*\n/.to_parseable.parse(state.remainder, state.options)
       state.skipped(parsed)
       marker    = parsed.match_data
-      indenting = (marker[1] == '') ? false : true
+      indenting = (marker[1] != '')
 
       if indenting # whitespace allowed before end marker
         end_marker = /^[ \t\v]*#{marker[2]}[ \t\v]*(\n|\z)/.to_parseable # will eat trailing newline
