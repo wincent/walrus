@@ -54,14 +54,18 @@ module Walrus
           elsif element.instance_of? Walrus::Grammar::ExtendsDirective
             # defines superclass and automatically invoke #super (super) at the
             # head of the template_body
-            raise CompileError.new('#extends may be used only once per template') if @extends_directive
-            raise CompileError.new('illegal #extends (#import already used in this template)') if @import_directive
+            raise CompileError,
+              '#extends may be used only once per template' if @extends_directive
+            raise CompileError,
+              'illegal #extends (#import already used in this template)' if @import_directive
             @extends_directive = element.compile options
           elsif element.instance_of? Walrus::Grammar::ImportDirective
             # defines superclass with no automatic invocation of #super on the
             # template_body
-            raise CompileError.new('#import may be used only once per template') if @import_directive
-            raise CompileError.new('illegal #import (#extends already used in this template)') if @extends_directive
+            raise CompileError,
+              '#import may be used only once per template' if @import_directive
+            raise CompileError,
+              'illegal #import (#extends already used in this template)' if @extends_directive
             @import_directive = element.compile options
           elsif element.kind_of? Walrus::Grammar::Comment and
                 element.column_start == 0
