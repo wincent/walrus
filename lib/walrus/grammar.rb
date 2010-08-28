@@ -247,7 +247,7 @@ module Walrus
 
       # want to insert a bunch of nodes (a subtree) into the parse tree
       # without advancing the location counters
-      sub_tree = Walrat::ArrayResult.new [ file_name, sub_result ? sub_result : [] ]
+      sub_tree = Walrat::ArrayResult.new [ file_name, sub_result || [] ]
       sub_tree.start  = file_name.start
       sub_tree.end    = file_name.end
       sub_tree
