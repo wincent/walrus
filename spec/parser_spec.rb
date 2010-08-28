@@ -307,7 +307,7 @@ describe Walrus::Parser do
       result = @parser.parse("#import ''")
       result.class_name.should be_kind_of(Walrus::Grammar::StringLiteral)
       result.class_name.should be_kind_of(Walrus::Grammar::SingleQuotedStringLiteral)
-      result.class_name.lexeme.to_s.should == '' # actually just returns []; I might need to add a "flatten" or "to_string" method to my Grammar specification system
+      result.class_name.lexeme.should == []
 
       # with escaped single quotes inside
       result = @parser.parse("#import 'hello \\'world\\''")
@@ -356,7 +356,7 @@ describe Walrus::Parser do
       result = @parser.parse('#import ""')
       result.class_name.should be_kind_of(Walrus::Grammar::StringLiteral)
       result.class_name.should be_kind_of(Walrus::Grammar::DoubleQuotedStringLiteral)
-      result.class_name.lexeme.to_s.should == '' # actually just returns []; I might need to add a "flatten" or "to_string" method to my Grammar specification system
+      result.class_name.lexeme.should == []
 
       # with escaped double quotes inside
       result = @parser.parse('#import "hello \\"world\\""')
