@@ -119,7 +119,7 @@ module Walrus
   class Grammar
     class #{@class_name} < #{superclass_name}
       def template_body
-#{@template_body.join}
+#{@template_body.join.chomp}
       end
 
 #{@outside_body.join}
