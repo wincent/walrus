@@ -66,5 +66,11 @@ describe Walrus::Grammar::EchoDirective do
       eval @parser.compile("#echo 'foo'", :class_name => :EchoDirectiveSpecAlpha)
       Walrus::Grammar::EchoDirectiveSpecAlpha.new.fill.should == 'foo'
     end
+
+    it 'evaluates multiple expressions, but only accumulates the last' do
+      eval @parser.compile("#echo @foo = 1 + 2; @foo = @foo + 3; @foo",
+                           :class_name => :EchoDirectiveSpecBeta)
+      Walrus::Grammar::EchoDirectiveSpecBeta.new.fill.should == '6'
+    end
   end
 end
