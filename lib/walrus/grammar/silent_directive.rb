@@ -30,22 +30,22 @@ module Walrus
     #
     # Like the #echo directive, a convienient shorthand syntax is available:
     #
-    #   # expressions(s) #
+    #   # expression(s) #
     #
     # Equivalent to the long form:
     #
-    #   #silent expressions(s) #
+    #   #silent expression(s) #
     #
     # And similar to but more concise than the ERB syntax:
     #
-    #   <% expressions(s) %>
+    #   <% expression(s) %>
     #
     # Note that the space between the opening hash character and the
     # expression(s) is required in order for Walrus to distinguish the
     # shorthand for the #silent directive from the other directives. That is,
     # the following is not legal:
     #
-    #   #expressions(s) #
+    #   #expression(s) #
     #
     class SilentDirective < Directive
       def compile options = {}
