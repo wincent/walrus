@@ -24,6 +24,36 @@ require 'walrus/grammar'
 
 module Walrus
   class Grammar
+    # "Any section of a template definition that is inside a #raw ... #end
+    # raw tag pair will be printed verbatim without any parsing of
+    # $placeholders or other directives."
+    # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.raw.html
+    # Unlike Cheetah, Walrus uses a bare "#end" marker and not an "#end raw"
+    # to mark the end of the raw block.
+    # The presence of a literal #end within a raw block is made possible by
+    # using an optional "here doc"-style delimiter:
+    #
+    # #raw <<END_MARKER
+    #     content goes here
+    # END_MARKER
+    #
+    # Here the opening "END_MARKER" must be the last thing on the line
+    # (trailing whitespace up to and including the newline is allowed but it
+    # is not considered to be part of the quoted text). The final
+    # "END_MARKER" must be the very first and last thing on the line, or it
+    # will not be considered to be an end marker at all and will be
+    # considered part of the quoted text. The newline immediately prior to
+    # the end marker is included in the quoted text.
+    #
+    # Or, if the end marker is to be indented:
+    #
+    # #raw <<-END_MARKER
+    #     content
+    #      END_MARKER
+    #
+    # Here "END_MARKER" may be preceeded by whitespace (and whitespace only)
+    # but it must be the last thing on the line. The preceding whitespace is
+    # not considered to be part of the quoted text.
     class RawDirective < Directive
       # Returns a string containing the compiled (Ruby) version of receiver.
       def compile options = {}

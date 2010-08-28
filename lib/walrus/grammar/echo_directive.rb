@@ -24,6 +24,25 @@ require 'walrus/grammar'
 
 module Walrus
   class Grammar
+    # "The #echo directive is used to echo the output from expressions that
+    # can't be written as simple $placeholders."
+    # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.echo.html
+    #
+    # Convenient alternative short syntax for the #echo directive, similar to
+    # ERB (http://www.ruby-doc.org/stdlib/libdoc/erb/rdoc/):
+    #
+    #   #= expression(s) #
+    #
+    # Is a shortcut equivalent to:
+    #
+    #   #echo expression(s) #
+    #
+    # This is similar to the ERB syntax, but even more concise:
+    #
+    #   <%= expression(s) =>
+    #
+    # See also the #silent directive, which also has a shortcut syntax.
+    #
     class EchoDirective < Directive
       def compile options = {}
         if @expression.respond_to? :each

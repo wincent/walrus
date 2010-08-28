@@ -24,6 +24,29 @@ require 'walrus/grammar'
 
 module Walrus
   class Grammar
+    # "#silent is the opposite of #echo. It executes an expression but
+    # discards the output."
+    # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.silent.html
+    #
+    # Like the #echo directive, a convienient shorthand syntax is available:
+    #
+    #   # expressions(s) #
+    #
+    # Equivalent to the long form:
+    #
+    #   #silent expressions(s) #
+    #
+    # And similar to but more concise than the ERB syntax:
+    #
+    #   <% expressions(s) %>
+    #
+    # Note that the space between the opening hash character and the
+    # expression(s) is required in order for Walrus to distinguish the
+    # shorthand for the #silent directive from the other directives. That is,
+    # the following is not legal:
+    #
+    #   #expressions(s) #
+    #
     class SilentDirective < Directive
       def compile options = {}
         if @expression.respond_to? :each

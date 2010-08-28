@@ -192,25 +192,6 @@ module Walrus
                 '#end'.skip & :directive_end
     production  :def_directive, :identifier, :params, :content
 
-    # "The #echo directive is used to echo the output from expressions that
-    # can't be written as simple $placeholders."
-    # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.echo.html
-    #
-    # Convenient alternative short syntax for the #echo directive, similar to
-    # ERB (http://www.ruby-doc.org/stdlib/libdoc/erb/rdoc/):
-    #
-    #   #= expression(s) #
-    #
-    # Is a shortcut equivalent to:
-    #
-    #   #echo expression(s) #
-    #
-    # This is similar to the ERB syntax, but even more concise:
-    #
-    #   <%= expression(s) =>
-    #
-    # See also the #silent directive, which also has a shortcut syntax.
-    #
     rule        :echo_directive_long_form,
                 '#echo'.skip & :ruby_expression_list & :directive_end
     rule        :echo_directive_short_form,
@@ -264,36 +245,6 @@ module Walrus
       sub_tree
     }
 
-    # "Any section of a template definition that is inside a #raw ... #end
-    # raw tag pair will be printed verbatim without any parsing of
-    # $placeholders or other directives."
-    # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.raw.html
-    # Unlike Cheetah, Walrus uses a bare "#end" marker and not an "#end raw"
-    # to mark the end of the raw block.
-    # The presence of a literal #end within a raw block is made possible by
-    # using an optional "here doc"-style delimiter:
-    #
-    # #raw <<END_MARKER
-    #     content goes here
-    # END_MARKER
-    #
-    # Here the opening "END_MARKER" must be the last thing on the line
-    # (trailing whitespace up to and including the newline is allowed but it
-    # is not considered to be part of the quoted text). The final
-    # "END_MARKER" must be the very first and last thing on the line, or it
-    # will not be considered to be an end marker at all and will be
-    # considered part of the quoted text. The newline immediately prior to
-    # the end marker is included in the quoted text.
-    #
-    # Or, if the end marker is to be indented:
-    #
-    # #raw <<-END_MARKER
-    #     content
-    #      END_MARKER
-    #
-    # Here "END_MARKER" may be preceeded by whitespace (and whitespace only)
-    # but it must be the last thing on the line. The preceding whitespace is
-    # not considered to be part of the quoted text.
     rule        :raw_directive,
                 '#raw'.skip &
                 ((:directive_end & /([^#]+|#(?!end)+)*/ & '#end'.skip & :directive_end) | :here_document)
@@ -357,29 +308,6 @@ module Walrus
                 :directive_end
     production  :set_directive, :placeholder, :expression
 
-    # "#silent is the opposite of #echo. It executes an expression but
-    # discards the output."
-    # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.silent.html
-    #
-    # Like the #echo directive, a convienient shorthand syntax is available:
-    #
-    #   # expressions(s) #
-    #
-    # Equivalent to the long form:
-    #
-    #   #silent expressions(s) #
-    #
-    # And similar to but more concise than the ERB syntax:
-    #
-    #   <% expressions(s) %>
-    #
-    # Note that the space between the opening hash character and the
-    # expression(s) is required in order for Walrus to distinguish the
-    # shorthand for the #silent directive from the other directives. That is,
-    # the following is not legal:
-    #
-    #   #expressions(s) #
-    #
     rule        :silent_directive_long_form,
                 '#silent'.skip & :ruby_expression_list & :directive_end
     rule        :silent_directive_short_form,
@@ -392,11 +320,6 @@ module Walrus
     rule        :ruby_expression_list,
                 :ruby_expression >> (';'.skip & :ruby_expression ).zero_or_more
 
-    # "The #slurp directive eats up the trailing newline on the line it
-    # appears in, joining the following line onto the current line."
-    # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.slurp.html
-    # The "slurp" directive must be the last thing on the line (not followed
-    # by a comment or directive end marker)
     rule        :slurp_directive,
                 '#slurp' & :whitespace.optional.skip & :newline.skip
     production  :slurp_directive
@@ -429,11 +352,9 @@ module Walrus
     rule        :parameter,
                 :placeholder | :ruby_expression
 
-    # placeholders may be in long form (${foo}) or short form ($foo)
     rule        :placeholder,
                 :long_placeholder | :short_placeholder
 
-    # No whitespace allowed between the "$" and the opening "{"
     rule        :long_placeholder,
                 '${'.skip &
                 :placeholder_name &
@@ -442,7 +363,6 @@ module Walrus
     node        :long_placeholder, :placeholder
     production  :long_placeholder, :name, :params
 
-    # No whitespace allowed between the "$" and the placeholder_name
     rule        :short_placeholder,
                 /\$(?![ \r\n\t\v])/.skip &
                 :placeholder_name &

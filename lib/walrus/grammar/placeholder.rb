@@ -24,6 +24,9 @@ require 'walrus/grammar'
 
 module Walrus
   class Grammar
+    # placeholders may be in long form (${foo}) or short form ($foo)
+    # No whitespace allowed between the "$" and the opening "{"
+    # No whitespace allowed between the "$" and the placeholder_name
     class Placeholder < Walrat::Node
       def compile options = {}
         if options[:nest_placeholders] == true
