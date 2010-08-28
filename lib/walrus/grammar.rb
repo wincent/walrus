@@ -58,14 +58,14 @@ module Walrus
 
     # only spaces and tabs, not newlines
     rule        :whitespace,
-                /[ \t\v]+/
+                /[ \t]+/
     rule        :newline,
                 /(\r\n|\r|\n)/
 
     # optional whitespace (tabs and spaces only) followed by a
     # backslash/newline (note: this is not escape-aware)
     rule        :line_continuation,
-                /[ \t\v]*\\\n/
+                /[ \t]*\\\n/
     rule        :end_of_input,
                 /\z/
 
@@ -253,22 +253,22 @@ module Walrus
     # In order to parse "here documents" we adopt a model similar to the one
     # proposed in this message to the ANTLR interest list:
     # http://www.antlr.org:8080/pipermail/antlr-interest/2005-September/013673.html
-    rule        :here_document_marker,  /<<(-?)([a-zA-Z0-9_]+)[ \t\v]*\n/
+    rule        :here_document_marker,  /<<(-?)([a-zA-Z0-9_]+)[ \t]*\n/
     rule        :line,                  /^.*\n/
     rule        :here_document,         lambda { |string, options|
 
       # for the time-being, not sure if there is much benefit in calling
       # memoizing_parse here
       state     = Walrat::ParserState.new(string, options)
-      parsed    = /<<(-?)([a-zA-Z0-9_]+)[ \t\v]*\n/.to_parseable.parse(state.remainder, state.options)
+      parsed    = /<<(-?)([a-zA-Z0-9_]+)[ \t]*\n/.to_parseable.parse(state.remainder, state.options)
       state.skipped(parsed)
       marker    = parsed.match_data
       indenting = (marker[1] != '')
 
       if indenting # whitespace allowed before end marker
-        end_marker = /^[ \t\v]*#{marker[2]}[ \t\v]*(\n|\z)/.to_parseable # will eat trailing newline
+        end_marker = /^[ \t]*#{marker[2]}[ \t]*(\n|\z)/.to_parseable # will eat trailing newline
       else         # no whitespace allowed before end marker
-        end_marker = /^#{marker[2]}[ \t\v]*(\n|\z)/.to_parseable         # will eat trailing newline
+        end_marker = /^#{marker[2]}[ \t]*(\n|\z)/.to_parseable         # will eat trailing newline
       end
 
       line = /^.*\n/.to_parseable # for gobbling a line
@@ -301,7 +301,7 @@ module Walrus
     # directive is an identifier preceded by a dollar sign.
     rule        :set_directive,
                 '#set'.skip &
-                /\$(?![ \r\n\t\v])/.skip &
+                /\$(?![ \r\n\t])/.skip &
                 :placeholder_name &
                 '='.skip &
                 (:addition_expression | :unary_expression) &
@@ -364,7 +364,7 @@ module Walrus
     production  :long_placeholder, :name, :params
 
     rule        :short_placeholder,
-                /\$(?![ \r\n\t\v])/.skip &
+                /\$(?![ \r\n\t])/.skip &
                 :placeholder_name &
                 :placeholder_parameters.optional([])
     node        :short_placeholder, :placeholder
