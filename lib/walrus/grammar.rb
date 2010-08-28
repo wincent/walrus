@@ -206,9 +206,12 @@ module Walrus
     #
     # See also the #silent directive, which also has a shortcut syntax.
     #
+    rule        :echo_directive_long_form,
+                '#echo'.skip & :ruby_expression_list & :directive_end
+    rule        :echo_directive_short_form,
+                '#='.skip & :ruby_expression_list & '#'.skip
     rule        :echo_directive,
-                '#echo'.skip & :ruby_expression_list & :directive_end | # long form
-                '#='.skip & :ruby_expression_list & '#'.skip            # short form
+                :echo_directive_long_form | :echo_directive_short_form
     production  :echo_directive, :expression
 
     rule        :import_directive,
@@ -361,9 +364,13 @@ module Walrus
     #
     #   #expressions(s) #
     #
-    rule            :silent_directive,                    '#silent'.skip & :ruby_expression_list & :directive_end | # long form
-                                                          '# '.skip & :ruby_expression_list & '#'.skip              # short form
-    production      :silent_directive, :expression
+    rule        :silent_directive_long_form,
+                '#silent'.skip & :ruby_expression_list & :directive_end
+    rule        :silent_directive_short_form,
+                '# '.skip & :ruby_expression_list & '#'.skip
+    rule        :silent_directive,
+                :silent_directive_long_form | :silent_directive_short_form
+    production  :silent_directive, :expression
 
     # Accept multiple expressions separated by a semi-colon.
     rule            :ruby_expression_list,                :ruby_expression >> (';'.skip & :ruby_expression ).zero_or_more
