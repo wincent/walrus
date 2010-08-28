@@ -110,62 +110,64 @@ module Walrus
                 /(\\(?!").|\\"|[^"\\]+)+/
 
     # TODO: support 1_000_000 syntax for numeric_literals
-    rule            :numeric_literal,                     /\d+\.\d+|\d+(?!\.)/
+    rule            :numeric_literal, /\d+\.\d+|\d+(?!\.)/
     node            :numeric_literal, :literal
     production      :numeric_literal
 
     # this matches both "foo" and "Foo::bar"
-    rule            :identifier,                          /([A-Z][a-zA-Z0-9_]*::)*[a-z_][a-zA-Z0-9_]*/
+    rule            :identifier, /([A-Z][a-zA-Z0-9_]*::)*[a-z_][a-zA-Z0-9_]*/
     node            :identifier, :literal
     production      :identifier
 
     # this matches both "Foo" and "Foo::Bar"
-    rule            :constant,                            /([A-Z][a-zA-Z0-9_]*::)*[A-Z][a-zA-Z0-9_]*/
+    rule            :constant, /([A-Z][a-zA-Z0-9_]*::)*[A-Z][a-zA-Z0-9_]*/
     node            :constant, :literal
     production      :constant
 
-    rule            :symbol_literal,                      /:[a-zA-Z_][a-zA-Z0-9_]*/
+    rule            :symbol_literal, /:[a-zA-Z_][a-zA-Z0-9_]*/
     node            :symbol_literal, :literal
     production      :symbol_literal
 
-    rule            :escape_sequence,                     '\\'.skip & /[\$\\#]/
+    rule            :escape_sequence, '\\'.skip & /[\$\\#]/
     production      :escape_sequence
 
-    rule            :comment,                             '##'.skip & /.*$/
+    rule            :comment, '##'.skip & /.*$/
     production      :comment
 
     # nested multiline comments
-    rule            :multiline_comment,                   '#*'.skip & :comment_content.zero_or_more('') & '*#'.skip
+    rule            :multiline_comment,
+                    '#*'.skip & :comment_content.zero_or_more('') & '*#'.skip
     skipping        :multiline_comment, nil
     production      :multiline_comment, :content
 
-    rule            :comment_content,                     (:comment & :newline.skip)  | 
-                                                          :multiline_comment          |
-                                                          /(                # three possibilities:
-                                                            [^*#]+      |   # 1. any run of characters other than # or *
-                                                            \#(?!\#|\*) |   # 2. any # not followed by another # or a *
-                                                            \*(?!\#)        # 3. any * not followed by a #
-                                                           )+               # match the three possibilities repeatedly
-                                                          /x
+    rule            :comment_content,
+                    (:comment & :newline.skip)  |
+                    :multiline_comment          |
+                    /(                # three possibilities:
+                      [^*#]+      |   # - any run of chars other than # or *
+                      \#(?!\#|\*) |   # - any # not followed by # or a *
+                      \*(?!\#)        # - any * not followed by  #
+                     )+               # match the three possibilities repeatedly
+                    /x
 
-    rule            :directive,                           :block_directive        |
-                                                          :def_directive          |
-                                                          :echo_directive         |
-                                                          :extends_directive      |
-                                                          :import_directive       |
-                                                          :include_directive      |
-                                                          :raw_directive          |
-                                                          :ruby_directive         |
-                                                          :set_directive          |
-                                                          :silent_directive       |
-                                                          :slurp_directive        |
-                                                          :super_directive
+    rule        :directive, :block_directive    |
+                            :def_directive      |
+                            :echo_directive     |
+                            :extends_directive  |
+                            :import_directive   |
+                            :include_directive  |
+                            :raw_directive      |
+                            :ruby_directive     |
+                            :set_directive      |
+                            :silent_directive   |
+                            :slurp_directive    |
+                            :super_directive
 
-    node            :directive
+    node        :directive
 
     # directives may span multiple lines if and only if the last character on
     # the line is a backslash \
-    skipping        :directive,                           :whitespace | :line_continuation
+    skipping    :directive, :whitespace | :line_continuation
 
     # "Directive tags can be closed explicitly with #, or implicitly with the
     # end of the line"
@@ -175,17 +177,20 @@ module Walrus
     # be ambiguous).
     # Note that "skipping" the end_of_input here is harmless as it isn't
     # actually consumed.
-    rule            :directive_end,                       ( /#/ | :newline | :end_of_input ).skip
+    rule        :directive_end,
+                ( /#/ | :newline | :end_of_input ).skip
 
-    rule            :block_directive,                     '#block'.skip & :identifier & :def_parameter_list.optional([]) & :directive_end &
-                                                          :template_element.zero_or_more([]) &
-                                                          '#end'.skip & :directive_end
-    production      :block_directive, :identifier, :params, :content
+    rule        :block_directive,
+                '#block'.skip & :identifier & :def_parameter_list.optional([]) & :directive_end &
+                :template_element.zero_or_more([]) &
+                '#end'.skip & :directive_end
+    production  :block_directive, :identifier, :params, :content
 
-    rule            :def_directive,                       '#def'.skip & :identifier & :def_parameter_list.optional([]) & :directive_end &
-                                                          :template_element.zero_or_more([]) &
-                                                          '#end'.skip & :directive_end
-    production      :def_directive, :identifier, :params, :content
+    rule        :def_directive,
+                '#def'.skip & :identifier & :def_parameter_list.optional([]) & :directive_end &
+                :template_element.zero_or_more([]) &
+                '#end'.skip & :directive_end
+    production  :def_directive, :identifier, :params, :content
 
     # "The #echo directive is used to echo the output from expressions that
     # can't be written as simple $placeholders."
@@ -289,14 +294,17 @@ module Walrus
     # Here "END_MARKER" may be preceeded by whitespace (and whitespace only)
     # but it must be the last thing on the line. The preceding whitespace is
     # not considered to be part of the quoted text.
-    rule            :raw_directive,                       '#raw'.skip &
-                                                          ((:directive_end & /([^#]+|#(?!end)+)*/ & '#end'.skip & :directive_end) | :here_document)
-    production      :raw_directive, :content
+    rule        :raw_directive,
+                '#raw'.skip &
+                ((:directive_end & /([^#]+|#(?!end)+)*/ & '#end'.skip & :directive_end) | :here_document)
+    production  :raw_directive, :content
 
     # In order to parse "here documents" we adopt a model similar to the one
     # proposed in this message to the ANTLR interest list:
     # http://www.antlr.org:8080/pipermail/antlr-interest/2005-September/013673.html
-    rule            :here_document,                       lambda { |string, options|
+    rule        :here_document_marker,  /<<(-?)([a-zA-Z0-9_]+)[ \t\v]*\n/
+    rule        :line,                  /^.*\n/
+    rule        :here_document,         lambda { |string, options|
 
       # for the time-being, not sure if there is much benefit in calling
       # memoizing_parse here
@@ -333,13 +341,21 @@ module Walrus
       document
     }
 
-    rule            :ruby_directive,                      '#ruby'.skip & ((:directive_end & /([^#]+|#(?!end)+)*/ & '#end'.skip & :directive_end) | :here_document)
-    production      :ruby_directive, :content
+    rule        :ruby_directive,
+                '#ruby'.skip &
+                ((:directive_end & /([^#]+|#(?!end)+)*/ & '#end'.skip & :directive_end) | :here_document)
+    production  :ruby_directive, :content
 
     # Unlike a normal Ruby assignement expression, the lvalue of a "#set"
     # directive is an identifier preceded by a dollar sign.
-    rule            :set_directive,                       '#set'.skip & /\$(?![ \r\n\t\v])/.skip & :placeholder_name & '='.skip & (:addition_expression | :unary_expression) & :directive_end
-    production      :set_directive, :placeholder, :expression
+    rule        :set_directive,
+                '#set'.skip &
+                /\$(?![ \r\n\t\v])/.skip &
+                :placeholder_name &
+                '='.skip &
+                (:addition_expression | :unary_expression) &
+                :directive_end
+    production  :set_directive, :placeholder, :expression
 
     # "#silent is the opposite of #echo. It executes an expression but
     # discards the output."
@@ -373,82 +389,117 @@ module Walrus
     production  :silent_directive, :expression
 
     # Accept multiple expressions separated by a semi-colon.
-    rule            :ruby_expression_list,                :ruby_expression >> (';'.skip & :ruby_expression ).zero_or_more
+    rule        :ruby_expression_list,
+                :ruby_expression >> (';'.skip & :ruby_expression ).zero_or_more
 
     # "The #slurp directive eats up the trailing newline on the line it
     # appears in, joining the following line onto the current line."
     # http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.slurp.html
     # The "slurp" directive must be the last thing on the line (not followed
     # by a comment or directive end marker)
-    rule            :slurp_directive,                     '#slurp' & :whitespace.optional.skip & :newline.skip
-    production      :slurp_directive
+    rule        :slurp_directive,
+                '#slurp' & :whitespace.optional.skip & :newline.skip
+    production  :slurp_directive
 
-    rule            :super_directive,                     :super_with_parentheses | :super_without_parentheses
-    rule            :super_with_parentheses,              '#super'.skip & :parameter_list.optional & :directive_end
-    node            :super_with_parentheses, :super_directive
-    production      :super_with_parentheses, :params
-    rule            :super_without_parentheses,           '#super'.skip & :parameter_list_without_parentheses & :directive_end
-    node            :super_without_parentheses, :super_directive
-    production      :super_without_parentheses, :params
+    rule        :super_directive,
+                :super_with_parentheses | :super_without_parentheses
+    rule        :super_with_parentheses,
+                '#super'.skip & :parameter_list.optional & :directive_end
+    node        :super_with_parentheses, :super_directive
+    production  :super_with_parentheses, :params
+
+    rule        :super_without_parentheses,
+                '#super'.skip &
+                :parameter_list_without_parentheses &
+                :directive_end
+    node        :super_without_parentheses, :super_directive
+    production  :super_without_parentheses, :params
 
     # The "def_parameter_list" is a special case of parameter list which
     # disallows interpolated placeholders.
-    rule            :def_parameter_list,                  '('.skip & ( :def_parameter >> ( ','.skip & :def_parameter ).zero_or_more ).optional & ')'.skip
-    rule            :def_parameter,                       :assignment_expression | :identifier
+    rule        :def_parameter_list,
+                '('.skip & ( :def_parameter >> ( ','.skip & :def_parameter ).zero_or_more ).optional & ')'.skip
+    rule        :def_parameter,
+                :assignment_expression | :identifier
 
-    rule            :parameter_list,                      '('.skip & ( :parameter >> ( ','.skip & :parameter ).zero_or_more ).optional & ')'.skip
-    rule            :parameter_list_without_parentheses,  :parameter >> ( ','.skip & :parameter ).zero_or_more
-    rule            :parameter,                           :placeholder | :ruby_expression
+    rule        :parameter_list,
+                '('.skip & ( :parameter >> ( ','.skip & :parameter ).zero_or_more ).optional & ')'.skip
+    rule        :parameter_list_without_parentheses,
+                :parameter >> ( ','.skip & :parameter ).zero_or_more
+    rule        :parameter,
+                :placeholder | :ruby_expression
 
     # placeholders may be in long form (${foo}) or short form ($foo)
-    rule            :placeholder,                         :long_placeholder | :short_placeholder
+    rule        :placeholder,
+                :long_placeholder | :short_placeholder
 
     # No whitespace allowed between the "$" and the opening "{"
-    rule            :long_placeholder,                    '${'.skip & :placeholder_name & :placeholder_parameters.optional([]) & '}'.skip
-    node            :long_placeholder, :placeholder
-    production      :long_placeholder, :name, :params
+    rule        :long_placeholder,
+                '${'.skip &
+                :placeholder_name &
+                :placeholder_parameters.optional([]) &
+                '}'.skip
+    node        :long_placeholder, :placeholder
+    production  :long_placeholder, :name, :params
 
     # No whitespace allowed between the "$" and the placeholder_name
-    rule            :short_placeholder,                   /\$(?![ \r\n\t\v])/.skip & :placeholder_name & :placeholder_parameters.optional([])
-    node            :short_placeholder, :placeholder
-    production      :short_placeholder, :name, :params
+    rule        :short_placeholder,
+                /\$(?![ \r\n\t\v])/.skip &
+                :placeholder_name &
+                :placeholder_parameters.optional([])
+    node        :short_placeholder, :placeholder
+    production  :short_placeholder, :name, :params
 
-    rule            :placeholder_name,                    :identifier
-    rule            :placeholder_parameters,              '('.skip & (:placeholder_parameter >> (','.skip & :placeholder_parameter).zero_or_more).optional & ')'.skip
-    rule            :placeholder_parameter,               :placeholder | :ruby_expression
+    rule        :placeholder_name, :identifier
+    rule        :placeholder_parameters,
+                '('.skip & (:placeholder_parameter >> (','.skip & :placeholder_parameter).zero_or_more).optional & ')'.skip
+    rule        :placeholder_parameter, :placeholder | :ruby_expression
 
     # simplified Ruby subset
-    rule            :ruby_expression,                     :assignment_expression | :addition_expression | :unary_expression
+    rule        :ruby_expression,
+                :assignment_expression  |
+                :addition_expression    |
+                :unary_expression
 
-    rule            :literal_expression,                  :string_literal     |
-                                                          :numeric_literal    |
-                                                          :array_literal      |
-                                                          :hash_literal       |
-                                                          :lvalue             |
-                                                          :symbol_literal
-    rule            :unary_expression,                    :message_expression | :literal_expression
+    rule        :literal_expression,
+                :string_literal   |
+                :numeric_literal  |
+                :array_literal    |
+                :hash_literal     |
+                :lvalue           |
+                :symbol_literal
 
-    rule            :lvalue,                              :class_variable | :instance_variable | :identifier | :constant
+    rule        :unary_expression,
+                :message_expression | :literal_expression
 
-    rule            :array_literal,                       '['.skip & ( :ruby_expression >> (','.skip & :ruby_expression ).zero_or_more ).optional & ']'.skip
-    node            :array_literal, :ruby_expression
-    production      :array_literal, :elements
+    rule        :lvalue,
+                :class_variable | :instance_variable | :identifier | :constant
 
-    rule            :hash_literal,                        '{'.skip & ( :hash_assignment >> (','.skip & :hash_assignment ).zero_or_more ).optional & '}'.skip
-    node            :hash_literal, :ruby_expression
-    production      :hash_literal, :pairs
+    rule        :array_literal,
+                '['.skip & ( :ruby_expression >> (','.skip & :ruby_expression ).zero_or_more ).optional & ']'.skip
+    node        :array_literal, :ruby_expression
+    production  :array_literal, :elements
 
-    rule            :hash_assignment,                     :unary_expression & '=>'.skip & (:addition_expression | :unary_expression)
-    node            :hash_assignment, :ruby_expression
-    production      :hash_assignment, :lvalue, :expression
+    rule        :hash_literal,
+                '{'.skip & ( :hash_assignment >> (','.skip & :hash_assignment ).zero_or_more ).optional & '}'.skip
+    node        :hash_literal, :ruby_expression
+    production  :hash_literal, :pairs
 
-    rule            :assignment_expression,               :lvalue & '='.skip & (:addition_expression | :unary_expression)
-    production      :assignment_expression, :lvalue, :expression
+    rule        :hash_assignment,
+                :unary_expression &
+                '=>'.skip &
+                (:addition_expression | :unary_expression)
+    node        :hash_assignment, :ruby_expression
+    production  :hash_assignment, :lvalue, :expression
+
+    rule        :assignment_expression,
+                :lvalue & '='.skip & (:addition_expression | :unary_expression)
+    production  :assignment_expression, :lvalue, :expression
 
     # addition is left-associative (left-recursive)
-    rule            :addition_expression,                 :addition_expression & '+'.skip & :unary_expression |
-                                                          :unary_expression & '+'.skip & :unary_expression
-
+    rule        :addition_expression,
+                :addition_expression & '+'.skip & :unary_expression |
+                :unary_expression & '+'.skip & :unary_expression
     node        :addition_expression, :ruby_expression
     production  :addition_expression, :left, :right
 
