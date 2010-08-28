@@ -72,5 +72,13 @@ describe Walrus::Grammar::EchoDirective do
                            :class_name => :EchoDirectiveSpecBeta)
       Walrus::Grammar::EchoDirectiveSpecBeta.new.fill.should == '6'
     end
+
+    it 'evaluates multiple expressions in the same context' do
+      # this means that local variables can be set in one expression in the
+      # list and accessed by others in the list
+      eval @parser.compile("#echo foo = 1 + 2; foo = foo + 3; foo",
+                           :class_name => :EchoDirectiveSpecDelta)
+      Walrus::Grammar::EchoDirectiveSpecDelta.new.fill.should == '6'
+    end
   end
 end
