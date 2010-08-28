@@ -206,21 +206,24 @@ module Walrus
     #
     # See also the #silent directive, which also has a shortcut syntax.
     #
-    rule            :echo_directive,                      '#echo'.skip & :ruby_expression_list & :directive_end | # long form
-                                                          '#='.skip & :ruby_expression_list & '#'.skip            # short form
-    production      :echo_directive, :expression
+    rule        :echo_directive,
+                '#echo'.skip & :ruby_expression_list & :directive_end | # long form
+                '#='.skip & :ruby_expression_list & '#'.skip            # short form
+    production  :echo_directive, :expression
 
-    rule            :import_directive,                    '#import'.skip & :string_literal & :directive_end
-    production      :import_directive, :class_name
+    rule        :import_directive,
+                '#import'.skip & :string_literal & :directive_end
+    production  :import_directive, :class_name
 
-    rule            :extends_directive,                   '#extends'.skip & :string_literal & :directive_end
-    node            :extends_directive, :import_directive
-    production      :extends_directive, :class_name
+    rule        :extends_directive,
+                '#extends'.skip & :string_literal & :directive_end
+    node        :extends_directive, :import_directive
+    production  :extends_directive, :class_name
 
-    rule            :include_directive,                   '#include'.skip & :include_subparslet
-    production      :include_directive, :file_name, :subtree
+    rule        :include_directive, '#include'.skip & :include_subparslet
+    production  :include_directive, :file_name, :subtree
 
-    rule            :include_subparslet,                  lambda { |string, options|
+    rule        :include_subparslet, lambda { |string, options|
 
       # scans a string literal
       parslet   = :string_literal & :directive_end
