@@ -26,4 +26,10 @@ class String
   def to_source_string
     gsub(/[\\']/, '\\\\\&')
   end
+
+  unless instance_methods.any? { |m| m.to_s == 'each' }
+    def each &block
+      each_line &block
+    end
+  end
 end # class String
