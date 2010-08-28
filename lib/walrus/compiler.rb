@@ -133,7 +133,7 @@ module Walrus
 end \# Walrus
         RETURN
       end
-    end
+    end # class Instance
 
     # Walks the Abstract Syntax Tree, tree, that represents a parsed Walrus
     # template.
@@ -141,7 +141,7 @@ end \# Walrus
     # Returns a String that defines a Document subclass corresponding to the
     # compiled version of the tree.
     def compile tree, options = {}
-      Instance.new(options).compile(tree)
+      Instance.new(options).compile tree
     end
   end # class Compiler
 end # module Walrus
