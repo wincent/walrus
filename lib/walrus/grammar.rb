@@ -260,7 +260,7 @@ module Walrus
       # for the time-being, not sure if there is much benefit in calling
       # memoizing_parse here
       state     = Walrat::ParserState.new(string, options)
-      parsed    = /<<(-?)([a-zA-Z0-9_]+)[ \t]*\n/.to_parseable.parse(state.remainder, state.options)
+      parsed    = rules[:here_document_marker].parse(state.remainder, state.options)
       state.skipped(parsed)
       marker    = parsed.match_data
       indenting = (marker[1] != '')
@@ -271,15 +271,13 @@ module Walrus
         end_marker = /^#{marker[2]}[ \t]*(\n|\z)/.to_parseable         # will eat trailing newline
       end
 
-      line = /^.*\n/.to_parseable # for gobbling a line
-
       while true do
         begin
           skipped = end_marker.parse(state.remainder, state.options)
           state.skipped(skipped)   # found end marker, skip it
           break                    # all done
         rescue Walrat::ParseError  # didn't find end marker yet, consume a line
-          parsed = line.parse(state.remainder, state.options)
+          parsed = rules[:line].parse(state.remainder, state.options)
           state.parsed(parsed)
         end
       end
