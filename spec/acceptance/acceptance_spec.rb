@@ -40,26 +40,26 @@ describe 'processing test files with Walrus' do
   template_paths.each do |path|
     template        = Walrus::Template.new(path)
     compiled        = nil
-    it 'template should compile (source file: #{path})' do
+    it 'compiles (source file: #{path})' do
       compiled      = template.compile
     end
     next if compiled.nil? # compiled will be nil if the compilation spec failed
 
     expected_output = IO.read(path.to_s.sub(/\.tmpl\z/i, ".expected"))
 
-    it "actual output should match expected output evaluating dynamically (source file: #{path})" do
+    it "matches expected output when evaluating dynamically (source file: #{path})" do
       actual_output = template.fill
       actual_output.should == expected_output
     end
 
-    it "actual output should match expected output running compiled file in subshell (source file: #{path})" do
+    it "matches expected output when running compiled file in subshell (source file: #{path})" do
       target_path = manually_compiled_templates.join(path.basename(path.extname).to_s + '.rb')
       File.open(target_path, 'w+') { |file| file.puts compiled }
       actual_output = `ruby -I#{Walrus::SpecHelper::LIBDIR} #{target_path}`
       actual_output.should == expected_output
     end
 
-    it "actual output should match expected output using 'walrus' commandline tool (source file: #{path})" do
+    it "matches expected output when using 'walrus' commandline tool (source file: #{path})" do
       `env RUBYLIB='#{search_additions}' #{Walrus::SpecHelper::TOOL} fill --output-dir '#{walrus_compiled_templates}' '#{path}'`
       dir, base = path.split
       dir   = dir.to_s.sub(/\A\//, '') if dir.absolute? # and always will be absolute
@@ -79,13 +79,13 @@ describe 'processing multiple-interdependent files with Walrus' do
   search_additions  = "#{ENV['RUBYLIB']}:#{Walrus::SpecHelper::LIBDIR}"
 
   template_paths.each do |path|
-    it 'should be able to compile all the templates' do
+    it "compiles all the templates (source file: #{path})" do
       `env RUBYLIB='#{search_additions}' #{Walrus::SpecHelper::TOOL} compile --input-extension complex --output-dir '#{output_dir}' '#{path}'`
     end
   end
 
   template_paths.each do |path|
-    it 'should be able to fill all the templates' do
+    it "fills all the templates (source file: #{path})" do
       `env RUBYLIB='#{search_additions}' #{Walrus::SpecHelper::TOOL} fill --input-extension complex --output-dir '#{output_dir}' '#{path}'`
       dir, base = path.split
       dir   = dir.to_s.sub(/\A\//, '') if dir.absolute? # and always will be absolute
