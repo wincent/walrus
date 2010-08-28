@@ -1,0 +1,45 @@
+= 0.5: not yet released
+
+* if a list of Ruby expressions is supplied to the +#echo+ directive, all are
+  evaluated, but only the last one is emitted to the template; this brings
+  Walrus in line with most other template systems' behavior
+* the +--debug+ switch, which never actually did anything, has been removed
+* the grammar no longer includes the archaic vertical tab in its definition of
+  "whitespace"
+* various optimizations for speed and memory use
+
+Code-level changelog: http://git.wincent.com/Walrus.git/shortlog/refs/tags/0.5
+
+= 0.4: 23 August 2010
+
+* the +--recurse+ option for the +walrus+ command-line tool now defaults to
+  true, bringing the implementation in line with what the usage text always
+  claimed
+* the default output extension is now the empty string, meaning that the
+  suggested workflow is to name your templates like +template.html.tmpl+
+  (which would compile to +template.html.rb+ and produce +tempalte.html+ when
+  filled)
+
+Code-level changelog: http://git.wincent.com/Walrus.git/shortlog/refs/tags/0.4
+
+= 0.3: 21 August 2010
+
+* switch to BSD license (from GPLv3)
+* replace jindex Ruby extension with native Ruby code
+* extract packrat parser generator into a separate gem, Walrat
+
+Code-level changelog: http://git.wincent.com/Walrus.git/shortlog/refs/tags/0.3
+
+= 0.2: 14 August 2010
+
+* changes for compatibility with Ruby 1.9
+* extract mkdtemp into a separate gem
+* move Wopen3 code into its own, separate repository
+
+Code-level changelog: http://git.wincent.com/Walrus.git/shortlog/refs/tags/0.2
+
+= 0.1: 13 April 2007
+
+* initial public release
+
+Code-level changelog: http://git.wincent.com/Walrus.git/shortlog/refs/tags/walrus-0.1
