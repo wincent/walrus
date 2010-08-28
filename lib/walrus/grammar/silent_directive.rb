@@ -59,7 +59,7 @@ module Walrus
 
         compiled  = ''
         first     = true
-        expression.each do |expr| 
+        expression.each do |expr|
           if first
             compiled << "instance_eval { %s } # Silent directive\n" % expr.compile
             first = false
