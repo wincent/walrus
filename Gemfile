@@ -22,4 +22,8 @@
 
 source :gemcutter
 
-gemspec
+gem 'mkdtemp'
+gem 'rspec',  '1.3.0'
+gem 'walrat', :git => 'git://git.wincent.com/walrat.git'
+gem 'wopen3'
+gem 'yard'
