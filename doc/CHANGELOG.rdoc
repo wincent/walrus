@@ -17,6 +17,10 @@
   compatible with JRuby (previously the forking meant that compiling worked to
   an extent under JRuby but filling did not work at all); more compatibility
   work is still to be done
+* +walrus fill+ and +walrus run+ no longer spawn a separate Ruby process in
+  order to capture the output of each template, insteading evaluating the
+  templates in the context of the existing Ruby process, which is more
+  efficient
 * various optimizations for speed and memory use
 * more work on compatibility with Ruby 1.9
 

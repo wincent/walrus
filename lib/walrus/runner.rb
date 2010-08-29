@@ -544,10 +544,8 @@ module Walrus
       if @options.dry
         "(no output: dry run)\n"
       else
-        path = compiled_source_path_for_input(input).realpath.to_s.shellescape
-        output = `#{path}`
-        raise "non-zero exit status (#{$?.exitstatus})" unless $?.exitstatus == 0
-        output
+        path = compiled_source_path_for_input(input)
+        Object.class_eval path.read, path.to_s
       end
     end
 
