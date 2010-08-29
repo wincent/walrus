@@ -25,8 +25,14 @@ require 'mkdtemp'
 require 'wopen3'
 
 describe 'processing a complete set of application documentation' do
-  template_dir      = Pathname.new(File.dirname(__FILE__)) +
-                      'complete_application/en.lproj/help'
+  # must start with absolute paths because __FILE__ varies depending on the
+  # spec invocation, which can cause specs to pass or fail inconsistently:
+  #   - spec spec                                         -> relative __FILE__
+  #   - spec spec/acceptance                              -> relative __FILE__
+  #   - spec spec/acceptance/complete_application_spec.rb -> absolute __FILE__
+  base_dir          = Pathname.new(File.dirname(__FILE__)).realpath
+  relative_dir      = base_dir.relative_path_from Walrus::SpecHelper::BASE
+  template_dir      = relative_dir + 'complete_application/en.lproj/help'
   all_templates     = Pathname.glob(template_dir + '**/*.tmpl')
   web_templates     = all_templates.reject { |t| t.to_s =~ %r{/autogen/} }
   search_additions  = "#{ENV['RUBYLIB']}:#{Walrus::SpecHelper::LIBDIR}"
@@ -34,8 +40,7 @@ describe 'processing a complete set of application documentation' do
   # NOTE: the buildtools specs must run first because the following specs
   # depend on the buildtools templates
   describe 'compiling the buildtools support templates' do
-    buildtools_dir  = Pathname.new(File.dirname(__FILE__)) +
-                      'complete_application/buildtools/help'
+    buildtools_dir  = relative_dir + 'complete_application/buildtools/help'
     buildtools_templates = Pathname.glob(buildtools_dir + '**/*.tmpl')
 
     # we could compile all the templates in one batch, but prefer to

@@ -28,9 +28,10 @@ module Walrus
   module SpecHelper
     # will append the local "lib" directory to search path if not
     # already present
-    base    = File.expand_path '..', File.dirname(__FILE__)
-    LIBDIR  = Pathname.new(File.join base, 'lib').realpath
-    TOOL    = Pathname.new(File.join base, 'bin', 'walrus').realpath
+    SPEC    = Pathname.new(__FILE__).dirname.realpath
+    BASE    = (SPEC + '..').realpath
+    LIBDIR  = (BASE + 'lib').realpath
+    TOOL    = (BASE + 'bin' + 'walrus').realpath
 
     # normalize all paths in the load path
     normalized = $:.map { |path| Pathname.new(path).realpath rescue path }
