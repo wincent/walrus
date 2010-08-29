@@ -53,31 +53,26 @@ module Walrus
 
     starting_symbol :template
     skipping    :whitespace_or_newlines
-    rule        :whitespace_or_newlines,
-                /\s+/
+    rule        :whitespace_or_newlines, /\s+/
 
     # only spaces and tabs, not newlines
-    rule        :whitespace,
-                /[ \t]+/
-    rule        :newline,
-                /(\r\n|\r|\n)/
+    rule        :whitespace,  /[ \t]+/
+    rule        :newline,     /(\r\n|\r|\n)/
 
     # optional whitespace (tabs and spaces only) followed by a
     # backslash/newline (note: this is not escape-aware)
-    rule        :line_continuation,
-                /[ \t]*\\\n/
-    rule        :end_of_input,
-                /\z/
+    rule        :line_continuation, /[ \t]*\\\n/
+    rule        :end_of_input,      /\z/
 
     rule        :template,
                 :template_element.zero_or_more &
                 :end_of_input.and?
     rule        :template_element,
-                :raw_text |
-                :comment |
-                :multiline_comment |
-                :directive |
-                :placeholder |
+                :raw_text           |
+                :comment            |
+                :multiline_comment  |
+                :directive          |
+                :placeholder        |
                 :escape_sequence
 
     # anything at all other than the three characters which have special
@@ -110,45 +105,45 @@ module Walrus
                 /(\\(?!").|\\"|[^"\\]+)+/
 
     # TODO: support 1_000_000 syntax for numeric_literals
-    rule            :numeric_literal, /\d+\.\d+|\d+(?!\.)/
-    node            :numeric_literal, :literal
-    production      :numeric_literal
+    rule        :numeric_literal, /\d+\.\d+|\d+(?!\.)/
+    node        :numeric_literal, :literal
+    production  :numeric_literal
 
     # this matches both "foo" and "Foo::bar"
-    rule            :identifier, /([A-Z][a-zA-Z0-9_]*::)*[a-z_][a-zA-Z0-9_]*/
-    node            :identifier, :literal
-    production      :identifier
+    rule        :identifier, /([A-Z][a-zA-Z0-9_]*::)*[a-z_][a-zA-Z0-9_]*/
+    node        :identifier, :literal
+    production  :identifier
 
     # this matches both "Foo" and "Foo::Bar"
-    rule            :constant, /([A-Z][a-zA-Z0-9_]*::)*[A-Z][a-zA-Z0-9_]*/
-    node            :constant, :literal
-    production      :constant
+    rule        :constant, /([A-Z][a-zA-Z0-9_]*::)*[A-Z][a-zA-Z0-9_]*/
+    node        :constant, :literal
+    production  :constant
 
-    rule            :symbol_literal, /:[a-zA-Z_][a-zA-Z0-9_]*/
-    node            :symbol_literal, :literal
-    production      :symbol_literal
+    rule        :symbol_literal, /:[a-zA-Z_][a-zA-Z0-9_]*/
+    node        :symbol_literal, :literal
+    production  :symbol_literal
 
-    rule            :escape_sequence, '\\'.skip & /[\$\\#]/
-    production      :escape_sequence
+    rule        :escape_sequence, '\\'.skip & /[\$\\#]/
+    production  :escape_sequence
 
-    rule            :comment, '##'.skip & /.*$/
-    production      :comment
+    rule        :comment, '##'.skip & /.*$/
+    production  :comment
 
     # nested multiline comments
-    rule            :multiline_comment,
-                    '#*'.skip & :comment_content.zero_or_more('') & '*#'.skip
-    skipping        :multiline_comment, nil
-    production      :multiline_comment, :content
+    rule        :multiline_comment,
+                '#*'.skip & :comment_content.zero_or_more('') & '*#'.skip
+    skipping    :multiline_comment, nil
+    production  :multiline_comment, :content
 
-    rule            :comment_content,
-                    (:comment & :newline.skip)  |
-                    :multiline_comment          |
-                    /(                # three possibilities:
-                      [^*#]+      |   # - any run of chars other than # or *
-                      \#(?!\#|\*) |   # - any # not followed by # or a *
-                      \*(?!\#)        # - any * not followed by  #
-                     )+               # match the three possibilities repeatedly
-                    /x
+    rule        :comment_content,
+                (:comment & :newline.skip)  |
+                :multiline_comment          |
+                /(                # three possibilities:
+                  [^*#]+      |   # - any run of chars other than # or *
+                  \#(?!\#|\*) |   # - any # not followed by # or a *
+                  \*(?!\#)        # - any * not followed by  #
+                 )+               # match the three possibilities repeatedly
+                /x
 
     rule        :directive, :block_directive    |
                             :def_directive      |
