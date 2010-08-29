@@ -50,15 +50,15 @@ describe Walrus::Grammar::RawText do
 
     it 'should be able to round trip' do
       # simple example
-      eval @parser.compile('hello world', :class_name => :RawTextSpecAlpha)
+      Object.class_eval @parser.compile('hello world', :class_name => :RawTextSpecAlpha)
       Walrus::Grammar::RawTextSpecAlpha.new.fill.should == 'hello world'
 
       # containing single quotes
-      eval @parser.compile("hello 'world'", :class_name => :RawTextSpecBeta)
+      Object.class_eval @parser.compile("hello 'world'", :class_name => :RawTextSpecBeta)
       Walrus::Grammar::RawTextSpecBeta.new.fill.should == "hello 'world'"
 
       # containing a newline
-      eval @parser.compile("hello\nworld", :class_name => :RawTextSpecDelta)
+      Object.class_eval @parser.compile("hello\nworld", :class_name => :RawTextSpecDelta)
       Walrus::Grammar::RawTextSpecDelta.new.fill.should == "hello\nworld"
     end
   end

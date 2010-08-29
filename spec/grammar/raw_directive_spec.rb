@@ -50,29 +50,29 @@ describe Walrus::Grammar::RawDirective do
 
     it 'should be able to round trip' do
       # simple example
-      eval @parser.compile "#raw\nhello world\n#end",
+      Object.class_eval @parser.compile "#raw\nhello world\n#end",
         :class_name => :RawDirectiveSpecAlpha
       Walrus::Grammar::RawDirectiveSpecAlpha.new.fill.should == "hello world\n"
 
       # containing single quotes
-      eval @parser.compile "#raw\nhello 'world'\n#end",
+      Object.class_eval @parser.compile "#raw\nhello 'world'\n#end",
         :class_name => :RawDirectiveSpecBeta
       Walrus::Grammar::RawDirectiveSpecBeta.new.fill.should == "hello 'world'\n"
 
       # containing a newline
-      eval @parser.compile "#raw\nhello\nworld\n#end",
+      Object.class_eval @parser.compile "#raw\nhello\nworld\n#end",
         :class_name => :RawDirectiveSpecDelta
       Walrus::Grammar::RawDirectiveSpecDelta.new.fill.should == "hello\nworld\n"
 
       # using a "here document"
-      eval @parser.compile "#raw <<HERE
+      Object.class_eval @parser.compile "#raw <<HERE
 hello world
 literal #end with no effect
 HERE", :class_name => :RawDirectiveSpecGamma
       Walrus::Grammar::RawDirectiveSpecGamma.new.fill.should == "hello world\nliteral #end with no effect\n"
 
       # "here document", alternative syntax
-      eval @parser.compile "#raw <<-HERE
+      Object.class_eval @parser.compile "#raw <<-HERE
 hello world
 literal #end with no effect
       HERE", :class_name => :RawDirectiveSpecIota

@@ -63,12 +63,12 @@ describe Walrus::Grammar::EchoDirective do
 
     it 'should be able to round trip' do
       # simple example
-      eval @parser.compile("#echo 'foo'", :class_name => :EchoDirectiveSpecAlpha)
+      Object.class_eval @parser.compile("#echo 'foo'", :class_name => :EchoDirectiveSpecAlpha)
       Walrus::Grammar::EchoDirectiveSpecAlpha.new.fill.should == 'foo'
     end
 
     it 'evaluates multiple expressions, but only accumulates the last' do
-      eval @parser.compile("#echo @foo = 1 + 2; @foo = @foo + 3; @foo",
+      Object.class_eval @parser.compile("#echo @foo = 1 + 2; @foo = @foo + 3; @foo",
                            :class_name => :EchoDirectiveSpecBeta)
       Walrus::Grammar::EchoDirectiveSpecBeta.new.fill.should == '6'
     end
@@ -76,7 +76,7 @@ describe Walrus::Grammar::EchoDirective do
     it 'evaluates multiple expressions in the same context' do
       # this means that local variables can be set in one expression in the
       # list and accessed by others in the list
-      eval @parser.compile("#echo foo = 1 + 2; foo = foo + 3; foo",
+      Object.class_eval @parser.compile("#echo foo = 1 + 2; foo = foo + 3; foo",
                            :class_name => :EchoDirectiveSpecDelta)
       Walrus::Grammar::EchoDirectiveSpecDelta.new.fill.should == '6'
     end

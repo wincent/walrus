@@ -35,7 +35,7 @@ describe Walrus::Grammar::Comment do
     end
 
     it 'produces no output' do
-      eval @parser.compile('## hello world', :class_name => :CommentSpec)
+      Object.class_eval @parser.compile('## hello world', :class_name => :CommentSpec)
       Walrus::Grammar::CommentSpec.new.fill.should == ''
     end
   end

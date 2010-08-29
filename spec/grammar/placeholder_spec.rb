@@ -29,7 +29,7 @@ describe Walrus::Grammar::Placeholder do
     end
 
     it 'should be substituted into the output' do
-      eval @parser.compile "#set $foo = 'bar'\n$foo",
+      Object.class_eval @parser.compile "#set $foo = 'bar'\n$foo",
         :class_name => :PlaceholderSpecAlpha
       Walrus::Grammar::PlaceholderSpecAlpha.new.fill.should == 'bar'
     end
@@ -41,7 +41,7 @@ describe Walrus::Grammar::Placeholder do
     end
 
     it 'should be substituted into the output' do
-      eval @parser.compile %q{#def foo(string)
+      Object.class_eval @parser.compile %q{#def foo(string)
 #echo string.downcase
 #end
 $foo("HELLO WORLD")}, :class_name => :PlaceholderSpecBeta

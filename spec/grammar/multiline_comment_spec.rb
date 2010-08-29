@@ -36,19 +36,19 @@ describe Walrus::Grammar::MultilineComment do
 
     it 'should produce no output' do
       # simple multiline comment
-      eval @parser.compile("#* hello\n   world *#", :class_name => :MultilineCommentSpecAlpha)
+      Object.class_eval @parser.compile("#* hello\n   world *#", :class_name => :MultilineCommentSpecAlpha)
       Walrus::Grammar::MultilineCommentSpecAlpha.new.fill.should == ''
 
       # nested singleline comment
-      eval @parser.compile("#* hello ## <-- first line\n   world *#", :class_name => :MultilineCommentSpecBeta)
+      Object.class_eval @parser.compile("#* hello ## <-- first line\n   world *#", :class_name => :MultilineCommentSpecBeta)
       Walrus::Grammar::MultilineCommentSpecBeta.new.fill.should == ''
 
       # nested multiline comment
-      eval @parser.compile("#* hello ## <-- first line\n   world #* <-- second line *# *#", :class_name => :MultilineCommentSpecDelta)
+      Object.class_eval @parser.compile("#* hello ## <-- first line\n   world #* <-- second line *# *#", :class_name => :MultilineCommentSpecDelta)
       Walrus::Grammar::MultilineCommentSpecDelta.new.fill.should == ''
 
       # multiple comments
-      eval @parser.compile("#* hello *##* world *#", :class_name => :MultilineCommentSpecGamma)
+      Object.class_eval @parser.compile("#* hello *##* world *#", :class_name => :MultilineCommentSpecGamma)
       Walrus::Grammar::MultilineCommentSpecGamma.new.fill.should == ''
     end
   end

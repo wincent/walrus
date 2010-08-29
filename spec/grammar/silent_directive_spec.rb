@@ -29,7 +29,7 @@ describe Walrus::Grammar::SilentDirective do
     end
 
     it 'produces no output' do
-      eval @parser.compile "#silent 'foo'",
+      Object.class_eval @parser.compile "#silent 'foo'",
         :class_name => :SilentDirectiveSpecAlpha
       Walrus::Grammar::SilentDirectiveSpecAlpha.new.fill.should == ''
     end

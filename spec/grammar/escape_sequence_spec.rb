@@ -64,19 +64,19 @@ describe Walrus::Grammar::EscapeSequence do
 
     it 'should be able to round trip' do
       # single $
-      eval @parser.compile('\\$', :class_name => :EscapeSequenceSpecAlpha)
+      Object.class_eval @parser.compile('\\$', :class_name => :EscapeSequenceSpecAlpha)
       Walrus::Grammar::EscapeSequenceSpecAlpha.new.fill.should == '$'
 
       # single #
-      eval @parser.compile('\\#', :class_name => :EscapeSequenceSpecBeta)
+      Object.class_eval @parser.compile('\\#', :class_name => :EscapeSequenceSpecBeta)
       Walrus::Grammar::EscapeSequenceSpecBeta.new.fill.should == '#'
 
       # single \
-      eval @parser.compile('\\\\', :class_name => :EscapeSequenceSpecDelta)
+      Object.class_eval @parser.compile('\\\\', :class_name => :EscapeSequenceSpecDelta)
       Walrus::Grammar::EscapeSequenceSpecDelta.new.fill.should == '\\'
 
       # multiple escape markers
-      eval @parser.compile('\\\\\\#\\$', :class_name => :EscapeSequenceSpecGamma)
+      Object.class_eval @parser.compile('\\\\\\#\\$', :class_name => :EscapeSequenceSpecGamma)
       Walrus::Grammar::EscapeSequenceSpecGamma.new.fill.should == '\\#$'
     end
   end
