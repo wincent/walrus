@@ -128,6 +128,8 @@ module Walrus
 #{@outside_body.join.chomp}
       if __FILE__ == $0   # if run from the command line
         new.run           # same as "walrus run __FILE__"
+      else                # if read and evaled
+        new.fill          # return filled content
       end
     end \# #{@class_name}
   end \# Grammar
