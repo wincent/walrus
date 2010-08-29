@@ -33,7 +33,7 @@ describe 'processing a complete set of application documentation' do
   base_dir          = Pathname.new(File.dirname(__FILE__)).realpath
   relative_dir      = base_dir.relative_path_from Walrus::SpecHelper::BASE
   template_dir      = relative_dir + 'complete_application/en.lproj/help'
-  all_templates     = Pathname.glob(template_dir + '**/*.tmpl')
+  all_templates     = Pathname.glob((template_dir + '**/*.tmpl').to_s)
   web_templates     = all_templates.reject { |t| t.to_s =~ %r{/autogen/} }
   search_additions  = "#{Walrus::SpecHelper::LIBDIR}:#{ENV['RUBYLIB']}"
 
@@ -41,7 +41,7 @@ describe 'processing a complete set of application documentation' do
   # depend on the buildtools templates
   describe 'compiling the buildtools support templates' do
     buildtools_dir  = relative_dir + 'complete_application/buildtools/help'
-    buildtools_templates = Pathname.glob(buildtools_dir + '**/*.tmpl')
+    buildtools_templates = Pathname.glob((buildtools_dir + '**/*.tmpl').to_s)
 
     # we could compile all the templates in one batch, but prefer to
     # have finer-grained error messages in the event of a failure, so
