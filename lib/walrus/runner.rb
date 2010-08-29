@@ -254,6 +254,17 @@ module Walrus
   # level will be processed; subdirectories contained within will not be
   # explored.
   #
+  # @note When passing in directories as arguments to the +walrus+ tool,
+  #   all files within the directory will be read as input templates. That is,
+  #   if you have a directory containing the template +input.html.tmpl+, the
+  #   compiled version of that template +input.html.rb+, and the filled output
+  #   +input.html+, then running +walrus+ on that directory will cause it to
+  #   treat all three of those files as input templates, which is probably not
+  #   what you want.
+  #
+  #   For this reason it is almost always more practical to explcitly pass in
+  #   the source template names rather than directories.
+  #
   # == +-b+/+--[no-]backup+
   #
   # Make backups before overwriting. A backup of the form +original_filename.bak+
@@ -476,10 +487,12 @@ module Walrus
       expanded = []
       inputs.each do |input|
         if input.directory?
-          input.entries.each do |entry|
+          input.each_entry do |entry|
+            next if ['.', '..'].any? { |d| d == entry.to_s }
+            entry = input + entry # want full path, not path relative to input
             if entry.directory?
               if @options.recurse
-                expanded.concat expand(entry.entries)
+                expanded.concat expand([entry])
               end
             else # not a directory
               expanded << entry
