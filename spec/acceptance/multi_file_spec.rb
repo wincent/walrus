@@ -27,7 +27,7 @@ describe 'processing multiple-interdependent files with Walrus' do
   template_paths  = Dir[File.join(File.dirname(__FILE__), 'multi_file/**/*.tmpl')].map { |template| Pathname.new(template).realpath }
   output_dir      = Pathname.new(Dir.mkdtemp('/tmp/walrus.acceptance.XXXXXX'))
 
-  search_additions  = "#{ENV['RUBYLIB']}:#{Walrus::SpecHelper::LIBDIR}"
+  search_additions  = "#{Walrus::SpecHelper::LIBDIR}:#{ENV['RUBYLIB']}"
 
   template_paths.each do |path|
     it "compiles all the templates (source file: #{path})" do

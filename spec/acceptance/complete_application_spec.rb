@@ -35,7 +35,7 @@ describe 'processing a complete set of application documentation' do
   template_dir      = relative_dir + 'complete_application/en.lproj/help'
   all_templates     = Pathname.glob(template_dir + '**/*.tmpl')
   web_templates     = all_templates.reject { |t| t.to_s =~ %r{/autogen/} }
-  search_additions  = "#{ENV['RUBYLIB']}:#{Walrus::SpecHelper::LIBDIR}"
+  search_additions  = "#{Walrus::SpecHelper::LIBDIR}:#{ENV['RUBYLIB']}"
 
   # NOTE: the buildtools specs must run first because the following specs
   # depend on the buildtools templates

@@ -56,7 +56,7 @@ module Walrus
       For example, you could do the following if you are using the Bash shell,
       substituting the absolute path for "lib":
 
-        export RUBYLIB="${RUBYLIB}:lib"
+        export RUBYLIB="lib:${RUBYLIB}"
     ERROR
     exit Exit::LOAD_ERROR
   end
