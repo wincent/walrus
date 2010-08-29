@@ -23,9 +23,8 @@
 require File.expand_path('../spec_helper', File.dirname(__FILE__))
 require 'mkdtemp'
 
-# These templates have a different extension to keep them separate from the other acceptance tests.
 describe 'processing multiple-interdependent files with Walrus' do
-  template_paths  = Dir[File.join(File.dirname(__FILE__), '**/*.complex')].map { |template| Pathname.new(template).realpath }
+  template_paths  = Dir[File.join(File.dirname(__FILE__), 'multi_file/**/*.tmpl')].map { |template| Pathname.new(template).realpath }
   output_dir      = Pathname.new(Dir.mkdtemp('/tmp/walrus.acceptance.XXXXXX'))
   parser          = Walrus::Parser.new
 
@@ -33,18 +32,18 @@ describe 'processing multiple-interdependent files with Walrus' do
 
   template_paths.each do |path|
     it "compiles all the templates (source file: #{path})" do
-      `env RUBYLIB='#{search_additions}' #{Walrus::SpecHelper::TOOL} compile --input-extension complex --output-dir '#{output_dir}' '#{path}'`
+      `env RUBYLIB='#{search_additions}' #{Walrus::SpecHelper::TOOL} compile --output-dir '#{output_dir}' '#{path}'`
     end
   end
 
   template_paths.each do |path|
     it "fills all the templates (source file: #{path})" do
-      `env RUBYLIB='#{search_additions}' #{Walrus::SpecHelper::TOOL} fill --input-extension complex --output-dir '#{output_dir}' '#{path}'`
+      `env RUBYLIB='#{search_additions}' #{Walrus::SpecHelper::TOOL} fill --output-dir '#{output_dir}' '#{path}'`
       dir, base = path.split
       dir   = dir.to_s.sub(/\A\//, '') if dir.absolute? # and always will be absolute
       base  = base.basename(base.extname).to_s
       actual_output   = IO.read(output_dir + dir + base)
-      expected_output = IO.read(path.to_s.sub(/\.complex\z/i, ".expected"))
+      expected_output = IO.read(path.to_s.sub(/\.tmpl\z/i, ".expected"))
       actual_output.should == expected_output
     end
   end

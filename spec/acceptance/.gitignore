@@ -1,2 +1,5 @@
 *.rb
 *.bak
+!multi_file_spec.rb
+!single_file_spec.rb
+!complete_application_spec.rb
