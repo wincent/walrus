@@ -211,7 +211,7 @@ module Walrus
 
       # scans a string literal
       parslet   = :string_literal & :directive_end
-      file_name = parslet.parse(string, options)
+      file_name = parslet.parse string, options
 
       # if options contains non-nil "origin" then try to construct relative
       # path; otherwise just look in current working directory
@@ -229,7 +229,7 @@ module Walrus
       sub_options = { :origin => include_target.to_s }
       sub_result  = nil
       catch :AndPredicateSuccess do
-        sub_result  = Parser.new.parse(content, sub_options)
+        sub_result = Parser.new.parse content, sub_options
       end
 
       # want to insert a bunch of nodes (a subtree) into the parse tree
@@ -254,32 +254,32 @@ module Walrus
 
       # for the time-being, not sure if there is much benefit in calling
       # memoizing_parse here
-      state     = Walrat::ParserState.new(string, options)
-      parsed    = rules[:here_document_marker].parse(state.remainder, state.options)
-      state.skipped(parsed)
+      state     = Walrat::ParserState.new string, options
+      parsed    = rules[:here_document_marker].parse state.remainder, state.options
+      state.skipped parsed
       marker    = parsed.match_data
       indenting = (marker[1] != '')
 
       if indenting # whitespace allowed before end marker
-        end_marker = /^[ \t]*#{marker[2]}[ \t]*(\n|\z)/.to_parseable # will eat trailing newline
+        end_marker = /^[ \t]*#{marker[2]}[ \t]*(\n|\z)/.to_parseable  # will eat trailing newline
       else         # no whitespace allowed before end marker
-        end_marker = /^#{marker[2]}[ \t]*(\n|\z)/.to_parseable         # will eat trailing newline
+        end_marker = /^#{marker[2]}[ \t]*(\n|\z)/.to_parseable        # will eat trailing newline
       end
 
       while true do
         begin
-          skipped = end_marker.parse(state.remainder, state.options)
-          state.skipped(skipped)   # found end marker, skip it
-          break                    # all done
-        rescue Walrat::ParseError  # didn't find end marker yet, consume a line
-          parsed = rules[:line].parse(state.remainder, state.options)
-          state.parsed(parsed)
+          skipped = end_marker.parse state.remainder, state.options
+          state.skipped skipped   # found end marker, skip it
+          break                   # all done
+        rescue Walrat::ParseError # didn't find end marker yet, consume a line
+          parsed = rules[:line].parse state.remainder, state.options
+          state.parsed parsed
         end
       end
 
       # caller will want a String, not an Array
       results         = state.results
-      document        = Walrat::StringResult.new(results.to_s)
+      document        = Walrat::StringResult.new results.to_s
       document.start  = results.start
       document.end    = results.end
       document
