@@ -4,9 +4,16 @@
   evaluated, but only the last one is emitted to the template; this brings
   Walrus in line with most other template systems' behavior
 * the +--debug+ switch, which never actually did anything, has been removed
+* added a +--recurse+ switch; this is a long form of the existing +-R+ switch
+* fixed a "stack level too deep" error when passing directories to the
+  +walrus+ tool
+* passing directories to the +walrus+ tool now works more usefully, only
+  selecting files matching the +--input-extension+ rather than expecting every
+  file in the directory to be a template
 * the grammar no longer includes the archaic vertical tab in its definition of
   "whitespace"
 * various optimizations for speed and memory use
+* more work on compatibility with Ruby 1.9
 
 Code-level changelog: http://git.wincent.com/Walrus.git/shortlog/refs/tags/0.5
 
