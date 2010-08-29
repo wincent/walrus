@@ -254,16 +254,10 @@ module Walrus
   # level will be processed; subdirectories contained within will not be
   # explored.
   #
-  # @note When passing in directories as arguments to the +walrus+ tool,
-  #   all files within the directory will be read as input templates. That is,
-  #   if you have a directory containing the template +input.html.tmpl+, the
-  #   compiled version of that template +input.html.rb+, and the filled output
-  #   +input.html+, then running +walrus+ on that directory will cause it to
-  #   treat all three of those files as input templates, which is probably not
-  #   what you want.
-  #
-  #   For this reason it is almost always more practical to explcitly pass in
-  #   the source template names rather than directories.
+  # In both recursive and non-recursive modes of operation, Walrus decides
+  # whether a directory entry should be processed on the basis of its
+  # extension: only entries matching the +--input-extension+ will be selected
+  # for processing.
   #
   # == +-b+/+--[no-]backup+
   #
@@ -495,7 +489,8 @@ module Walrus
                 expanded.concat expand([entry])
               end
             else # not a directory
-              expanded << entry
+              regexp = Regexp.escape @options.input_extension
+              expanded << entry if entry.to_s =~ /\.#{regexp}\z/
             end
           end
         else # not a directory
