@@ -22,10 +22,26 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 module Walrus
-  EXIT_LOAD_ERROR     = 1
-  EXIT_ARGUMENT_ERROR = 2
-  EXIT_OTHER_ERROR    = 3
-  EXIT_UNKNOWN_ERROR  = 4
+  # Exit statuses.
+  #
+  # @see for other exit statuses see {Walrus::Runner}.
+  module Exit
+    # Exit status when requiring a component of Walrus fails, usually caused
+    # because Walrus is not properly installed, or the environment is not set
+    # up with the correct load path.
+    LOAD_ERROR = 1
+
+    # Indicates the run was interrupted by the user (for example, with
+    # Control-C).
+    INTERRUPT_ERROR = 2
+
+    # Indicates that the user did not provide a correct set of command line
+    # arguments.
+    ARGUMENT_ERROR = 3
+
+    # Indicates that an unknown (internal) error occurred.
+    UNKNOWN_ERROR = 4
+  end # module Exit
 
   begin
     require 'walrus/runner'
@@ -41,25 +57,27 @@ module Walrus
 
         export RUBYLIB="${RUBYLIB}:lib"
     ERROR
-    exit EXIT_LOAD_ERROR
+    exit Exit::LOAD_ERROR
   end
 
+  exit_status = 0
   begin
-    Runner.new.run
+    exit_status = Runner.new.run
   rescue SystemExit => e
     # normally raised for "--version" or "--help" switches
   rescue Interrupt => e
     $stderr.puts ':: aborting: interrupt'
-    exit EXIT_OTHER_ERROR
+    exit Exit::INTERRUPT_ERROR
   rescue Runner::ArgumentError => e
     $stderr.puts ":: error: #{e}",
       "For usage information type: #{$0} --help"
-    exit EXIT_ARGUMENT_ERROR
+    exit Exit::ARGUMENT_ERROR
   rescue Runner::Error => e
     $stderr.puts ":: error: #{e}"
-    exit EXIT_OTHER_ERROR
+    exit e.exit_status
   rescue Exception => e
     $stderr.puts ":: error: #{e}"
-    exit EXIT_UNKNOWN_ERROR
+    exit Exit::UNKNOWN_ERROR
   end
+  exit exit_status
 end # module Walrus

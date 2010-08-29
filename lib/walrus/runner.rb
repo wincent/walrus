@@ -29,6 +29,29 @@ require 'rubygems'
 require 'wopen3'
 
 module Walrus
+  # Exit statuses.
+  #
+  # @see {bin/walrus} for exit statuses 1 through 4
+  module Exit
+    # Indicates a problem occurred trying to read a file.
+    READ_ERROR = 32
+
+    # Indicates a problem occurred trying to create a directory.
+    MKDIR_ERROR = 33
+
+    # Indicates a problem occurred while trying to write to a file.
+    WRITE_ERROR = 34
+
+    # Indicates a problem occurred during compilation.
+    COMPILE_ERROR = 34
+
+    # Indicates problem occurred during filling.
+    FILL_ERROR = 35
+
+    # Indicates a problem occurred during running.
+    RUN_ERROR = 36
+  end # module Exit
+
   # The {Walrus::Runner} class is instantiated from the +walrus+ executable
   # tool. It processes command-line arguments and then compiles, fills and
   # runs Walrus templates accordingly. It can process single templates or
@@ -253,6 +276,10 @@ module Walrus
   #
   # Defaults to off.
   #
+  # When +--halt+ is off, processing will continue after non-fatal errors. In the
+  # case of non-fatal errors in multiple input templates, the exit status of the
+  # +walrus+ command-line tool will correspond to the last-encountered error.
+  #
   # == +-t+/+--test+
   #
   # Performs a "dry" (test) run in which no modifications are made to the filesystem
@@ -276,14 +303,19 @@ module Walrus
   #
   # Shows the Walrus version.
   class Runner
-    class Error < Exception; end
+    # Used to signal early exit to the caller when the +--halt+ option is
+    # active.
+    class Error < Exception
+      attr_accessor :exit_status
+    end
 
     # This is different from the standard ::ArgumentError; it is specifically
     # used to signal errors in the command-line arguments passed to the runner.
     class ArgumentError < Error; end
 
     def initialize
-      @options = OpenStruct.new
+      @exit_status                = 0
+      @options                    = OpenStruct.new
       @options.output_dir         = nil
       @options.input_extension    = 'tmpl'
       @options.output_extension   = ''
@@ -414,7 +446,7 @@ module Walrus
             write_string_to_path get_output(input),
               filled_output_path_for_input(input)
           rescue Exception => e
-            handle_error e
+            handle_error e, Exit::FILL_ERROR
           end
         when 'run'
           log "Running '#{input}'."
@@ -423,13 +455,14 @@ module Walrus
             printf '%s', get_output(input)
             $stdout.flush
           rescue Exception => e
-            handle_error e
+            handle_error e, Exit::RUN_ERROR
           end
         else
           raise ArgumentError, "unrecognized command '#{@command}'"
         end
       end
       log "Processing complete: #{Time.new}."
+      @exit_status
     end
 
   private
@@ -482,7 +515,8 @@ module Walrus
           template = Template.new template_source_path
         rescue Exception => e
           handle_error \
-            "failed to read input template '#{template_source_path}' (#{e})"
+            "failed to read input template '#{template_source_path}' (#{e})",
+            Exit::READ_ERROR
           return
         end
 
@@ -490,7 +524,8 @@ module Walrus
           compiled = template.compile
         rescue Walrat::ParseError => e
           handle_error \
-            "failed to compile input template '#{template_source_path}' (#{e})"
+            "failed to compile input template '#{template_source_path}' (#{e})",
+            Exit::COMPILE_ERROR
           return
         end
         write_string_to_path compiled, compiled_path, true
@@ -520,7 +555,7 @@ module Walrus
             log "Creating directory '#{path.dirname}'."
             FileUtils.mkdir_p path.dirname
           rescue SystemCallError => e
-            handle_error e
+            handle_error e, Exit::MKDIR_ERROR
             return
           end
         end
@@ -539,7 +574,7 @@ module Walrus
             f.chmod 0744 if executable
           end
         rescue SystemCallError => e
-          handle_error e
+          handle_error e, Exit::WRITE_ERROR
         end
       end
     end
@@ -608,10 +643,13 @@ module Walrus
     # If the user supplied the "--halt" switch raises a Runner::Error exception
     # based on "message".
     # Otherwise merely prints "message" to the standard error.
-    def handle_error message
+    def handle_error message, exit_status
       if @options.halt
-        raise Error, message
+        error = Error.new message
+        error.exit_status = exit_status
+        raise error
       else
+        @exit_status = exit_status
         $stderr.puts ":: error: #{message}"
       end
     end
