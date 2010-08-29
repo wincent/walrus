@@ -50,8 +50,8 @@ describe 'processing a complete set of application documentation' do
       describe "template: #{t}" do
         before :all do
           @result = Wopen3.system 'env', "RUBYLIB=#{search_additions}",
-            'RUBYOPT=rrubygems', Walrus::SpecHelper::TOOL, 'compile',
-            '--no-backup', t
+            'RUBYOPT=rrubygems', Walrus::SpecHelper::TOOL.to_s, 'compile',
+            '--no-backup', t.to_s
         end
 
         it 'succeeds' do
@@ -71,8 +71,8 @@ describe 'processing a complete set of application documentation' do
         describe 'compiling' do
           before :all do
             @result = Wopen3.system 'env', "RUBYLIB=#{search_additions}",
-              'RUBYOPT=rrubygems', Walrus::SpecHelper::TOOL, 'compile',
-              '--no-backup', t
+              'RUBYOPT=rrubygems', Walrus::SpecHelper::TOOL.to_s, 'compile',
+              '--no-backup', t.to_s
           end
 
           it 'succeeds' do
@@ -84,8 +84,8 @@ describe 'processing a complete set of application documentation' do
         describe 'filling' do
           before :all do
             @result = Wopen3.system 'env', "RUBYLIB=#{search_additions}",
-              'RUBYOPT=rrubygems', Walrus::SpecHelper::TOOL, 'fill',
-              '--no-backup', '--output-dir', @output_dir, t
+              'RUBYOPT=rrubygems', Walrus::SpecHelper::TOOL.to_s, 'fill',
+              '--no-backup', '--output-dir', @output_dir.to_s, t.to_s
             @output_file = @output_dir + t.sub(/\.tmpl\z/, '')
           end
 
@@ -101,8 +101,8 @@ describe 'processing a complete set of application documentation' do
           it 'produces matching output' do
             tidied_output = @output_file.sub(/\.html\z/, '.tidy.html')
             Wopen3.system 'tidy', '-utf8', '-wrap', '0', '--fix-uri', 'no',
-              '--tidy-mark', 'no', '-quiet', '-o', tidied_output, @output_file,
-              '\;'
+              '--tidy-mark', 'no', '-quiet', '-o', tidied_output.to_s,
+              @output_file.to_s, '\;'
             actual_output = tidied_output.read
             expected_output = t.sub(/\.tmpl\z/, '.app.html').read
             actual_output.should == expected_output
@@ -123,7 +123,7 @@ describe 'processing a complete set of application documentation' do
           before :all do
             @result = Wopen3.system 'env', "RUBYLIB=#{search_additions}",
               'RUBYOPT=rrubygems', 'WALRUS_STLYE=web',
-              Walrus::SpecHelper::TOOL, 'compile', '--no-backup', t
+              Walrus::SpecHelper::TOOL.to_s, 'compile', '--no-backup', t.to_s
           end
 
           it 'succeeds' do
@@ -136,8 +136,8 @@ describe 'processing a complete set of application documentation' do
           before :all do
             @result = Wopen3.system 'env', "RUBYLIB=#{search_additions}",
               'RUBYOPT=rrubygems', 'WALRUS_STYLE=web',
-              Walrus::SpecHelper::TOOL, 'fill', '--no-backup',
-              '--output-dir', @output_dir, t
+              Walrus::SpecHelper::TOOL.to_s, 'fill', '--no-backup',
+              '--output-dir', @output_dir.to_s, t.to_s
             @output_file = @output_dir + t.sub(/\.tmpl\z/, '')
           end
 
@@ -153,8 +153,8 @@ describe 'processing a complete set of application documentation' do
           it 'produces matching output' do
             tidied_output = @output_file.sub(/\.html\z/, '.tidy.html')
             Wopen3.system 'tidy', '-utf8', '-wrap', '0', '--fix-uri', 'no',
-              '--tidy-mark', 'no', '-quiet', '-o', tidied_output, @output_file,
-              '\;'
+              '--tidy-mark', 'no', '-quiet', '-o', tidied_output.to_s,
+              @output_file.to_s, '\;'
             actual_output = tidied_output.read
             expected_output = t.sub(/\.tmpl\z/, '.web.html').read
             actual_output.should == expected_output

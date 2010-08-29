@@ -36,7 +36,7 @@ describe 'bin/walrus' do
 
   def walrus *args
     Wopen3.system 'env', "RUBYLIB=#{load_path}",
-      Walrus::SpecHelper::TOOL, *args
+      Walrus::SpecHelper::TOOL.to_s, *args
   end
 
   describe 'regressions' do

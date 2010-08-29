@@ -548,7 +548,7 @@ module Walrus
         # throws away the exit status)
         # TODO: replace this with something that works under JRuby (JRuby
         # doesn't support fork)
-        result = Wopen3.system compiled_source_path_for_input(input).realpath
+        result = Wopen3.system compiled_source_path_for_input(input).realpath.to_s
         raise "non-zero exit status (#{result.status})" unless result.success?
         result.stdout
       end
