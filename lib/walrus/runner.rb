@@ -242,7 +242,7 @@ module Walrus
   #     walrus compile example.html.tmpl  # => compiles to: example.html.rb
   #     walrus fill example.html.tmpl     # => writes to:   example.html
   #
-  # == +-R+
+  # == +-R+/+--[no-]recurse+
   #
   # Search subdirectories recursively for input files. If a directory is
   # supplied as one of the inputs then any subdirectories contained within
@@ -380,7 +380,7 @@ module Walrus
           @options.output_extension = opt
         end
 
-        o.on('-R',
+        o.on('-R', '--[no-]recurse'
              'Search subdirectories recursively for input files',
              'default: on') do |opt|
           @options.recurse = opts
