@@ -24,7 +24,7 @@ Code-level changelog: http://git.wincent.com/Walrus.git/shortlog/refs/tags/0.5
   claimed
 * the default output extension is now the empty string, meaning that the
   suggested workflow is to name your templates like +template.html.tmpl+
-  (which would compile to +template.html.rb+ and produce +tempalte.html+ when
+  (which would compile to +template.html.rb+ and produce +template.html+ when
   filled)
 
 Code-level changelog: http://git.wincent.com/Walrus.git/shortlog/refs/tags/0.4
