@@ -34,7 +34,6 @@ describe 'processing test files with Walrus' do
   # make temporary output dirs for storing compiled templates
   manually_compiled_templates = Pathname.new(Dir.mkdtemp('/tmp/walrus.acceptance.XXXXXX'))
   walrus_compiled_templates   = Pathname.new(Dir.mkdtemp('/tmp/walrus.acceptance.XXXXXX'))
-  parser                      = Walrus::Parser.new
   search_additions            = "#{ENV['RUBYLIB']}:#{Walrus::SpecHelper::LIBDIR}"
 
   template_paths.each do |path|

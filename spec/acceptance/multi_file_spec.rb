@@ -26,7 +26,6 @@ require 'mkdtemp'
 describe 'processing multiple-interdependent files with Walrus' do
   template_paths  = Dir[File.join(File.dirname(__FILE__), 'multi_file/**/*.tmpl')].map { |template| Pathname.new(template).realpath }
   output_dir      = Pathname.new(Dir.mkdtemp('/tmp/walrus.acceptance.XXXXXX'))
-  parser          = Walrus::Parser.new
 
   search_additions  = "#{ENV['RUBYLIB']}:#{Walrus::SpecHelper::LIBDIR}"
 
