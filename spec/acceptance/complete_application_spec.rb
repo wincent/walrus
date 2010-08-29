@@ -31,6 +31,27 @@ describe 'processing a complete set of application documentation' do
   web_templates     = all_templates.reject { |t| t.to_s =~ %r{/autogen/} }
   search_additions  = "#{ENV['RUBYLIB']}:#{Walrus::SpecHelper::LIBDIR}"
 
+  # NOTE: the buildtools specs must run first because the following specs
+  # depend on the buildtools templates
+  describe 'compiling the buildtools support templates' do
+    buildtools_dir  = Pathname.new(File.dirname(__FILE__)) +
+                      'complete_application/buildtools/help'
+    buildtools_templates = Pathname.glob(buildtools_dir + '**/*.tmpl')
+    buildtools_templates.each do |t|
+      describe "template: #{t}" do
+        before do
+          @result = Wopen3.system 'env', "RUBY_LIB=#{search_additions}",
+            'RUBYOPT=rrubygems', Walrus::SpecHelper::TOOL, 'compile',
+            '--no-backup', t
+        end
+
+        it 'succeeds' do
+          @result.should be_success
+        end
+      end
+    end
+  end
+
   describe 'help book format' do
     all_templates.each do |t|
       describe "template: #{t}" do
