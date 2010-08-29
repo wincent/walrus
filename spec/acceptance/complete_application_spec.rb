@@ -37,10 +37,14 @@ describe 'processing a complete set of application documentation' do
     buildtools_dir  = Pathname.new(File.dirname(__FILE__)) +
                       'complete_application/buildtools/help'
     buildtools_templates = Pathname.glob(buildtools_dir + '**/*.tmpl')
+
+    # we could compile all the templates in one batch, but prefer to
+    # have finer-grained error messages in the event of a failure, so
+    # do them one template at a time
     buildtools_templates.each do |t|
       describe "template: #{t}" do
         before do
-          @result = Wopen3.system 'env', "RUBY_LIB=#{search_additions}",
+          @result = Wopen3.system 'env', "RUBYLIB=#{search_additions}",
             'RUBYOPT=rrubygems', Walrus::SpecHelper::TOOL, 'compile',
             '--no-backup', t
         end
@@ -61,7 +65,7 @@ describe 'processing a complete set of application documentation' do
 
         describe 'compiling' do
           before do
-            @result = Wopen3.system 'env', "RUBY_LIB=#{search_additions}",
+            @result = Wopen3.system 'env', "RUBYLIB=#{search_additions}",
               'RUBYOPT=rrubygems', Walrus::SpecHelper::TOOL, 'compile',
               '--no-backup', t
           end
@@ -74,7 +78,7 @@ describe 'processing a complete set of application documentation' do
 
         describe 'filling' do
           before do
-            @result = Wopen3.system 'env', "RUBY_LIB=#{search_additions}",
+            @result = Wopen3.system 'env', "RUBYLIB=#{search_additions}",
               'RUBYOPT=rrubygems', Walrus::SpecHelper::TOOL, 'fill',
               '--no-backup', '--output-dir', @output_dir, t
             @output_file = @output_dir + t.sub(/\.tmpl\z/, '')
@@ -112,7 +116,7 @@ describe 'processing a complete set of application documentation' do
 
         describe 'compiling' do
           before do
-            @result = Wopen3.system 'env', "RUBY_LIB=#{search_additions}",
+            @result = Wopen3.system 'env', "RUBYLIB=#{search_additions}",
               'RUBYOPT=rrubygems', 'WALRUS_STLYE=web',
               Walrus::SpecHelper::TOOL, 'compile', '--no-backup', t
           end
@@ -125,7 +129,7 @@ describe 'processing a complete set of application documentation' do
 
         describe 'filling' do
           before do
-            @result = Wopen3.system 'env', "RUBY_LIB=#{search_additions}",
+            @result = Wopen3.system 'env', "RUBYLIB=#{search_additions}",
               'RUBYOPT=rrubygems', 'WALRUS_STYLE=web',
               Walrus::SpecHelper::TOOL, 'fill', '--no-backup',
               '--output-dir', @output_dir, t
