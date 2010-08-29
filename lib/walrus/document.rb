@@ -29,30 +29,30 @@ module Walrus
       @internal_hash = {}
     end
 
-    def set_value(key, value)
+    def set_value key, value
       @internal_hash[key.to_sym] = value
     end
 
-    def get_value(key)
+    def get_value key
       @internal_hash[key.to_sym]
     end
 
-    def remove_value(key)
-      @internal_hash.delete(key.to_sym)
+    def remove_value key
+      @internal_hash.delete key.to_sym
     end
 
     # Expects a placeholder symbol or String.
     # The parameters are optional.
-    def lookup_and_accumulate_placeholder(placeholder, *params)
-      output = lookup_and_return_placeholder(placeholder, *params)
-      accumulate(output) if output
+    def lookup_and_accumulate_placeholder placeholder, *params
+      output = lookup_and_return_placeholder placeholder, *params
+      accumulate output if output
     end
 
-    def lookup_and_return_placeholder(placeholder, *params)
+    def lookup_and_return_placeholder placeholder, *params
       # if exists a method responding to placeholder, call it
       if respond_to? placeholder
         @accumulators << nil                # push new accumulator onto the stack
-        output = send(placeholder, *params) # call method
+        output = send placeholder, *params  # call method
         accumulated = @accumulators.pop     # pop last accumulator from the stack
         if accumulated
           return accumulated
@@ -68,10 +68,10 @@ module Walrus
     #   - if passed a string it will be appended to the accumulator.
     #   - if not passed a string but given a block will evaluate the block and
     #     append the (string) result to the accumulator.
-    def accumulate(string = nil)
-      if (@accumulators.last.nil?)  # accumulator will be nil if hasn't been used yet
+    def accumulate string = nil
+      if @accumulators.last.nil?    # accumulator will be nil if hasn't been used yet
         @accumulators.pop           # replace temporary nil accumulator
-        @accumulators.push("")      # with proper string accumulator
+        @accumulators.push ""       # with proper string accumulator
       end
       if block_given?
         @accumulators.last << yield.to_s
@@ -94,7 +94,7 @@ module Walrus
     # obscured by the command prompt that is drawn (starting at the first
     # column) after execution completes.
     def run
-      printf('%s', fill)
+      printf '%s', fill
       $stdout.flush
     end
 
@@ -103,9 +103,11 @@ module Walrus
     end
 
     if __FILE__ == $0
-      self.new.run      # When run from the command line the default action is to call "run".
+      # when run from the command line the default action is to call "run".
+      self.new.run
     else
-      self.new.fill     # in other cases, evaluate 'fill' (if run inside an eval, will return filled content)
+      # if run inside an eval, will return filled content
+      self.new.fill
     end
   end # class Document
 end # module Walrus
