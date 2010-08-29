@@ -12,6 +12,11 @@
   file in the directory to be a template
 * the grammar no longer includes the archaic vertical tab in its definition of
   "whitespace"
+* Wopen3 has been made a development dependency instead of a runtime one,
+  which means that the Walrus codebase is now fork-free and should be more
+  compatible with JRuby (previously the forking meant that compiling worked to
+  an extent under JRuby but filling did not work at all); more compatibility
+  work is still to be done
 * various optimizations for speed and memory use
 * more work on compatibility with Ruby 1.9
 

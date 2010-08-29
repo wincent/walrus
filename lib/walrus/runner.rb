@@ -26,7 +26,7 @@ require 'optparse'
 require 'ostruct'
 require 'pathname'
 require 'rubygems'
-require 'wopen3'
+require 'shellwords'
 
 module Walrus
   # Exit statuses.
@@ -544,13 +544,10 @@ module Walrus
       if @options.dry
         "(no output: dry run)\n"
       else
-        # use Wopen3 (backticks choke if there is a space in the path, open3
-        # throws away the exit status)
-        # TODO: replace this with something that works under JRuby (JRuby
-        # doesn't support fork)
-        result = Wopen3.system compiled_source_path_for_input(input).realpath.to_s
-        raise "non-zero exit status (#{result.status})" unless result.success?
-        result.stdout
+        path = compiled_source_path_for_input(input).realpath.to_s.shellescape
+        output = `#{path}`
+        raise "non-zero exit status (#{$?.exitstatus})" unless $?.exitstatus == 0
+        output
       end
     end
 
