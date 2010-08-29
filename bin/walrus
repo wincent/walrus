@@ -26,9 +26,10 @@ module Walrus
   #
   # @see for other exit statuses see {Walrus::Runner}.
   module Exit
-    # Exit status when requiring a component of Walrus fails, usually caused
-    # because Walrus is not properly installed, or the environment is not set
-    # up with the correct load path.
+    # Indicates that requiring a component of Walrus failed.
+    #
+    # This is usually caused because Walrus is not properly installed, or the
+    # environment is not set up with the correct load path.
     LOAD_ERROR = 1
 
     # Indicates the run was interrupted by the user (for example, with
