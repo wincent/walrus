@@ -99,13 +99,5 @@ module Walrus
     # By default, there is nothing at all in the template body.
     def template_body
     end
-
-    if __FILE__ == $0
-      # when run from the command line the default action is to call "run".
-      new.run
-    else
-      # if run inside an eval, will return filled content
-      new.fill
-    end
   end # class Document
 end # module Walrus
