@@ -1,0 +1,3 @@
+[submodule "spec/acceptance/complete_application/buildtools"]
+	path = spec/acceptance/complete_application/buildtools
+	url = git://git.wincent.com/buildtools.git
