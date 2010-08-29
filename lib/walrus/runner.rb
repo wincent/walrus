@@ -374,7 +374,7 @@ module Walrus
           @options.output_extension = opt
         end
 
-        o.on('-R', '--[no-]recurse'
+        o.on('-R', '--[no-]recurse',
              'Search subdirectories recursively for input files',
              'default: on') do |opt|
           @options.recurse = opts
