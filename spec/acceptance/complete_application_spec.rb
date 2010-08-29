@@ -43,7 +43,7 @@ describe 'processing a complete set of application documentation' do
     # do them one template at a time
     buildtools_templates.each do |t|
       describe "template: #{t}" do
-        before do
+        before :all do
           @result = Wopen3.system 'env', "RUBYLIB=#{search_additions}",
             'RUBYOPT=rrubygems', Walrus::SpecHelper::TOOL, 'compile',
             '--no-backup', t
@@ -64,7 +64,7 @@ describe 'processing a complete set of application documentation' do
         end
 
         describe 'compiling' do
-          before do
+          before :all do
             @result = Wopen3.system 'env', "RUBYLIB=#{search_additions}",
               'RUBYOPT=rrubygems', Walrus::SpecHelper::TOOL, 'compile',
               '--no-backup', t
@@ -77,7 +77,7 @@ describe 'processing a complete set of application documentation' do
         end
 
         describe 'filling' do
-          before do
+          before :all do
             @result = Wopen3.system 'env', "RUBYLIB=#{search_additions}",
               'RUBYOPT=rrubygems', Walrus::SpecHelper::TOOL, 'fill',
               '--no-backup', '--output-dir', @output_dir, t
@@ -115,7 +115,7 @@ describe 'processing a complete set of application documentation' do
         end
 
         describe 'compiling' do
-          before do
+          before :all do
             @result = Wopen3.system 'env', "RUBYLIB=#{search_additions}",
               'RUBYOPT=rrubygems', 'WALRUS_STLYE=web',
               Walrus::SpecHelper::TOOL, 'compile', '--no-backup', t
@@ -128,7 +128,7 @@ describe 'processing a complete set of application documentation' do
         end
 
         describe 'filling' do
-          before do
+          before :all do
             @result = Wopen3.system 'env', "RUBYLIB=#{search_additions}",
               'RUBYOPT=rrubygems', 'WALRUS_STYLE=web',
               Walrus::SpecHelper::TOOL, 'fill', '--no-backup',
