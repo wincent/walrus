@@ -24,7 +24,7 @@ https://wincent.com/products/walrus
 
 = Source code
 
-http://git.wincent.com/Walrus.git
+http://git.wincent.com/walrus.git
 
 = Donations
 
