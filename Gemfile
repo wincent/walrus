@@ -22,6 +22,7 @@
 
 source 'https://rubygems.org'
 
+gem 'RedCloth', '3.0.4'
 gem 'mkdtemp'
 gem 'rspec',  '1.3.0'
 gem 'walrat', path: 'vendor/walrat'

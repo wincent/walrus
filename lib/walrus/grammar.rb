@@ -1,4 +1,4 @@
-# Copyright 2007-2010 Wincent Colaiuta. All rights reserved.
+# Copyright 2007-2014 Greg Hurrell. All rights reserved.
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #
@@ -279,7 +279,7 @@ module Walrus
 
       # caller will want a String, not an Array
       results         = state.results
-      document        = Walrat::StringResult.new results.to_s
+      document        = Walrat::StringResult.new Array(results).join
       document.start  = results.start
       document.end    = results.end
       document

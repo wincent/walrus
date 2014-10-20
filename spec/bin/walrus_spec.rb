@@ -1,4 +1,4 @@
-# Copyright 2010 Wincent Colaiuta. All rights reserved.
+# Copyright 2010-2014 Greg Hurrell. All rights reserved.
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #
@@ -30,7 +30,7 @@ require 'wopen3'
 describe 'bin/walrus' do
   def load_path
     path = Walrus::SpecHelper::LIBDIR
-    path << ":#{ENV['RUBYLIB']}" if ENV['RUBYLIB']
+    path += ":#{ENV['RUBYLIB']}" if ENV['RUBYLIB']
     path
   end
 

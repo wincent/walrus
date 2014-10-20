@@ -1,4 +1,4 @@
-# Copyright 2007-2010 Wincent Colaiuta. All rights reserved.
+# Copyright 2007-2014 Greg Hurrell. All rights reserved.
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #
@@ -23,25 +23,26 @@
 require File.expand_path('lib/walrus/version', File.dirname(__FILE__))
 
 Gem::Specification.new do |s|
-  s.name              = 'walrus'
-  s.version           = Walrus::VERSION
-  s.author            = 'Wincent Colaiuta'
-  s.email             = 'win@wincent.com'
-  s.homepage          = 'https://wincent.com/products/walrus'
-  s.rubyforge_project = 'walrus'
-  s.platform          = Gem::Platform::RUBY
-  s.summary           = 'Object-oriented templating system'
-  s.description       = <<-DESC
+  s.author                = 'Greg Hurrell'
+  s.email                 = 'greg@hurrell.net'
+  s.has_rdoc              = true
+  s.homepage              = 'https://wincent.com/products/walrus'
+  s.name                  = 'walrus'
+  s.platform              = Gem::Platform::RUBY
+  s.require_paths         = ['lib']
+  s.required_ruby_version = '~> 2.1.0'
+  s.rubyforge_project     = 'walrus'
+  s.summary               = 'Object-oriented templating system'
+  s.version               = Walrus::VERSION
+  s.description           = <<-DESC
     Walrus is an object-oriented templating system inspired by and similar
     to the Cheetah Python-powered template engine.
   DESC
-  s.require_paths     = ['lib']
-  s.has_rdoc          = true
 
   # TODO: add 'docs' subdirectory, 'README.txt' when they're done
   s.files             = Dir['bin/walrus', 'lib/**/*.rb']
   s.executables       = ['walrus']
-  s.add_runtime_dependency 'walrat'
+  s.add_runtime_dependency 'walrat', '0.2'
   s.add_development_dependency 'wopen3', '>= 0.3'
   s.add_development_dependency 'mkdtemp', '>= 1.0'
   s.add_development_dependency 'rspec', '1.3.0'
