@@ -20,7 +20,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-source :gemcutter
+source 'https://rubygems.org'
 
 gem 'mkdtemp'
 gem 'rspec',  '1.3.0'
