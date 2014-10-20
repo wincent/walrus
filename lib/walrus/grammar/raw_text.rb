@@ -1,4 +1,4 @@
-# Copyright 2007-2010 Wincent Colaiuta. All rights reserved.
+# Copyright 2007-2014 Greg Hurrell. All rights reserved.
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #
@@ -31,7 +31,7 @@ module Walrus
       # leading carriage return/line feed from the @lexeme prior to emitting
       # the compiled output.
       def compile options = {}
-        lexeme = options[:slurping] ? @lexeme.to_s.sub(/\A(\r\n|\r|\n)/, '') : @lexeme.to_s
+        lexeme = options[:slurping] ? to_s.sub(/\A(\r\n|\r|\n)/, '') : to_s
 
         compiled  = ''
         first     = true
