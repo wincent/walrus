@@ -1,4 +1,4 @@
-# Copyright 2007-2010 Wincent Colaiuta. All rights reserved.
+# Copyright 2007-2014 Greg Hurrell. All rights reserved.
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #
@@ -24,6 +24,6 @@ source :gemcutter
 
 gem 'mkdtemp'
 gem 'rspec',  '1.3.0'
-gem 'walrat', :git => 'git://git.wincent.com/walrat.git'
+gem 'walrat', path: 'vendor/walrat'
 gem 'wopen3'
 gem 'yard'

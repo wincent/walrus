@@ -1,6 +1,5 @@
-GIT
-  remote: git://git.wincent.com/walrat.git
-  revision: 48ff88b
+PATH
+  remote: vendor/walrat
   specs:
     walrat (0.1.0.99)
 
