@@ -6,6 +6,8 @@ require 'walrus/grammar'
 module Walrus
   class Grammar
     class DefDirective < Directive
+      using StringAdditions
+
       # Returns a string containing the compiled (Ruby) version of receiver.
       def compile options = {}
         internal = ''

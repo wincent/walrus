@@ -2,7 +2,6 @@
 # Licensed under the terms of the BSD 2-clause license.
 
 require 'walrus/grammar'
-require 'walrat/additions/string'
 require 'ostruct'
 
 module Walrus

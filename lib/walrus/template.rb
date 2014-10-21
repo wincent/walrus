@@ -2,7 +2,6 @@
 # Licensed under the terms of the BSD 2-clause license.
 
 require 'walrus'
-require 'walrat/additions/string'
 
 module Walrus
   class Template

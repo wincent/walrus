@@ -6,6 +6,8 @@ require 'pathname'
 
 module Walrus
   class Compiler
+    using StringAdditions
+
     BODY_INDENT     = ' ' * 8
     OUTSIDE_INDENT  = ' ' * 6
     DEFAULT_CLASS   = 'DocumentSubclass'

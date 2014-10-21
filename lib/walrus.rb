@@ -4,13 +4,12 @@
 require 'walrat'
 
 module Walrus
-  autoload :CompileError, 'walrus/compile_error'
-  autoload :Compiler,     'walrus/compiler'
-  autoload :COPYRIGHT,    'walrus/version'
-  autoload :Grammar,      'walrus/grammar'
-  autoload :Parser,       'walrus/parser'
-  autoload :Template,     'walrus/template'
-  autoload :VERSION,      'walrus/version'
+  autoload :CompileError,    'walrus/compile_error'
+  autoload :Compiler,        'walrus/compiler'
+  autoload :COPYRIGHT,       'walrus/version'
+  autoload :Grammar,         'walrus/grammar'
+  autoload :Parser,          'walrus/parser'
+  autoload :StringAdditions, 'walrus/additions/string'
+  autoload :Template,        'walrus/template'
+  autoload :VERSION,         'walrus/version'
 end # module Walrus
-
-require 'walrus/additions/string'

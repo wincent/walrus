@@ -36,6 +36,8 @@ module Walrus
     # but it must be the last thing on the line. The preceding whitespace is
     # not considered to be part of the quoted text.
     class RawDirective < Directive
+      using StringAdditions
+
       # Returns a string containing the compiled (Ruby) version of receiver.
       def compile options = {}
         compiled  = []

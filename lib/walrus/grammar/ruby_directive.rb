@@ -6,6 +6,8 @@ require 'walrus/grammar'
 module Walrus
   class Grammar
     class RubyDirective < Directive
+      using StringAdditions
+
       # TODO: could make a #rubyecho method that did an "accumulate do" instead
       # of instance_eval
       def compile options = {}

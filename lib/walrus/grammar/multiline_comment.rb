@@ -6,6 +6,8 @@ require 'walrus/grammar/comment'
 module Walrus
   class Grammar
     class MultilineComment < Comment
+      using StringAdditions
+
       # Multiline comments may contain nested Comments/Multiline comments or
       # normal text, so must compile recursively.
       #

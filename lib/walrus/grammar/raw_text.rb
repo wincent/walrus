@@ -2,11 +2,12 @@
 # Licensed under the terms of the BSD 2-clause license.
 
 require 'walrus/grammar'
-require 'walrus/additions/string'
 
 module Walrus
   class Grammar
     class RawText < Walrat::Node
+      using StringAdditions
+
       # Returns a string containing the compiled (Ruby) version of receiver.
       # If options[:slurping] is true, instructs the receiver to strip the
       # leading carriage return/line feed from the @lexeme prior to emitting
