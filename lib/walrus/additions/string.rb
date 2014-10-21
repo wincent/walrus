@@ -8,9 +8,7 @@ class String
     gsub(/[\\']/, '\\\\\&')
   end
 
-  unless instance_methods.any? { |m| m.to_s == 'each' }
-    def each &block
-      each_line &block
-    end
+  def each &block
+    each_line &block
   end
 end # class String
