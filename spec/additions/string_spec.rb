@@ -21,7 +21,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-require File.expand_path('../spec_helper', File.dirname(__FILE__))
+require 'spec_helper'
 
 describe 'converting to source strings' do
   it 'standard strings should be unchanged' do

@@ -20,7 +20,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-require File.expand_path('../spec_helper', File.dirname(__FILE__))
+require 'spec_helper'
 
 describe Walrus::Grammar::EchoDirective do
   class Accumulator
