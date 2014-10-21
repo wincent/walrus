@@ -22,19 +22,19 @@ describe Walrus::Grammar::EscapeSequence do
     it 'should be able to round trip ($)' do
       sequence = Walrus::Grammar::EscapeSequence.new('$')
       @accumulator.instance_eval(sequence.compile)
-      @accumulator.content.should == '$'
+      expect(@accumulator.content).to eq('$')
     end
 
     it 'should be able to round trip (#)' do
       sequence = Walrus::Grammar::EscapeSequence.new('#')
       @accumulator.instance_eval(sequence.compile)
-      @accumulator.content.should == '#'
+      expect(@accumulator.content).to eq('#')
     end
 
     it 'should be able to round trip (\\)' do
       sequence = Walrus::Grammar::EscapeSequence.new('\\')
       @accumulator.instance_eval(sequence.compile)
-      @accumulator.content.should == '\\'
+      expect(@accumulator.content).to eq('\\')
     end
   end
 
@@ -46,19 +46,19 @@ describe Walrus::Grammar::EscapeSequence do
     it 'should be able to round trip' do
       # single $
       Object.class_eval @parser.compile('\\$', :class_name => :EscapeSequenceSpecAlpha)
-      Walrus::Grammar::EscapeSequenceSpecAlpha.new.fill.should == '$'
+      expect(Walrus::Grammar::EscapeSequenceSpecAlpha.new.fill).to eq('$')
 
       # single #
       Object.class_eval @parser.compile('\\#', :class_name => :EscapeSequenceSpecBeta)
-      Walrus::Grammar::EscapeSequenceSpecBeta.new.fill.should == '#'
+      expect(Walrus::Grammar::EscapeSequenceSpecBeta.new.fill).to eq('#')
 
       # single \
       Object.class_eval @parser.compile('\\\\', :class_name => :EscapeSequenceSpecDelta)
-      Walrus::Grammar::EscapeSequenceSpecDelta.new.fill.should == '\\'
+      expect(Walrus::Grammar::EscapeSequenceSpecDelta.new.fill).to eq('\\')
 
       # multiple escape markers
       Object.class_eval @parser.compile('\\\\\\#\\$', :class_name => :EscapeSequenceSpecGamma)
-      Walrus::Grammar::EscapeSequenceSpecGamma.new.fill.should == '\\#$'
+      expect(Walrus::Grammar::EscapeSequenceSpecGamma.new.fill).to eq('\\#$')
     end
   end
 end

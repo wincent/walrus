@@ -43,7 +43,7 @@ describe 'processing multiple-interdependent files with Walrus' do
       base  = base.basename(base.extname).to_s
       actual_output   = IO.read(output_dir + dir + base)
       expected_output = IO.read(path.to_s.sub(/\.tmpl\z/i, ".expected"))
-      actual_output.should == expected_output
+      expect(actual_output).to eq(expected_output)
     end
   end
 end

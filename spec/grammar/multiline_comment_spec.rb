@@ -6,7 +6,7 @@ require 'spec_helper'
 describe Walrus::Grammar::MultilineComment do
   context 'compiling' do
     it 'comments should produce no meaningful output' do
-      eval(Walrus::Grammar::MultilineComment.new(" hello\n   world ").compile).should == nil
+      expect(eval(Walrus::Grammar::MultilineComment.new(" hello\n   world ").compile)).to eq(nil)
     end
   end
 
@@ -18,19 +18,19 @@ describe Walrus::Grammar::MultilineComment do
     it 'should produce no output' do
       # simple multiline comment
       Object.class_eval @parser.compile("#* hello\n   world *#", :class_name => :MultilineCommentSpecAlpha)
-      Walrus::Grammar::MultilineCommentSpecAlpha.new.fill.should == ''
+      expect(Walrus::Grammar::MultilineCommentSpecAlpha.new.fill).to eq('')
 
       # nested singleline comment
       Object.class_eval @parser.compile("#* hello ## <-- first line\n   world *#", :class_name => :MultilineCommentSpecBeta)
-      Walrus::Grammar::MultilineCommentSpecBeta.new.fill.should == ''
+      expect(Walrus::Grammar::MultilineCommentSpecBeta.new.fill).to eq('')
 
       # nested multiline comment
       Object.class_eval @parser.compile("#* hello ## <-- first line\n   world #* <-- second line *# *#", :class_name => :MultilineCommentSpecDelta)
-      Walrus::Grammar::MultilineCommentSpecDelta.new.fill.should == ''
+      expect(Walrus::Grammar::MultilineCommentSpecDelta.new.fill).to eq('')
 
       # multiple comments
       Object.class_eval @parser.compile("#* hello *##* world *#", :class_name => :MultilineCommentSpecGamma)
-      Walrus::Grammar::MultilineCommentSpecGamma.new.fill.should == ''
+      expect(Walrus::Grammar::MultilineCommentSpecGamma.new.fill).to eq('')
     end
   end
 end

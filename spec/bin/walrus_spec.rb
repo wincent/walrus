@@ -44,8 +44,8 @@ describe 'bin/walrus' do
       # fixed in commit a9e4646
       Dir.mkdtemp do
         result = walrus 'compile', 'non-existent-template'
-        result.stderr.should =~ /failed to read input template/
-        result.status.should == Walrus::Exit::READ_ERROR
+        expect(result.stderr).to match(/failed to read input template/)
+        expect(result.status).to eq(Walrus::Exit::READ_ERROR)
       end
     end
 
@@ -53,7 +53,7 @@ describe 'bin/walrus' do
       # fixed in commit 6d23968
       dir = Dir.mkdtemp
       result = walrus 'compile', dir
-      result.should be_success
+      expect(result).to be_success
     end
   end
 end

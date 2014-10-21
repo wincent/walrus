@@ -48,14 +48,14 @@ describe 'processing test files with Walrus' do
 
     it "matches expected output when evaluating dynamically (source file: #{path})" do
       actual_output = template.fill
-      actual_output.should == expected_output
+      expect(actual_output).to eq(expected_output)
     end
 
     it "matches expected output when running compiled file in subshell (source file: #{path})" do
       target_path = manually_compiled_templates.join(path.basename(path.extname).to_s + '.rb')
       File.open(target_path, 'w+') { |file| file.puts compiled }
       actual_output = `ruby -I#{Walrus::SpecHelper::LIBDIR} #{target_path}`
-      actual_output.should == expected_output
+      expect(actual_output).to eq(expected_output)
     end
 
     it "matches expected output when using 'walrus' commandline tool (source file: #{path})" do
@@ -64,7 +64,7 @@ describe 'processing test files with Walrus' do
       dir   = dir.to_s.sub(/\A\//, '') if dir.absolute? # and always will be absolute
       base  = base.basename(base.extname).to_s
       actual_output = IO.read(walrus_compiled_templates + dir + base)
-      actual_output.should == expected_output
+      expect(actual_output).to eq(expected_output)
     end
   end
 end

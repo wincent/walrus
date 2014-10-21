@@ -6,7 +6,7 @@ require 'spec_helper'
 describe Walrus::Grammar::Comment do
   context 'compiled' do
     it 'produces no meaningful output' do
-      eval(Walrus::Grammar::Comment.new(' hello world').compile).should == nil
+      expect(eval(Walrus::Grammar::Comment.new(' hello world').compile)).to eq(nil)
     end
   end
 
@@ -17,7 +17,7 @@ describe Walrus::Grammar::Comment do
 
     it 'produces no output' do
       Object.class_eval @parser.compile('## hello world', :class_name => :CommentSpec)
-      Walrus::Grammar::CommentSpec.new.fill.should == ''
+      expect(Walrus::Grammar::CommentSpec.new.fill).to eq('')
     end
   end
 end

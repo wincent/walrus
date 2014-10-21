@@ -12,7 +12,7 @@ describe Walrus::Grammar::Placeholder do
     it 'should be substituted into the output' do
       Object.class_eval @parser.compile "#set $foo = 'bar'\n$foo",
         :class_name => :PlaceholderSpecAlpha
-      Walrus::Grammar::PlaceholderSpecAlpha.new.fill.should == 'bar'
+      expect(Walrus::Grammar::PlaceholderSpecAlpha.new.fill).to eq('bar')
     end
   end
 
@@ -26,7 +26,7 @@ describe Walrus::Grammar::Placeholder do
 #echo string.downcase
 #end
 $foo("HELLO WORLD")}, :class_name => :PlaceholderSpecBeta
-      Walrus::Grammar::PlaceholderSpecBeta.new.fill.should == "hello world"
+      expect(Walrus::Grammar::PlaceholderSpecBeta.new.fill).to eq("hello world")
     end
   end
 end

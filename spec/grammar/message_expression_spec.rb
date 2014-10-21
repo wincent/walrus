@@ -11,13 +11,13 @@ describe Walrus::Grammar::MessageExpression do
 
     it 'should return the text of the expression only' do
       directive = @parser.parse '#echo string.downcase'
-      directive.column_start.should == 0
-      directive.expression.target.column_start.should == 6
-      directive.expression.message.column_start.should == 13
+      expect(directive.column_start).to eq(0)
+      expect(directive.expression.target.column_start).to eq(6)
+      expect(directive.expression.message.column_start).to eq(13)
 
       pending 'proper boundary detection requires massive changes to the algorithm'
-      directive.expression.column_start.should == 6                 # currently returns: 0
-      directive.expression.source_text.should == 'string.downcase'  # currently returns: #echo string.downcase
+      expect(directive.expression.column_start).to eq(6)                 # currently returns: 0
+      expect(directive.expression.source_text).to eq('string.downcase')  # currently returns: #echo string.downcase
 
     end
   end

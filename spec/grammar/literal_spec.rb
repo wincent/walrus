@@ -9,8 +9,8 @@ describe Walrus::Grammar::DoubleQuotedStringLiteral do
       string = Walrat::StringResult.new('hello world')
       string.source_text = '"hello world"'
       compiled = Walrus::Grammar::DoubleQuotedStringLiteral.new(string).compile
-      compiled.should == '"hello world"'
-      eval(compiled).should == 'hello world'
+      expect(compiled).to eq('"hello world"')
+      expect(eval(compiled)).to eq('hello world')
     end
   end
 end
@@ -21,8 +21,8 @@ describe Walrus::Grammar::SingleQuotedStringLiteral do
       string = Walrat::StringResult.new('hello world')
       string.source_text = "'hello world'"
       compiled = Walrus::Grammar::SingleQuotedStringLiteral.new(string).compile
-      compiled.should == "'hello world'"
-      eval(compiled).should == 'hello world'
+      expect(compiled).to eq("'hello world'")
+      expect(eval(compiled)).to eq('hello world')
     end
   end
 end

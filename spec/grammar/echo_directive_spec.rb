@@ -22,7 +22,7 @@ describe Walrus::Grammar::EchoDirective do
       string.source_text  = "'hello world'"
       @accumulator        = Accumulator.new
       @accumulator.instance_eval(Walrus::Grammar::EchoDirective.new(Walrus::Grammar::SingleQuotedStringLiteral.new(string)).compile)
-      @accumulator.content.should == 'hello world'
+      expect(@accumulator.content).to eq('hello world')
     end
 
     # regression test for inputs that previously raised
@@ -45,13 +45,13 @@ describe Walrus::Grammar::EchoDirective do
     it 'should be able to round trip' do
       # simple example
       Object.class_eval @parser.compile("#echo 'foo'", :class_name => :EchoDirectiveSpecAlpha)
-      Walrus::Grammar::EchoDirectiveSpecAlpha.new.fill.should == 'foo'
+      expect(Walrus::Grammar::EchoDirectiveSpecAlpha.new.fill).to eq('foo')
     end
 
     it 'evaluates multiple expressions, but only accumulates the last' do
       Object.class_eval @parser.compile("#echo @foo = 1 + 2; @foo = @foo + 3; @foo",
                            :class_name => :EchoDirectiveSpecBeta)
-      Walrus::Grammar::EchoDirectiveSpecBeta.new.fill.should == '6'
+      expect(Walrus::Grammar::EchoDirectiveSpecBeta.new.fill).to eq('6')
     end
 
     it 'evaluates multiple expressions in the same context' do
@@ -59,7 +59,7 @@ describe Walrus::Grammar::EchoDirective do
       # list and accessed by others in the list
       Object.class_eval @parser.compile("#echo foo = 1 + 2; foo = foo + 3; foo",
                            :class_name => :EchoDirectiveSpecDelta)
-      Walrus::Grammar::EchoDirectiveSpecDelta.new.fill.should == '6'
+      expect(Walrus::Grammar::EchoDirectiveSpecDelta.new.fill).to eq('6')
     end
   end
 end

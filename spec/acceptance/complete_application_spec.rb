@@ -55,7 +55,7 @@ describe 'processing a complete set of application documentation' do
         end
 
         it 'succeeds' do
-          @result.should be_success
+          expect(@result).to be_success
         end
       end
     end
@@ -77,7 +77,7 @@ describe 'processing a complete set of application documentation' do
 
           it 'succeeds' do
             puts @result.stderr unless @result.success? # for debugging
-            @result.should be_success
+            expect(@result).to be_success
           end
         end
 
@@ -91,11 +91,11 @@ describe 'processing a complete set of application documentation' do
 
           it 'succeeds' do
             puts @result.stderr unless @result.success? # for debugging
-            @result.should be_success
+            expect(@result).to be_success
           end
 
           it 'writes to the output file' do
-            @output_file.should exist
+            expect(@output_file).to exist
           end
 
           it 'produces matching output' do
@@ -105,7 +105,7 @@ describe 'processing a complete set of application documentation' do
               @output_file.to_s, '\;'
             actual_output = tidied_output.read
             expected_output = t.sub(/\.tmpl\z/, '.app.html').read
-            actual_output.should == expected_output
+            expect(actual_output).to eq(expected_output)
           end
         end
       end
@@ -128,7 +128,7 @@ describe 'processing a complete set of application documentation' do
 
           it 'succeeds' do
             puts @result.stderr unless @result.success? # for debugging
-            @result.should be_success
+            expect(@result).to be_success
           end
         end
 
@@ -143,11 +143,11 @@ describe 'processing a complete set of application documentation' do
 
           it 'succeeds' do
             puts @result.stderr unless @result.success? # for debugging
-            @result.should be_success
+            expect(@result).to be_success
           end
 
           it 'writes to the output file' do
-            @output_file.should exist
+            expect(@output_file).to exist
           end
 
           it 'produces matching output' do
@@ -157,7 +157,7 @@ describe 'processing a complete set of application documentation' do
               @output_file.to_s, '\;'
             actual_output = tidied_output.read
             expected_output = t.sub(/\.tmpl\z/, '.web.html').read
-            actual_output.should == expected_output
+            expect(actual_output).to eq(expected_output)
           end
         end
       end

@@ -20,7 +20,7 @@ describe Walrus::Grammar::RawText do
       @accumulator  = Accumulator.new
       @raw_text     = Walrus::Grammar::RawText.new('hello \'world\'\\... €')
       @accumulator.instance_eval(@raw_text.compile)
-      @accumulator.content.should == 'hello \'world\'\\... €'
+      expect(@accumulator.content).to eq('hello \'world\'\\... €')
     end
   end
 
@@ -32,15 +32,15 @@ describe Walrus::Grammar::RawText do
     it 'should be able to round trip' do
       # simple example
       Object.class_eval @parser.compile('hello world', :class_name => :RawTextSpecAlpha)
-      Walrus::Grammar::RawTextSpecAlpha.new.fill.should == 'hello world'
+      expect(Walrus::Grammar::RawTextSpecAlpha.new.fill).to eq('hello world')
 
       # containing single quotes
       Object.class_eval @parser.compile("hello 'world'", :class_name => :RawTextSpecBeta)
-      Walrus::Grammar::RawTextSpecBeta.new.fill.should == "hello 'world'"
+      expect(Walrus::Grammar::RawTextSpecBeta.new.fill).to eq("hello 'world'")
 
       # containing a newline
       Object.class_eval @parser.compile("hello\nworld", :class_name => :RawTextSpecDelta)
-      Walrus::Grammar::RawTextSpecDelta.new.fill.should == "hello\nworld"
+      expect(Walrus::Grammar::RawTextSpecDelta.new.fill).to eq("hello\nworld")
     end
   end
 end

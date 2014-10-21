@@ -26,6 +26,6 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'walrat', '0.2'
   s.add_development_dependency 'wopen3', '>= 0.3'
   s.add_development_dependency 'mkdtemp', '>= 1.0'
-  s.add_development_dependency 'rspec', '1.3.0'
+  s.add_development_dependency 'rspec', '~> 3.1.0'
   s.add_development_dependency 'yard'
 end

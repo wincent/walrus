@@ -13,23 +13,23 @@ describe Walrus::Compiler do
     # the line
     Object.class_eval @parser.compile "## hello world\nhere's some raw text",
       :class_name => :CompilerSpecAlpha
-    Walrus::Grammar::CompilerSpecAlpha.new.fill.should == "here's some raw text"
+    expect(Walrus::Grammar::CompilerSpecAlpha.new.fill).to eq("here's some raw text")
   end
 
   it 'compiles raw text followed by a comment' do
     # on the same line (note that trailing newline is not eaten)
     Object.class_eval @parser.compile "here's some raw text## hello world\n",
       :class_name => :CompilerSpecBeta
-    Walrus::Grammar::CompilerSpecBeta.new.fill.should == "here's some raw text\n"
+    expect(Walrus::Grammar::CompilerSpecBeta.new.fill).to eq("here's some raw text\n")
 
     # on two separate lines (note that second trailing newline gets eaten)
     Object.class_eval @parser.compile "here's some raw text\n## hello world\n",
       :class_name => :CompilerSpecDelta
-    Walrus::Grammar::CompilerSpecDelta.new.fill.should == "here's some raw text\n"
+    expect(Walrus::Grammar::CompilerSpecDelta.new.fill).to eq("here's some raw text\n")
 
     # same but with no trailing newline
     Object.class_eval @parser.compile "here's some raw text\n## hello world",
       :class_name => :CompilerSpecGamma
-    Walrus::Grammar::CompilerSpecGamma.new.fill.should == "here's some raw text\n"
+    expect(Walrus::Grammar::CompilerSpecGamma.new.fill).to eq("here's some raw text\n")
   end
 end

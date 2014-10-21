@@ -12,7 +12,7 @@ describe Walrus::Grammar::SilentDirective do
     it 'produces no output' do
       Object.class_eval @parser.compile "#silent 'foo'",
         :class_name => :SilentDirectiveSpecAlpha
-      Walrus::Grammar::SilentDirectiveSpecAlpha.new.fill.should == ''
+      expect(Walrus::Grammar::SilentDirectiveSpecAlpha.new.fill).to eq('')
     end
   end
 end
