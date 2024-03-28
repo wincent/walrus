@@ -1,6 +1,6 @@
 [submodule "spec/acceptance/complete_application/buildtools"]
 	path = spec/acceptance/complete_application/buildtools
-	url = git://git.wincent.com/buildtools.git
+	url = git://git.wincent.dev/buildtools.git
 [submodule "vendor/walrat"]
 	path = vendor/walrat
-	url = git://git.wincent.com/walrat.git
+	url = git://git.wincent.dev/walrat.git

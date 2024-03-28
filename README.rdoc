@@ -20,19 +20,11 @@ templates either individually or in batches.
 
 = Website
 
-https://wincent.com/products/walrus
+https://wincent.dev/products/walrus
 
 = Source code
 
-http://git.wincent.com/walrus.git
-
-= Donations
-
-Walrus is free, open source software released under the BSD license. If you
-find it useful and would like to support further development you can make a
-donation via PayPal to win@wincent.com:
-
-https://wincent.com/products/walrus/donations
+https://github.com/wincent/walrus
 
 = Author
 
